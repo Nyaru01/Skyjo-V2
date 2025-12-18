@@ -29,37 +29,11 @@ const checkGameOver = (totals, threshold) => {
 export const useGameStore = create(
     persist(
         (set, get) => ({
-            // MOCK DATA FOR TESTING - Remove after testing!
-            players: [
-                { id: 'test-p1', name: 'Alice' },
-                { id: 'test-p2', name: 'Bob' },
-                { id: 'test-p3', name: 'Charlie' }
-            ],
+            // Initial clean state
+            players: [],
             threshold: 100,
-            rounds: [
-                {
-                    id: 'r1',
-                    rawScores: { 'test-p1': 12, 'test-p2': 25, 'test-p3': -5 },
-                    scores: { 'test-p1': 12, 'test-p2': 25, 'test-p3': -5 },
-                    finisherId: 'test-p3',
-                    isStrictlyLowest: true
-                },
-                {
-                    id: 'r2',
-                    rawScores: { 'test-p1': 8, 'test-p2': 15, 'test-p3': 20 },
-                    scores: { 'test-p1': 8, 'test-p2': 15, 'test-p3': 40 }, // doubled because not lowest
-                    finisherId: 'test-p3',
-                    isStrictlyLowest: false
-                },
-                {
-                    id: 'r3',
-                    rawScores: { 'test-p1': -2, 'test-p2': 0, 'test-p3': 10 },
-                    scores: { 'test-p1': -2, 'test-p2': 0, 'test-p3': 10 },
-                    finisherId: 'test-p1',
-                    isStrictlyLowest: true
-                }
-            ],
-            gameStatus: 'PLAYING', // Start in PLAYING mode with mock data
+            rounds: [],
+            gameStatus: 'SETUP',
 
             setConfiguration: (names, threshold) => {
                 const players = names.map((name, index) => ({
