@@ -41,8 +41,8 @@ const PlayerHand = memo(function PlayerHand({
             className={cn(
                 "relative p-3 rounded-2xl transition-all duration-300",
                 isCurrentPlayer
-                    ? "bg-gradient-to-br from-emerald-100/80 to-teal-100/80 dark:from-emerald-900/40 dark:to-teal-900/40 ring-2 ring-emerald-400 shadow-lg shadow-emerald-500/20"
-                    : "bg-white/50 dark:bg-slate-800/50",
+                    ? "bg-gradient-to-br from-emerald-200/90 to-teal-200/90 dark:from-emerald-800/60 dark:to-teal-800/60 ring-4 ring-emerald-400 shadow-xl shadow-emerald-500/40"
+                    : "bg-slate-100/50 dark:bg-slate-800/30",
                 isLocalPlayer && "border-2 border-amber-400"
             )}
         >

@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SkyjoCard from './SkyjoCard';
 import { cn } from '../../lib/utils';
@@ -17,7 +17,24 @@ const DrawDiscard = memo(function DrawDiscard({
     onDrawClick,
     onDiscardClick,
     onDiscardDrawnCard, // Handler for discarding the drawn card
+    lastDiscardedCard = null, // New: card that was just discarded (for animation)
 }) {
+    // Track animation state for new discard
+    const [showNewDiscardGlow, setShowNewDiscardGlow] = useState(false);
+    const [discardKey, setDiscardKey] = useState(0);
+
+    // Trigger animation when lastDiscardedCard changes
+    useEffect(() => {
+        if (lastDiscardedCard) {
+            setShowNewDiscardGlow(true);
+            setDiscardKey(prev => prev + 1);
+            const timer = setTimeout(() => {
+                setShowNewDiscardGlow(false);
+            }, 1500); // Glow lasts 1.5 seconds
+            return () => clearTimeout(timer);
+        }
+    }, [lastDiscardedCard]);
+
     return (
         <div className="flex items-center justify-center gap-8 py-4">
             {/* Draw Pile */}
@@ -93,12 +110,33 @@ const DrawDiscard = memo(function DrawDiscard({
                     whileTap={(canTakeDiscard || canDiscardDrawn) ? { scale: 0.95 } : undefined}
                 >
                     {discardTop ? (
-                        <div className={cn(
-                            "rounded-xl",
-                            canTakeDiscard && "ring-2 ring-blue-400 animate-pulse",
-                            canDiscardDrawn && "ring-2 ring-orange-400 animate-pulse"
-                        )}>
-                            <SkyjoCard card={discardTop} size="md" />
+                        <div className="relative">
+                            {/* Glow effect for newly discarded card */}
+                            <AnimatePresence>
+                                {showNewDiscardGlow && (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1.2 }}
+                                        exit={{ opacity: 0, scale: 1.4 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="absolute inset-0 bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 rounded-xl blur-lg -z-10"
+                                    />
+                                )}
+                            </AnimatePresence>
+
+                            <motion.div
+                                key={discardKey}
+                                initial={discardKey > 0 ? { scale: 1.3, opacity: 0 } : false}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                                className={cn(
+                                    "rounded-xl",
+                                    canTakeDiscard && "ring-2 ring-blue-400 animate-pulse",
+                                    canDiscardDrawn && "ring-2 ring-orange-400 animate-pulse"
+                                )}
+                            >
+                                <SkyjoCard card={discardTop} size="md" />
+                            </motion.div>
                         </div>
                     ) : (
                         <div className={cn(
@@ -127,3 +165,4 @@ const DrawDiscard = memo(function DrawDiscard({
 });
 
 export default DrawDiscard;
+

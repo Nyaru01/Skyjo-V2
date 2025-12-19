@@ -160,19 +160,9 @@ export const revealInitialCards = (gameState, playerIndex, cardIndices) => {
 
         newState.phase = 'PLAYING';
         newState.currentPlayerIndex = startingPlayer;
-    } else {
-        // Move to next player who hasn't revealed their cards yet
-        let nextPlayerIndex = (playerIndex + 1) % newState.players.length;
-        while (nextPlayerIndex !== playerIndex) {
-            const nextPlayer = newState.players[nextPlayerIndex];
-            const revealedCount = nextPlayer.hand.filter(c => c.isRevealed).length;
-            if (revealedCount < 2) {
-                break;
-            }
-            nextPlayerIndex = (nextPlayerIndex + 1) % newState.players.length;
-        }
-        newState.currentPlayerIndex = nextPlayerIndex;
     }
+    // For simultaneous reveal: don't change currentPlayerIndex until all reveal
+    // Each player can reveal independently
 
     return newState;
 };
