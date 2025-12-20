@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Archive, Trophy, Calendar, Users, ChevronRight, Trash2, ArrowLeft } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Archive, Trophy, Calendar, Users, ChevronRight, Trash2, ArrowLeft, Download, Upload } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore, selectGameHistory } from '../store/gameStore';
 import { Card, CardContent } from './ui/Card';
@@ -140,6 +140,55 @@ function PastGameDetail({ game, onBack }) {
 export default function GameHistory() {
     const gameHistory = useGameStore(selectGameHistory);
     const [selectedGame, setSelectedGame] = useState(null);
+    const fileInputRef = useRef(null);
+
+    // Export game history to JSON file
+    const handleExport = () => {
+        const exportData = {
+            version: 1,
+            exportDate: new Date().toISOString(),
+            gameHistory: gameHistory
+        };
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `skyjo-parties-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    // Import game history from JSON file
+    const handleImport = (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data.gameHistory && Array.isArray(data.gameHistory)) {
+                    // Merge with existing history
+                    const existingIds = new Set(gameHistory.map(g => g.id));
+                    const newGames = data.gameHistory.filter(g => !existingIds.has(g.id));
+                    if (newGames.length > 0) {
+                        useGameStore.setState(state => ({
+                            gameHistory: [...newGames, ...state.gameHistory].slice(0, 50)
+                        }));
+                        alert(`${newGames.length} partie(s) importée(s) !`);
+                    } else {
+                        alert('Toutes les parties sont déjà présentes.');
+                    }
+                } else {
+                    alert('Format de fichier invalide.');
+                }
+            } catch (err) {
+                alert('Erreur lors de la lecture du fichier.');
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = ''; // Reset input
+    };
 
     if (selectedGame) {
         return (
@@ -152,10 +201,40 @@ export default function GameHistory() {
 
     return (
         <div className="space-y-4">
-            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                <Archive className="h-5 w-5 text-teal-600 dark:text-teal-400" />
-                Parties terminées
-            </h2>
+            <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                    <Archive className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                    Parties terminées
+                </h2>
+                <div className="flex gap-2">
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        accept=".json"
+                        onChange={handleImport}
+                        className="hidden"
+                    />
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="text-slate-500 hover:text-teal-600 dark:text-slate-400 dark:hover:text-teal-400"
+                        title="Importer"
+                    >
+                        <Upload className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleExport}
+                        disabled={gameHistory.length === 0}
+                        className="text-slate-500 hover:text-teal-600 dark:text-slate-400 dark:hover:text-teal-400 disabled:opacity-30"
+                        title="Exporter"
+                    >
+                        <Download className="h-4 w-4" />
+                    </Button>
+                </div>
+            </div>
 
             {gameHistory.length === 0 ? (
                 <Card className="glass-premium dark:glass-dark">

@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
-import { Trophy, TrendingUp, Target, Award, Zap, Crown, Flame, Users } from 'lucide-react';
+import { useMemo, useRef } from 'react';
+import { Trophy, TrendingUp, Target, Award, Zap, Crown, Flame, Users, Download, Upload } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useGameStore, selectGameHistory } from '../store/gameStore';
 import { Card, CardContent } from './ui/Card';
+import { Button } from './ui/Button';
 import { cn } from '../lib/utils';
 
 // Palette de couleurs pour les joueurs
@@ -98,6 +99,54 @@ function LeaderboardItem({ player, rank, wins, avgScore, colorIndex }) {
 
 export default function Stats() {
     const gameHistory = useGameStore(selectGameHistory);
+    const fileInputRef = useRef(null);
+
+    // Export game history to JSON file
+    const handleExport = () => {
+        const exportData = {
+            version: 1,
+            exportDate: new Date().toISOString(),
+            gameHistory: gameHistory
+        };
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `skyjo-stats-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    // Import game history from JSON file
+    const handleImport = (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data.gameHistory && Array.isArray(data.gameHistory)) {
+                    const existingIds = new Set(gameHistory.map(g => g.id));
+                    const newGames = data.gameHistory.filter(g => !existingIds.has(g.id));
+                    if (newGames.length > 0) {
+                        useGameStore.setState(state => ({
+                            gameHistory: [...newGames, ...state.gameHistory].slice(0, 50)
+                        }));
+                        alert(`${newGames.length} partie(s) importée(s) !`);
+                    } else {
+                        alert('Toutes les parties sont déjà présentes.');
+                    }
+                } else {
+                    alert('Format de fichier invalide.');
+                }
+            } catch (err) {
+                alert('Erreur lors de la lecture du fichier.');
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    };
 
     // Calculer toutes les statistiques
     const stats = useMemo(() => {
@@ -216,15 +265,44 @@ export default function Stats() {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 shadow-glow-emerald">
-                    <TrendingUp className="h-6 w-6 text-white" />
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 shadow-glow-emerald">
+                        <TrendingUp className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                        <h2 className="text-xl font-black text-slate-800 dark:text-slate-100">Statistiques</h2>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                            {stats.totalGames} partie{stats.totalGames > 1 ? 's' : ''} jouée{stats.totalGames > 1 ? 's' : ''}
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <h2 className="text-xl font-black text-slate-800 dark:text-slate-100">Statistiques</h2>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                        {stats.totalGames} partie{stats.totalGames > 1 ? 's' : ''} jouée{stats.totalGames > 1 ? 's' : ''}
-                    </p>
+                <div className="flex gap-2">
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        accept=".json"
+                        onChange={handleImport}
+                        className="hidden"
+                    />
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400"
+                        title="Importer"
+                    >
+                        <Upload className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleExport}
+                        className="text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400"
+                        title="Exporter"
+                    >
+                        <Download className="h-4 w-4" />
+                    </Button>
                 </div>
             </div>
 
