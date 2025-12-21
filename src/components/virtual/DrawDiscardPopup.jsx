@@ -52,12 +52,12 @@ const DrawDiscardPopup = memo(function DrawDiscardPopup({
                     className="fixed inset-0 z-50 flex items-center justify-center"
                     onClick={onClose}
                 >
-                    {/* Blur backdrop */}
+                    {/* Blur backdrop - lighter for better visibility of background cards */}
                     <div
-                        className="absolute inset-0 bg-black/60"
+                        className="absolute inset-0 bg-black/20"
                         style={{
-                            backdropFilter: 'blur(12px)',
-                            WebkitBackdropFilter: 'blur(12px)',
+                            backdropFilter: 'blur(3px)',
+                            WebkitBackdropFilter: 'blur(3px)',
                         }}
                     />
 

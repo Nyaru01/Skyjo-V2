@@ -27,7 +27,7 @@ export default function GameSetup({ onNavigate }) {
         { name: '', emoji: '🐱' },
         { name: '', emoji: '🐶' }
     ]);
-    const [threshold, setThreshold] = useState(100);
+    // const [threshold, setThreshold] = useState(100); // Removed as per request
     const [openEmojiPicker, setOpenEmojiPicker] = useState(null);
     const setConfiguration = useGameStore(state => state.setConfiguration);
     const { playStart } = useFeedback();
@@ -66,7 +66,7 @@ export default function GameSetup({ onNavigate }) {
             emoji: p.emoji
         }));
         playStart();
-        setConfiguration(finalPlayers, threshold);
+        setConfiguration(finalPlayers, 100); // Default threshold 100
     };
 
     // Récupérer le joueur pour lequel le picker est ouvert
@@ -163,23 +163,7 @@ export default function GameSetup({ onNavigate }) {
                 </CardContent>
             </Card>
 
-            {/* Carte Seuil */}
-            <Card className="glass-premium dark:glass-dark shadow-xl">
-                <CardContent className="py-3 px-4">
-                    <div className="flex items-center gap-4">
-                        <div className="flex-1">
-                            <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">🎯 Seuil de fin</span>
-                            <p className="text-xs text-slate-600 dark:text-slate-400">Fin quand un joueur atteint ce score</p>
-                        </div>
-                        <Input
-                            type="number"
-                            value={threshold}
-                            onChange={(e) => setThreshold(Number(e.target.value) || 100)}
-                            className="w-24 text-xl font-bold text-center bg-white/90 dark:bg-white/10 border-slate-300 dark:border-white/20 focus:bg-white dark:focus:bg-white/20 focus:border-emerald-400 shadow-sm h-11 text-slate-900 dark:text-white"
-                        />
-                    </div>
-                </CardContent>
-            </Card>
+            {/* Carte Seuil REMOVED */}
 
             {/* Bouton Démarrer */}
             <Button
