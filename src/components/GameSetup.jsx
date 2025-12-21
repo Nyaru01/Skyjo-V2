@@ -75,26 +75,30 @@ export default function GameSetup({ onNavigate }) {
     return (
         <div className="max-w-md mx-auto p-3 space-y-3 animate-in fade-in zoom-in duration-300 h-[calc(100vh-6rem)] flex flex-col justify-center">
             {/* Header Premium */}
-            <div className="text-center glass-premium dark:glass-dark p-4 rounded-2xl shadow-xl relative overflow-hidden">
-                <div className="absolute inset-0 animate-shimmer opacity-20 pointer-events-none" />
-                <div className="relative z-10 flex items-center justify-center gap-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg animate-float overflow-hidden bg-slate-900 border border-skyjo-blue/30">
+            {/* Header Premium - Uniformisé avec le bouton Virtuel */}
+            <div className="w-full relative overflow-hidden rounded-2xl">
+                {/* Halo Blanc Léger Permanent */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/5 to-white/10 animate-pulse-slow blur-xl opacity-30" />
+
+                <div className="relative p-6 rounded-2xl glass-premium dark:glass-dark border border-skyjo-blue/30 flex items-center gap-6 shadow-[0_0_15px_rgba(255,255,255,0.15)]">
+                    <div className="w-20 h-20 rounded-xl flex items-center justify-center shadow-lg overflow-hidden border border-white/20 bg-slate-900 shrink-0">
                         <img
                             src="/logo.jpg"
                             alt="Skyjo Logo"
                             className="w-full h-full object-cover"
                         />
                     </div>
-                    <div className="text-left">
+                    <div className="text-left flex-1">
                         <h1 className="text-2xl font-extrabold text-skyjo-blue drops-shadow-sm dark:text-sky-300">
                             Skyjo Score
                         </h1>
-                        <p className="text-slate-700 dark:text-slate-300 font-medium text-sm">Compteur de points</p>
+                        <p className="text-slate-400 font-medium text-sm mt-1">Compteur de points</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-500 mt-2 flex items-center gap-1">
+                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Pour vos vraies parties
+                        </p>
                     </div>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                    🃏 Pour jouer avec vos vraies cartes
-                </p>
             </div>
 
             {/* Carte Joueurs */}
@@ -119,8 +123,8 @@ export default function GameSetup({ onNavigate }) {
                                     type="button"
                                     onClick={() => setOpenEmojiPicker(openEmojiPicker === index ? null : index)}
                                     className={cn(
-                                        "w-9 h-9 rounded-lg flex items-center justify-center text-lg shadow-sm transition-all hover:scale-110",
-                                        color.bg
+                                        "w-9 h-9 rounded-lg flex items-center justify-center text-lg shadow-lg transition-all hover:scale-110 border border-white/10",
+                                        "bg-skyjo-blue text-white shadow-skyjo-blue/30"
                                     )}
                                 >
                                     {player.emoji}
@@ -190,21 +194,24 @@ export default function GameSetup({ onNavigate }) {
 
             <button
                 onClick={() => onNavigate?.('virtual')}
-                className="w-full p-4 rounded-2xl glass-premium dark:glass-dark border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 transition-all group cursor-pointer"
+                className="w-full relative group cursor-pointer overflow-hidden rounded-2xl transition-all hover:scale-[1.02]"
             >
-                <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform overflow-hidden border border-purple-500/30 bg-slate-900">
+                {/* Halo Blanc Scintillant */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/10 via-white/5 to-white/10 animate-pulse-slow blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                <div className="relative p-6 rounded-2xl glass-premium dark:glass-dark border border-purple-200/50 dark:border-purple-700/50 hover:border-white/40 transition-all flex items-center gap-6 shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:shadow-[0_0_25px_rgba(255,255,255,0.3)]">
+                    <div className="w-20 h-20 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform overflow-hidden border border-white/20 bg-slate-900 shrink-0">
                         <img
-                            src="/logo.jpg"
-                            alt="Play"
+                            src="/virtual-logo.jpg"
+                            alt="Skyjo Virtual"
                             className="w-full h-full object-cover"
                         />
                     </div>
                     <div className="text-left flex-1">
-                        <p className="font-bold" style={{ color: '#e2e8f0' }}>Jouer en virtuel</p>
-                        <p className="text-xs" style={{ color: '#94a3b8' }}>Mode local ou en ligne</p>
+                        <p className="font-extrabold text-xl bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">Jouer en virtuel</p>
+                        <p className="text-sm text-slate-400 mt-1">Mode local ou en ligne</p>
                     </div>
-                    <span className="text-purple-500 dark:text-purple-400 text-lg">→</span>
+                    <span className="text-white/80 text-2xl group-hover:translate-x-1 transition-transform">→</span>
                 </div>
             </button>
 
