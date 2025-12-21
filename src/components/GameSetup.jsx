@@ -81,11 +81,11 @@ export default function GameSetup({ onNavigate }) {
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/5 to-white/10 animate-pulse-slow blur-xl opacity-30" />
 
                 <div className="relative p-6 rounded-2xl glass-premium dark:glass-dark border border-skyjo-blue/30 flex items-center gap-6 shadow-[0_0_15px_rgba(255,255,255,0.15)]">
-                    <div className="w-20 h-20 rounded-xl flex items-center justify-center shadow-lg overflow-hidden border border-white/20 bg-slate-900 shrink-0">
+                    <div className="w-20 h-20 rounded-3xl flex items-center justify-center shadow-lg overflow-hidden border border-white/20 bg-slate-900 shrink-0">
                         <img
                             src="/logo.jpg"
                             alt="Skyjo Logo"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover scale-110"
                         />
                     </div>
                     <div className="text-left flex-1">
@@ -94,7 +94,7 @@ export default function GameSetup({ onNavigate }) {
                         </h1>
                         <p className="text-slate-400 font-medium text-sm mt-1">Compteur de points</p>
                         <p className="text-xs text-slate-500 dark:text-slate-500 mt-2 flex items-center gap-1">
-                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-skyjo-blue animate-pulse"></span>
                             Pour vos vraies parties
                         </p>
                     </div>
@@ -200,11 +200,11 @@ export default function GameSetup({ onNavigate }) {
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/10 via-white/5 to-white/10 animate-pulse-slow blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
 
                 <div className="relative p-6 rounded-2xl glass-premium dark:glass-dark border border-purple-200/50 dark:border-purple-700/50 hover:border-white/40 transition-all flex items-center gap-6 shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:shadow-[0_0_25px_rgba(255,255,255,0.3)]">
-                    <div className="w-20 h-20 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform overflow-hidden border border-white/20 bg-slate-900 shrink-0">
+                    <div className="w-20 h-20 rounded-3xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform overflow-hidden border border-white/20 bg-slate-900 shrink-0">
                         <img
                             src="/virtual-logo.jpg"
                             alt="Skyjo Virtual"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover scale-110"
                         />
                     </div>
                     <div className="text-left flex-1">

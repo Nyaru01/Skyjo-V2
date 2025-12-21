@@ -29,7 +29,7 @@ const cardVariants = {
 };
 
 // Stat Card Component
-function StatCard({ icon: Icon, title, value, subtitle, colorClass = 'text-emerald-500', index }) {
+function StatCard({ icon: Icon, title, value, subtitle, colorClass = 'text-skyjo-blue', index }) {
     return (
         <motion.div
             custom={index}
@@ -267,7 +267,7 @@ export default function Stats() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 shadow-glow-emerald">
+                    <div className="p-2 rounded-xl bg-skyjo-blue shadow-[0_0_15px_rgba(26,72,105,0.4)]">
                         <TrendingUp className="h-6 w-6 text-white" />
                     </div>
                     <div>
@@ -289,7 +289,7 @@ export default function Stats() {
                         variant="ghost"
                         size="sm"
                         onClick={() => fileInputRef.current?.click()}
-                        className="text-slate-400 hover:text-emerald-400"
+                        className="text-slate-400 hover:text-skyjo-blue"
                         title="Importer"
                     >
                         <Upload className="h-4 w-4" />
@@ -298,7 +298,7 @@ export default function Stats() {
                         variant="ghost"
                         size="sm"
                         onClick={handleExport}
-                        className="text-slate-400 hover:text-emerald-400"
+                        className="text-slate-400 hover:text-skyjo-blue"
                         title="Exporter"
                     >
                         <Download className="h-4 w-4" />
@@ -330,7 +330,7 @@ export default function Stats() {
                         title="Meilleur score manche"
                         value={stats.records.bestRound}
                         subtitle={stats.records.bestRoundPlayer?.name}
-                        colorClass="text-emerald-600"
+                        colorClass="text-skyjo-blue"
                         index={2}
                     />
                 )}
@@ -373,7 +373,7 @@ export default function Stats() {
                 <Card className="glass-premium shadow-lg">
                     <div className="p-4 border-b border-white/10">
                         <h3 className="font-bold text-slate-100 flex items-center gap-2">
-                            <Users className="h-5 w-5 text-teal-500" />
+                            <Users className="h-5 w-5 text-skyjo-blue" />
                             Détails par joueur
                         </h3>
                     </div>
@@ -404,7 +404,7 @@ export default function Stats() {
                                                 <td className="py-2 text-center">
                                                     <span className={cn(
                                                         "font-bold",
-                                                        player.winRate >= 50 ? "text-emerald-600 dark:text-emerald-400" : "text-slate-600 dark:text-slate-400"
+                                                        player.winRate >= 50 ? "text-skyjo-blue dark:text-sky-400" : "text-slate-600 dark:text-slate-400"
                                                     )}>
                                                         {player.winRate.toFixed(0)}%
                                                     </span>
@@ -416,7 +416,7 @@ export default function Stats() {
                                                     <span className={cn(
                                                         "text-xs px-2 py-0.5 rounded-full font-medium",
                                                         player.finishSuccessRate >= 70
-                                                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300"
+                                                            ? "bg-sky-100 text-skyjo-blue dark:bg-sky-900 dark:text-sky-300"
                                                             : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
                                                     )}>
                                                         {player.finishSuccessRate.toFixed(0)}%

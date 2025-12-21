@@ -368,7 +368,7 @@ export default function VirtualGame() {
                                 <img
                                     src="/logo.jpg"
                                     alt="Skyjo Logo"
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-cover scale-110"
                                 />
                             </div>
                         </div>

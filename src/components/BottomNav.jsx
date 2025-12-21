@@ -34,24 +34,24 @@ export default function BottomNav({ activeTab, onTabChange }) {
                             onClick={() => !isDisabled && onTabChange(tab.id)}
                             className={cn(
                                 "relative flex-1 flex flex-col items-center justify-center h-full space-y-0.5 transition-all duration-300 active:scale-95",
-                                isActive ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300",
+                                isActive ? "text-skyjo-blue dark:text-blue-400" : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300",
                                 isDisabled && "opacity-40 cursor-not-allowed"
                             )}
                         >
                             {/* Indicateur supérieur */}
                             {isActive && (
-                                <span className="absolute top-0 w-8 h-1 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-b-lg shadow-glow-emerald" />
+                                <span className="absolute top-0 w-8 h-1 bg-gradient-to-r from-skyjo-blue to-sky-500 rounded-b-lg shadow-[0_0_10px_rgba(26,72,105,0.4)]" />
                             )}
                             <Icon
                                 className={cn(
                                     "h-5 w-5 transition-all duration-300 relative z-10",
-                                    isActive && "stroke-emerald-600 dark:stroke-emerald-400 drop-shadow-sm"
+                                    isActive && "stroke-skyjo-blue dark:stroke-blue-400 drop-shadow-sm"
                                 )}
                                 strokeWidth={isActive ? 2.5 : 2}
                             />
                             <span className={cn(
                                 "text-[9px] font-bold tracking-wide transition-colors relative z-10",
-                                isActive ? "text-emerald-700 dark:text-emerald-400" : "text-slate-400 dark:text-slate-500"
+                                isActive ? "text-skyjo-blue dark:text-blue-400" : "text-slate-400 dark:text-slate-500"
                             )}>
                                 {tab.label.toUpperCase()}
                             </span>

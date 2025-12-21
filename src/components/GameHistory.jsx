@@ -60,8 +60,8 @@ function PastGameDetail({ game, onBack }) {
 
             {/* Game Info Card */}
             <Card className="glass-premium dark:glass-dark shadow-lg overflow-hidden">
-                <div className="bg-gradient-to-br from-emerald-500 via-teal-500 to-emerald-600 p-6 text-white">
-                    <div className="flex items-center gap-2 text-emerald-100 text-sm mb-2">
+                <div className="bg-gradient-to-br from-skyjo-blue via-sky-600 to-skyjo-blue p-6 text-white">
+                    <div className="flex items-center gap-2 text-sky-100 text-sm mb-2">
                         <Calendar className="h-4 w-4" />
                         {formatDate(game.date)}
                     </div>
@@ -70,7 +70,7 @@ function PastGameDetail({ game, onBack }) {
                             <Trophy className="h-6 w-6 text-yellow-300" />
                         </div>
                         <div>
-                            <div className="text-sm text-emerald-100">Gagnant</div>
+                            <div className="text-sm text-sky-100">Gagnant</div>
                             <div className="text-2xl font-bold">{game.winner.name}</div>
                         </div>
                         <div className="ml-auto text-4xl font-black">{game.winner.score}</div>
@@ -90,7 +90,7 @@ function PastGameDetail({ game, onBack }) {
                                     key={player.id}
                                     className={cn(
                                         "flex items-center justify-between p-3 rounded-lg border",
-                                        index === 0 ? "bg-emerald-50 dark:bg-emerald-900/40 border-emerald-200 dark:border-emerald-700" :
+                                        index === 0 ? "bg-sky-50 dark:bg-sky-900/40 border-sky-200 dark:border-sky-700" :
                                             index === 1 ? "bg-slate-50 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600" :
                                                 index === 2 ? "bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-700" :
                                                     "bg-white dark:bg-slate-700/30 border-slate-100 dark:border-slate-600"
@@ -99,7 +99,7 @@ function PastGameDetail({ game, onBack }) {
                                     <div className="flex items-center gap-3">
                                         <span className={cn(
                                             "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold",
-                                            index === 0 ? "bg-emerald-500 text-white" :
+                                            index === 0 ? "bg-skyjo-blue text-white" :
                                                 index === 1 ? "bg-slate-400 text-white" :
                                                     index === 2 ? "bg-amber-500 text-white" :
                                                         "bg-slate-200 text-slate-600"
@@ -203,7 +203,7 @@ export default function GameHistory() {
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                    <Archive className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                    <Archive className="h-5 w-5 text-skyjo-blue dark:text-blue-400" />
                     Parties terminées
                 </h2>
                 <div className="flex gap-2">
@@ -218,7 +218,7 @@ export default function GameHistory() {
                         variant="ghost"
                         size="sm"
                         onClick={() => fileInputRef.current?.click()}
-                        className="text-slate-500 hover:text-teal-600 dark:text-slate-400 dark:hover:text-teal-400"
+                        className="text-slate-500 hover:text-skyjo-blue dark:text-slate-400 dark:hover:text-blue-400"
                         title="Importer"
                     >
                         <Upload className="h-4 w-4" />
@@ -228,7 +228,7 @@ export default function GameHistory() {
                         size="sm"
                         onClick={handleExport}
                         disabled={gameHistory.length === 0}
-                        className="text-slate-500 hover:text-teal-600 dark:text-slate-400 dark:hover:text-teal-400 disabled:opacity-30"
+                        className="text-slate-500 hover:text-skyjo-blue dark:text-slate-400 dark:hover:text-blue-400 disabled:opacity-30"
                         title="Exporter"
                     >
                         <Download className="h-4 w-4" />
@@ -279,7 +279,7 @@ export default function GameHistory() {
                                                         <span className="font-bold text-slate-800 dark:text-slate-200 truncate">
                                                             {game.winner.name}
                                                         </span>
-                                                        <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">
+                                                        <span className="font-mono text-skyjo-blue dark:text-blue-400 font-bold">
                                                             {game.winner.score} pts
                                                         </span>
                                                     </div>
