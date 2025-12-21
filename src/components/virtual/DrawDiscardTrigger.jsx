@@ -37,7 +37,7 @@ const DrawDiscardTrigger = memo(function DrawDiscardTrigger({
     const miniCardColors = discardTop ? (MINI_CARD_COLORS[discardTop.color] || MINI_CARD_COLORS.green) : null;
 
     return (
-        <div className="relative flex items-center justify-center gap-6 w-full">
+        <div className="relative flex items-center justify-center gap-4 w-full">
             {/* Draw pile card preview - Face-down card on the LEFT - CLICKABLE */}
             <motion.div
                 className={cn(
@@ -66,7 +66,7 @@ const DrawDiscardTrigger = memo(function DrawDiscardTrigger({
                 onClick={onClick}
                 disabled={!canInteract}
                 className={cn(
-                    "flex items-center justify-center gap-4 w-full px-6 py-3 rounded-2xl transition-all relative z-10",
+                    "flex items-center justify-center gap-4 w-full px-4 py-2 rounded-2xl transition-all relative z-10",
                     canInteract
                         ? "cursor-pointer bg-slate-700 hover:bg-slate-600 border border-emerald-500/50"
                         : "cursor-not-allowed bg-slate-700/60 opacity-60 border border-slate-600/30"

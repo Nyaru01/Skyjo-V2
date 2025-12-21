@@ -37,6 +37,7 @@ export const useGameStore = create(
             gameHistory: [], // Array of archived finished games
             darkMode: false,
             soundEnabled: true,
+            musicEnabled: true,
 
             toggleDarkMode: () => {
                 const newMode = !get().darkMode;
@@ -45,6 +46,8 @@ export const useGameStore = create(
             },
 
             toggleSound: () => set({ soundEnabled: !get().soundEnabled }),
+
+            toggleMusic: () => set({ musicEnabled: !get().musicEnabled }),
 
             setConfiguration: (playerData, threshold) => {
                 const players = playerData.map((p, index) => ({

@@ -58,7 +58,7 @@ const PlayerHand = memo(function PlayerHand({
                 backgroundColor: 'rgba(0, 0, 0, 0.85)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                padding: '24px 16px 16px 16px', // More top padding for badge
+                padding: '18px 16px 16px 16px', // Reduced top padding
                 borderRadius: '20px', // Softer corners
                 border: '1px solid #333333', // Subtle border
                 ...(isCurrentPlayer ? {
@@ -84,7 +84,7 @@ const PlayerHand = memo(function PlayerHand({
                     style={{
                         fontSize: '12px',
                         zIndex: 50,
-                        top: '-16px', // 16px margin from grid
+                        top: '-14px', // Slightly adjusted
                     }}
                 >
                     {isOpponent ? (
@@ -108,13 +108,13 @@ const PlayerHand = memo(function PlayerHand({
                 </div>
             )}
 
-            {/* Card grid: 16px margin from badge, strict 12px gap */}
+            {/* Card grid: 10px margin from badge, strict 12px gap */}
             <motion.div
                 style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(4, 1fr)',
                     gap: '12px',
-                    marginTop: '16px', // 16px margin from badge area
+                    marginTop: '10px', // Reduced margin
                     justifyItems: 'center',
                 }}
                 variants={containerVariants}

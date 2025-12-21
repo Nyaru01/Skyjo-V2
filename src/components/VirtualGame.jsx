@@ -16,8 +16,9 @@ import { useGameStore } from '../store/gameStore';
 import { calculateFinalScores } from '../lib/skyjoEngine';
 import { AI_DIFFICULTY, chooseInitialCardsToReveal } from '../lib/skyjoAI';
 import { useFeedback } from '../hooks/useFeedback';
+import { useBackgroundMusic } from '../hooks/useBackgroundMusic';
 import { cn } from '../lib/utils';
-import { Copy, Wifi, WifiOff, Share2 } from 'lucide-react';
+import { Copy, Wifi, WifiOff, Share2, Music, Music2 } from 'lucide-react';
 
 // Player colors for avatars
 
@@ -115,8 +116,13 @@ export default function VirtualGame() {
         difficulty: AI_DIFFICULTY.NORMAL,
     });
 
-    // Feedback sounds
+    // Feedback sounds and Music
     const { playVictory } = useFeedback();
+    const musicEnabled = useGameStore(state => state.musicEnabled);
+    const toggleMusic = useGameStore(state => state.toggleMusic);
+
+    // Play music when in game or lobby
+    useBackgroundMusic(screen === 'game' || screen === 'lobby');
 
     // Sync notifications from store
     useEffect(() => {
@@ -1210,9 +1216,24 @@ export default function VirtualGame() {
                 >
                     ← Quitter
                 </Button>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                    MANCHE {activeRoundNumber}
-                </span>
+
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={toggleMusic}
+                        className={cn(
+                            "h-6 w-6 p-0 rounded-full",
+                            musicEnabled ? "bg-emerald-500/10 text-emerald-400" : "text-slate-500"
+                        )}
+                        title={musicEnabled ? "Couper la musique" : "Activer la musique"}
+                    >
+                        {musicEnabled ? <Music className="h-3.5 w-3.5" /> : <Music2 className="h-3.5 w-3.5 opacity-50" />}
+                    </Button>
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                        MANCHE {activeRoundNumber}
+                    </span>
+                </div>
             </div>
 
             {/* Bot/Opponent (Player 2) at TOP for thumb zone optimization */}
@@ -1248,7 +1269,7 @@ export default function VirtualGame() {
             {!isInitialReveal && (
                 <div
                     className="flex justify-center px-4"
-                    style={{ marginTop: '24px', marginBottom: '16px' }}
+                    style={{ marginTop: '6px', marginBottom: '8px' }}
                 >
                     <div style={{ width: '100%', maxWidth: '340px' }}>
                         <DrawDiscardTrigger
@@ -1294,7 +1315,7 @@ export default function VirtualGame() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
                     className="text-center"
-                    style={{ marginBottom: '30px' }}
+                    style={{ marginBottom: '12px' }}
                 >
                     <span
                         className={cn(
