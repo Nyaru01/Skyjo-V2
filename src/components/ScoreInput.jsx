@@ -77,7 +77,7 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                 className={cn(
                                     "relative flex items-center justify-between p-3 rounded-xl border-2 transition-all cursor-pointer duration-500 animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards shadow-sm",
                                     isFinisher
-                                        ? "border-emerald-500 bg-emerald-50/90 dark:bg-emerald-900/40"
+                                        ? "border-skyjo-blue bg-sky-50/90 dark:bg-sky-900/40"
                                         : "border-white/20 dark:border-white/10 bg-white/40 dark:bg-slate-700/50 hover:bg-white/60 dark:hover:bg-slate-600/50 hover:border-white/40"
                                 )}
                                 style={{ animationDelay: `${index * 100}ms` }}
@@ -87,7 +87,7 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                     {/* Finisher Selection */}
                                     <div className={cn(
                                         "w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors",
-                                        isFinisher ? "border-emerald-500 bg-emerald-500 text-white" : "border-slate-400 dark:border-slate-500 bg-white/50 dark:bg-slate-600/50"
+                                        isFinisher ? "border-skyjo-blue bg-skyjo-blue text-white" : "border-slate-400 dark:border-slate-500 bg-white/50 dark:bg-slate-600/50"
                                     )}>
                                         {isFinisher && <Check className="h-4 w-4" strokeWidth={3} />}
                                     </div>
@@ -95,12 +95,12 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                     {/* Player Avatar with Emoji + Initials */}
                                     <div className={cn(
                                         "w-10 h-10 rounded-full flex flex-col items-center justify-center shrink-0 shadow-sm relative",
-                                        isFinisher ? "bg-emerald-500" : "bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-600 dark:to-slate-700"
+                                        isFinisher ? "bg-skyjo-blue" : "bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-600 dark:to-slate-700"
                                     )}>
                                         <span className="text-lg leading-none">{p.emoji || '👤'}</span>
                                         <span className={cn(
                                             "text-[8px] font-bold leading-none",
-                                            isFinisher ? "text-emerald-100" : "text-slate-500 dark:text-slate-300"
+                                            isFinisher ? "text-sky-100" : "text-slate-500 dark:text-slate-300"
                                         )}>
                                             {p.name.slice(0, 2).toUpperCase()}
                                         </span>
@@ -108,10 +108,10 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
 
                                     {/* Player Name & Current Total - Hidden on small screens */}
                                     <div className="hidden sm:flex flex-col min-w-0">
-                                        <span className={cn("font-bold truncate text-base leading-tight", isFinisher ? "text-emerald-900 dark:text-emerald-300" : "text-slate-900 dark:text-slate-100")}>
+                                        <span className={cn("font-bold truncate text-base leading-tight", isFinisher ? "text-sky-900 dark:text-sky-300" : "text-slate-900 dark:text-slate-100")}>
                                             {p.name}
                                         </span>
-                                        <span className={cn("text-xs font-semibold", isFinisher ? "text-emerald-700 dark:text-emerald-400" : "text-slate-500 dark:text-slate-400")}>
+                                        <span className={cn("text-xs font-semibold", isFinisher ? "text-sky-700 dark:text-sky-400" : "text-slate-500 dark:text-slate-400")}>
                                             Actuel: {previousTotal}
                                         </span>
                                     </div>
@@ -129,7 +129,7 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                             className={cn(
                                                 "w-20 text-center font-mono text-xl h-12 shadow-sm transition-colors",
                                                 scores[p.id] !== ''
-                                                    ? "font-bold text-slate-900 dark:text-white border-emerald-500 ring-2 ring-emerald-100 dark:ring-emerald-900 bg-white/80 dark:bg-slate-700"
+                                                    ? "font-bold text-slate-900 dark:text-white border-skyjo-blue ring-2 ring-sky-100 dark:ring-sky-900 bg-white/80 dark:bg-slate-700"
                                                     : "bg-white/50 dark:bg-slate-600/50 border-white/30 dark:border-slate-500 dark:text-white focus:bg-white/80 dark:focus:bg-slate-600"
                                             )}
                                             placeholder="0"
@@ -138,7 +138,7 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
 
                                     {/* Total Display */}
                                     <div className="w-14 text-center flex flex-col justify-center">
-                                        <span className={cn("text-lg font-black tabular-nums drop-shadow-sm", isFinisher ? "text-emerald-800 dark:text-emerald-300" : "text-slate-800 dark:text-slate-200")}>
+                                        <span className={cn("text-lg font-black tabular-nums drop-shadow-sm", isFinisher ? "text-skyjo-blue dark:text-sky-300" : "text-slate-800 dark:text-slate-200")}>
                                             {newTotal}
                                         </span>
                                     </div>
@@ -146,7 +146,7 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
 
                                 {/* Finisher Label Badge */}
                                 {isFinisher && (
-                                    <div className="absolute -top-2.5 left-4 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm z-10">
+                                    <div className="absolute -top-2.5 left-4 bg-skyjo-blue text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm z-10 transition-transform animate-in zoom-in spin-in-3">
                                         A FINI
                                     </div>
                                 )}
@@ -169,7 +169,7 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                             Annuler
                         </Button>
                     )}
-                    <Button onClick={handleSubmit} className="w-full bg-emerald-600 hover:bg-emerald-700 h-14 text-lg shadow-emerald-200 shadow-lg">
+                    <Button onClick={handleSubmit} className="w-full bg-skyjo-blue hover:bg-skyjo-blue/90 h-14 text-lg shadow-xl shadow-skyjo-blue/20 border border-white/20 animate-pulse-glow">
                         Valider la manche
                     </Button>
                 </div>

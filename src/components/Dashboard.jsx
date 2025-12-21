@@ -199,8 +199,14 @@ export default function Dashboard() {
                         <Card className="glass-premium dark:glass-dark shadow-2xl overflow-hidden">
                             {/* Header with Stop Game */}
                             <div className="flex items-center justify-between p-4 border-b border-white/20 dark:border-white/10 bg-white/30 dark:bg-white/5">
-                                <h2 className="font-bold text-slate-900 dark:text-slate-100 text-lg flex items-center gap-2">
-                                    <Sparkles className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                                <h2 className="font-bold text-slate-900 dark:text-slate-100 text-lg flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-md animate-float overflow-hidden bg-slate-900 border border-skyjo-blue/30">
+                                        <img
+                                            src="/logo.jpg"
+                                            alt="Skyjo Logo"
+                                            className="w-full h-full object-cover scale-110"
+                                        />
+                                    </div>
                                     Partie en cours
                                 </h2>
                                 <div className="flex gap-2">
@@ -238,11 +244,11 @@ export default function Dashboard() {
                             {/* Embedded Score Input - Always visible for continuous entry */}
                             <div className="p-4">
                                 <div className="flex items-center gap-4 mb-4">
-                                    <div className="h-px bg-gradient-to-r from-transparent via-emerald-300 to-transparent flex-1"></div>
-                                    <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider bg-emerald-100 dark:bg-emerald-900/50 px-3 py-1 rounded-full">
+                                    <div className="h-px bg-gradient-to-r from-transparent via-skyjo-blue to-transparent flex-1"></div>
+                                    <span className="text-xs font-bold text-skyjo-blue dark:text-blue-400 uppercase tracking-wider bg-sky-100 dark:bg-sky-900/50 px-3 py-1 rounded-full shadow-sm">
                                         Nouvelle Manche {rounds.length + 1}
                                     </span>
-                                    <div className="h-px bg-gradient-to-r from-transparent via-emerald-300 to-transparent flex-1"></div>
+                                    <div className="h-px bg-gradient-to-r from-transparent via-skyjo-blue to-transparent flex-1"></div>
                                 </div>
 
                                 <ScoreInput

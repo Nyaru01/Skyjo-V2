@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { Trophy, TrendingUp, Target, Award, Zap, Crown, Flame, Users, Download, Upload } from 'lucide-react';
+import { Trophy, TrendingUp, TrendingDown, Target, Award, Zap, Crown, Flame, Users, Download, Upload, Save } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useGameStore, selectGameHistory } from '../store/gameStore';
 import { Card, CardContent } from './ui/Card';
@@ -29,7 +29,7 @@ const cardVariants = {
 };
 
 // Stat Card Component
-function StatCard({ icon: Icon, title, value, subtitle, colorClass = 'text-skyjo-blue', index }) {
+function StatCard({ icon: Icon, title, value, subtitle, colorClass = 'text-skyjo-blue', index, className, imageSrc }) {
     return (
         <motion.div
             custom={index}
@@ -37,12 +37,23 @@ function StatCard({ icon: Icon, title, value, subtitle, colorClass = 'text-skyjo
             initial="hidden"
             animate="visible"
         >
-            <Card className="glass-premium shadow-lg hover:shadow-xl transition-shadow">
-                <CardContent className="p-4">
+            <Card className={cn("glass-premium shadow-lg hover:shadow-xl transition-shadow h-full", className)}>
+                <CardContent className="p-4 h-full flex flex-col justify-between">
                     <div className="flex items-start justify-between">
-                        <div className={cn("p-2 rounded-xl", colorClass.replace('text-', 'bg-').replace('600', '900/30').replace('500', '900/30'))}>
-                            <Icon className={cn("h-5 w-5", colorClass)} />
-                        </div>
+                        {imageSrc ? (
+                            <div className="w-12 h-12 rounded-lg overflow-hidden shadow-md border border-white/10 shrink-0">
+                                <img src={imageSrc} alt="Icon" className="w-full h-full object-cover scale-110" />
+                            </div>
+                        ) : (
+                            <div className={cn(
+                                "p-2 rounded-xl",
+                                colorClass === 'text-skyjo-blue'
+                                    ? 'bg-skyjo-blue/10 dark:bg-sky-900/20'
+                                    : colorClass.replace('text-', 'bg-').replace('600', '900/30').replace('500', '900/30')
+                            )}>
+                                <Icon className={cn("h-5 w-5", colorClass)} />
+                            </div>
+                        )}
                         <div className="text-right">
                             <div className="text-2xl font-black text-slate-100">{value}</div>
                             <div className="text-xs text-slate-400 font-medium">{subtitle}</div>
@@ -285,24 +296,6 @@ export default function Stats() {
                         onChange={handleImport}
                         className="hidden"
                     />
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="text-slate-400 hover:text-skyjo-blue"
-                        title="Importer"
-                    >
-                        <Upload className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleExport}
-                        className="text-slate-400 hover:text-skyjo-blue"
-                        title="Exporter"
-                    >
-                        <Download className="h-4 w-4" />
-                    </Button>
                 </div>
             </div>
 
@@ -326,12 +319,13 @@ export default function Stats() {
                 />
                 {stats.records.bestRound !== null && (
                     <StatCard
-                        icon={Zap}
+                        icon={TrendingDown}
                         title="Meilleur score manche"
                         value={stats.records.bestRound}
                         subtitle={stats.records.bestRoundPlayer?.name}
                         colorClass="text-skyjo-blue"
                         index={2}
+                        className="col-span-2"
                     />
                 )}
                 {stats.records.mostNegatives && stats.records.mostNegatives.negativeRounds > 0 && (
@@ -344,6 +338,45 @@ export default function Stats() {
                         index={3}
                     />
                 )}
+                {/* Sauvegarde Card */}
+                <motion.div
+                    variants={cardVariants}
+                    custom={3}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    <Card className="glass-premium shadow-lg hover:shadow-xl transition-shadow h-full">
+                        <CardContent className="p-4 flex flex-col justify-between h-full gap-3">
+                            <div className="flex items-center gap-2 mb-1">
+                                <div className="p-2 rounded-lg bg-skyjo-blue/10 dark:bg-sky-900/20 text-skyjo-blue dark:text-sky-400">
+                                    <Save className="h-5 w-5" />
+                                </div>
+                                <div className="text-sm font-bold text-slate-700 dark:text-slate-200">Sauvegarde</div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="w-full justify-start gap-2 border-slate-200 dark:border-slate-700 hover:bg-sky-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
+                                >
+                                    <Upload className="h-4 w-4 text-skyjo-blue" />
+                                    Importer
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleExport}
+                                    className="w-full justify-start gap-2 border-slate-200 dark:border-slate-700 hover:bg-sky-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
+                                >
+                                    <Download className="h-4 w-4 text-skyjo-blue" />
+                                    Exporter
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.div>
             </div>
 
             {/* Leaderboard */}

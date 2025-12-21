@@ -360,8 +360,7 @@ export default function VirtualGame() {
     if (screen === 'menu') {
         return (
             <div className="max-w-md mx-auto p-4 pt-16 space-y-6 animate-in fade-in">
-                <Card className="glass-premium dark:glass-dark shadow-xl overflow-hidden">
-                    <div className="absolute inset-0 animate-shimmer opacity-10 pointer-events-none" />
+                <Card className="glass-premium dark:glass-dark shadow-xl relative">
                     <CardHeader className="text-center">
                         <div className="flex justify-center mb-3">
                             <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg animate-float overflow-hidden bg-slate-900 border border-skyjo-blue/30">
@@ -380,19 +379,22 @@ export default function VirtualGame() {
                         </p>
                     </CardHeader>
                     <CardContent className="space-y-4">
+                        {/* Local Game Button */}
                         <Button
                             size="lg"
-                            className="w-full bg-skyjo-blue hover:bg-skyjo-blue/90 text-white shadow-lg"
+                            className="w-full bg-skyjo-blue hover:bg-skyjo-blue/90 text-white font-bold shadow-xl shadow-skyjo-blue/40 border border-white/20 animate-pulse-glow"
                             onClick={() => setScreen('setup')}
                         >
                             <Play className="mr-2 h-5 w-5" />
                             Partie Locale
                         </Button>
 
+                        {/* Online Game Button */}
                         <Button
                             size="lg"
                             variant="outline"
-                            className="w-full border-blue-300 text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                            className="w-full border-blue-400 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 font-bold shadow-xl shadow-blue-400/40 animate-pulse-glow"
+                            style={{ animationDelay: '0.3s' }}
                             onClick={() => {
                                 setScreen('lobby');
                                 connectOnline();
@@ -402,10 +404,12 @@ export default function VirtualGame() {
                             En Ligne (1v1)
                         </Button>
 
+                        {/* AI Game Button */}
                         <Button
                             size="lg"
                             variant="outline"
-                            className="w-full border-purple-300 text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30"
+                            className="w-full border-purple-400 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 font-bold shadow-xl shadow-purple-400/40 animate-pulse-glow"
+                            style={{ animationDelay: '0.6s' }}
                             onClick={() => setScreen('ai-setup')}
                         >
                             <Bot className="mr-2 h-5 w-5" />
