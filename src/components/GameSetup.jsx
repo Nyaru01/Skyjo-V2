@@ -78,7 +78,7 @@ export default function GameSetup({ onNavigate }) {
             <div className="text-center glass-premium dark:glass-dark p-4 rounded-2xl shadow-xl relative overflow-hidden">
                 <div className="absolute inset-0 animate-shimmer opacity-20 pointer-events-none" />
                 <div className="relative z-10 flex items-center justify-center gap-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-glow-emerald animate-float overflow-hidden bg-slate-900 border border-emerald-500/30">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg animate-float overflow-hidden bg-slate-900 border border-skyjo-blue/30">
                         <img
                             src="/logo.jpg"
                             alt="Skyjo Logo"
@@ -86,7 +86,7 @@ export default function GameSetup({ onNavigate }) {
                         />
                     </div>
                     <div className="text-left">
-                        <h1 className="text-2xl font-extrabold bg-gradient-to-r from-emerald-700 via-teal-600 to-emerald-700 bg-clip-text text-transparent drop-shadow-sm dark:from-emerald-400 dark:via-teal-300 dark:to-emerald-400">
+                        <h1 className="text-2xl font-extrabold text-skyjo-blue drops-shadow-sm dark:text-sky-300">
                             Skyjo Score
                         </h1>
                         <p className="text-slate-700 dark:text-slate-300 font-medium text-sm">Compteur de points</p>
@@ -101,7 +101,7 @@ export default function GameSetup({ onNavigate }) {
             <Card className="glass-premium dark:glass-dark shadow-xl">
                 <CardHeader className="py-2 px-4">
                     <CardTitle className="text-slate-900 dark:text-slate-100 flex items-center gap-2 text-base">
-                        <User className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                        <User className="h-4 w-4 text-skyjo-blue dark:text-sky-400" />
                         Joueurs
                     </CardTitle>
                 </CardHeader>
@@ -172,7 +172,7 @@ export default function GameSetup({ onNavigate }) {
             {/* Bouton Démarrer */}
             <Button
                 size="lg"
-                className="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-500 hover:via-teal-500 hover:to-emerald-500 text-white font-bold shadow-xl shadow-emerald-900/25 border border-white/20 h-12 text-base animate-pulse-glow"
+                className="w-full bg-skyjo-blue hover:bg-skyjo-blue/90 text-white font-bold shadow-xl shadow-skyjo-blue/25 border border-white/20 h-12 text-base animate-pulse-glow"
                 onClick={handleStart}
             >
                 🚀 Commencer à compter

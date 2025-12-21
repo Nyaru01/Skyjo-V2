@@ -364,7 +364,7 @@ export default function VirtualGame() {
                     <div className="absolute inset-0 animate-shimmer opacity-10 pointer-events-none" />
                     <CardHeader className="text-center">
                         <div className="flex justify-center mb-3">
-                            <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-glow-emerald animate-float overflow-hidden bg-slate-900 border border-emerald-500/30">
+                            <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg animate-float overflow-hidden bg-slate-900 border border-skyjo-blue/30">
                                 <img
                                     src="/logo.jpg"
                                     alt="Skyjo Logo"
@@ -372,7 +372,7 @@ export default function VirtualGame() {
                                 />
                             </div>
                         </div>
-                        <CardTitle className="text-2xl bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                        <CardTitle className="text-2xl text-skyjo-blue font-bold">
                             Skyjo Virtuel
                         </CardTitle>
                         <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
@@ -382,7 +382,7 @@ export default function VirtualGame() {
                     <CardContent className="space-y-4">
                         <Button
                             size="lg"
-                            className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg"
+                            className="w-full bg-skyjo-blue hover:bg-skyjo-blue/90 text-white shadow-lg"
                             onClick={() => setScreen('setup')}
                         >
                             <Play className="mr-2 h-5 w-5" />
@@ -1155,7 +1155,7 @@ export default function VirtualGame() {
                                 Quitter
                             </Button>
                             <Button
-                                className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 text-white"
+                                className="flex-1 bg-skyjo-blue hover:bg-skyjo-blue/90 text-white"
                                 onClick={() => {
                                     if (isOnlineMode) {
                                         // Online mode: emit to server

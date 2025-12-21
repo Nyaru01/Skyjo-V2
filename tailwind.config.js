@@ -10,6 +10,9 @@ export default {
             fontFamily: {
                 sans: ['Outfit', 'system-ui', 'sans-serif'],
             },
+            colors: {
+                'skyjo-blue': '#1A4869',
+            },
         },
     },
     plugins: [],
