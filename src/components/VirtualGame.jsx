@@ -434,8 +434,8 @@ export default function VirtualGame() {
                         <div className="flex justify-center mb-3">
                             <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg animate-float overflow-hidden bg-slate-900 border border-skyjo-blue/30">
                                 <img
-                                    src="/logo.jpg"
-                                    alt="Skyjo Logo"
+                                    src="/virtual-logo.jpg"
+                                    alt="Skyjo Virtual"
                                     className="w-full h-full object-cover scale-110"
                                 />
                             </div>
