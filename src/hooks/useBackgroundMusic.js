@@ -25,11 +25,12 @@ export const useBackgroundMusic = (shouldPlay = false) => {
     const shuffledPlaylistRef = useRef(shuffleArray(PLAYLIST));
     const currentTrackIndexRef = useRef(0);
     const hasStartedSessionRef = useRef(false);
+    const playNextTrackRef = useRef(null);
 
     const musicEnabled = useGameStore(state => state.musicEnabled);
     const [isPlaying, setIsPlaying] = useState(false);
 
-    // Function to play next track
+    // Function to play next track - stored in ref for stable reference
     const playNextTrack = useCallback(() => {
         currentTrackIndexRef.current++;
 
@@ -46,21 +47,35 @@ export const useBackgroundMusic = (shouldPlay = false) => {
         }
     }, []);
 
+    // Keep the ref updated with the latest callback
+    playNextTrackRef.current = playNextTrack;
+
     // Initialize audio object once
     useEffect(() => {
         if (!audioRef.current) {
             audioRef.current = new Audio();
             audioRef.current.volume = 0.3;
-            audioRef.current.addEventListener('ended', playNextTrack);
+            // Use a wrapper function that calls the ref to ensure we always use the latest callback
+            const handleEnded = () => {
+                if (playNextTrackRef.current) {
+                    playNextTrackRef.current();
+                }
+            };
+            audioRef.current.addEventListener('ended', handleEnded);
+
+            // Store the handler for cleanup
+            audioRef.current._endedHandler = handleEnded;
         }
 
         return () => {
             if (audioRef.current) {
                 audioRef.current.pause();
-                audioRef.current.removeEventListener('ended', playNextTrack);
+                if (audioRef.current._endedHandler) {
+                    audioRef.current.removeEventListener('ended', audioRef.current._endedHandler);
+                }
             }
         };
-    }, [playNextTrack]);
+    }, []);
 
     // Handle play/pause and shuffle on new session
     useEffect(() => {
