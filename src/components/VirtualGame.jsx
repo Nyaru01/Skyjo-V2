@@ -459,7 +459,7 @@ export default function VirtualGame() {
                             <div className="absolute inset-[2px] bg-[#1e2235] rounded-[18px] z-10" />
 
                             {/* Content */}
-                            <div className="relative z-20 flex items-center justify-start pl-20 gap-3 h-16 w-full text-white font-bold text-lg">
+                            <div className="relative z-20 flex items-center justify-center gap-3 h-16 w-full text-white font-bold text-lg">
                                 {/* Halo effect */}
                                 <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity rounded-[18px]" />
                                 <Play className="h-6 w-6 fill-current" />
@@ -482,7 +482,7 @@ export default function VirtualGame() {
                             <div className="absolute inset-[2px] bg-[#1e2235] rounded-[18px] z-10" />
 
                             {/* Content */}
-                            <div className="relative z-20 flex items-center justify-start pl-20 gap-3 h-16 w-full text-[#5DA0F2] font-bold text-lg">
+                            <div className="relative z-20 flex items-center justify-center gap-3 h-16 w-full text-[#5DA0F2] font-bold text-lg">
                                 {/* Halo effect */}
                                 <div className="absolute inset-0 bg-gradient-to-r from-[#5DA0F2]/0 via-[#5DA0F2]/5 to-[#5DA0F2]/0 opacity-0 group-hover:opacity-100 transition-opacity rounded-[18px]" />
                                 <Wifi className="h-6 w-6" />
@@ -502,11 +502,11 @@ export default function VirtualGame() {
                             <div className="absolute inset-[2px] bg-[#1e2235] rounded-[18px] z-10" />
 
                             {/* Content */}
-                            <div className="relative z-20 flex items-center justify-start pl-20 gap-3 h-16 w-full text-[#C084FC] font-bold text-lg">
+                            <div className="relative z-20 flex items-center justify-center gap-3 h-16 w-full text-[#C084FC] font-bold text-lg">
                                 {/* Halo effect */}
                                 <div className="absolute inset-0 bg-gradient-to-r from-[#C084FC]/0 via-[#C084FC]/5 to-[#C084FC]/0 opacity-0 group-hover:opacity-100 transition-opacity rounded-[18px]" />
                                 <Bot className="h-6 w-6" />
-                                Contre l'IA
+                                Affronter l'IA
                             </div>
                         </button>
 
@@ -528,17 +528,17 @@ export default function VirtualGame() {
                 {/* Rules Button */}
                 <button
                     onClick={() => setShowRulesModal(true)}
-                    className="w-full p-3 rounded-2xl glass-premium dark:glass-dark border border-amber-200/50 dark:border-amber-700/50 hover:border-amber-400 transition-all group cursor-pointer"
+                    className="w-full p-2 rounded-2xl glass-premium dark:glass-dark border border-amber-200/50 dark:border-amber-700/50 hover:border-amber-400 transition-all group cursor-pointer"
                 >
-                    <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                            <BookOpen className="h-5 w-5 text-white" />
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                            <BookOpen className="h-4 w-4 text-white" />
                         </div>
                         <div className="text-left flex-1">
-                            <p className="font-bold text-slate-800 dark:text-slate-200">Règles du jeu</p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">Comment jouer à Skyjo</p>
+                            <p className="font-bold text-sm text-slate-800 dark:text-slate-200">Règles du jeu</p>
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400">Comment jouer à Skyjo</p>
                         </div>
-                        <span className="text-amber-500 dark:text-amber-400 text-lg">→</span>
+                        <span className="text-amber-500 dark:text-amber-400 text-base">→</span>
                     </div>
                 </button>
 
@@ -764,15 +764,26 @@ export default function VirtualGame() {
                     <CardHeader>
                         <CardTitle className="text-lg text-slate-800 dark:text-slate-200 flex items-center gap-2">
                             <Users className="h-5 w-5 text-emerald-600" />
-                            Joueurs ({players.length}/8)
+                            Joueurs (1v1)
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         {players.map((player, index) => (
                             <div key={index} className="flex items-center gap-2">
-                                <span className="text-2xl w-10 text-center">
-                                    {player.emoji}
-                                </span>
+                                <select
+                                    value={player.emoji}
+                                    onChange={(e) => updatePlayer(index, 'emoji', e.target.value)}
+                                    className="h-10 w-14 text-2xl text-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md cursor-pointer appearance-none"
+                                    style={{
+                                        backgroundImage: `url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23CBD5E1%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")`,
+                                        backgroundRepeat: 'no-repeat',
+                                        backgroundPosition: 'right 0.3rem center',
+                                        backgroundSize: '0.65em auto',
+                                        paddingRight: '1rem'
+                                    }}
+                                >
+                                    {PLAYER_EMOJIS.map(e => <option key={e} value={e}>{e}</option>)}
+                                </select>
                                 <Input
                                     placeholder={`Joueur ${index + 1}`}
                                     value={player.name}
@@ -794,7 +805,7 @@ export default function VirtualGame() {
                             </div>
                         ))}
 
-                        {players.length < 8 && (
+                        {players.length < 2 && (
                             <Button
                                 variant="outline"
                                 size="sm"
@@ -809,7 +820,7 @@ export default function VirtualGame() {
 
                 <Button
                     size="lg"
-                    className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg"
+                    className="w-full bg-[#1e2235] text-white shadow-lg hover:bg-[#1e2235]/90 transition-colors border border-white/20"
                     onClick={handleStartGame}
                 >
                     🚀 Lancer la partie
