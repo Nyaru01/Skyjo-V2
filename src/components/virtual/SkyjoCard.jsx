@@ -68,7 +68,7 @@ const SkyjoCard = memo(function SkyjoCard({
     return (
         <motion.div
             className={cn(
-                "perspective-1000",
+                "perspective-1000 relative",
                 isClickable ? "cursor-pointer" : "cursor-default",
                 className
             )}
@@ -81,6 +81,20 @@ const SkyjoCard = memo(function SkyjoCard({
             whileHover={isClickable ? { scale: 1.08, y: -4 } : undefined}
             whileTap={isClickable ? { scale: 0.95 } : undefined}
         >
+            {/* Extended invisible touch/click area - 8px padding around the card */}
+            {isClickable && (
+                <div
+                    className="absolute pointer-events-auto"
+                    style={{
+                        top: '-8px',
+                        left: '-8px',
+                        right: '-8px',
+                        bottom: '-8px',
+                        zIndex: 10,
+                    }}
+                    onClick={onClick}
+                />
+            )}
             <motion.div
                 className="relative w-full h-full preserve-3d transition-transform duration-500"
                 animate={{ rotateY: isRevealed ? 0 : 180 }}

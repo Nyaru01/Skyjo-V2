@@ -166,6 +166,11 @@ export default function VirtualGame() {
     // Track if we've archived the current online game
     const [hasArchivedOnline, setHasArchivedOnline] = useState(false);
 
+    // Track if we've archived the current AI/local game
+    const [hasArchivedVirtual, setHasArchivedVirtual] = useState(false);
+    const archiveVirtualGame = useGameStore(s => s.archiveVirtualGame);
+    const gameMode = useVirtualGameStore(s => s.gameMode);
+
     // Archive online game when it ends
     useEffect(() => {
         if (onlineIsGameOver && onlineGameStarted && !hasArchivedOnline) {
@@ -182,6 +187,25 @@ export default function VirtualGame() {
             setHasArchivedOnline(false);
         }
     }, [onlineIsGameOver, onlineGameStarted, hasArchivedOnline, onlinePlayers, onlineTotalScores, onlineGameWinner, onlineRoundNumber, archiveOnlineGame]);
+
+    // Archive AI/local game when it ends
+    useEffect(() => {
+        if (isGameOver && gameState && !hasArchivedVirtual && !onlineGameStarted) {
+            archiveVirtualGame({
+                players: gameState.players,
+                totalScores: totalScores,
+                winner: gameWinner,
+                roundsPlayed: roundNumber,
+                gameType: aiMode ? 'ai' : 'local'
+            });
+            setHasArchivedVirtual(true);
+        }
+        // Reset when starting a new game
+        if (!isGameOver && hasArchivedVirtual) {
+            setHasArchivedVirtual(false);
+        }
+    }, [isGameOver, gameState, hasArchivedVirtual, totalScores, gameWinner, roundNumber, aiMode, onlineGameStarted, archiveVirtualGame]);
+
 
     // AI Auto-play: Execute AI turns automatically with delay
     useEffect(() => {
@@ -342,8 +366,8 @@ export default function VirtualGame() {
 
     // Back to menu
     const handleBackToMenu = () => {
-        // Archive online game if it was started and has data
-        if (onlineGameStarted && onlinePlayers.length > 0) {
+        // Archive online game if it was started and has data (avoid duplicates)
+        if (onlineGameStarted && onlinePlayers.length > 0 && !hasArchivedOnline) {
             archiveOnlineGame({
                 players: onlinePlayers,
                 totalScores: onlineTotalScores,
@@ -351,7 +375,32 @@ export default function VirtualGame() {
                 roundsPlayed: onlineRoundNumber
             });
             disconnectOnline();
+        } else if (onlineGameStarted) {
+            // Just disconnect if already archived
+            disconnectOnline();
         }
+
+        // Archive AI/local game when quitting (even if not finished)
+        // Only archive if not already archived (avoid duplicates)
+        if (gameState && gameState.players && gameState.players.length > 0 && !onlineGameStarted && !hasArchivedVirtual) {
+            // Calculate current winner based on totalScores
+            const scores = totalScores || {};
+            const playersWithScores = gameState.players.map(p => ({
+                ...p,
+                finalScore: scores[p.id] || 0
+            })).sort((a, b) => a.finalScore - b.finalScore);
+
+            const winner = playersWithScores[0];
+
+            archiveVirtualGame({
+                players: gameState.players,
+                totalScores: scores,
+                winner: winner ? { id: winner.id, name: winner.name, score: winner.finalScore } : null,
+                roundsPlayed: roundNumber || 1,
+                gameType: aiMode ? 'ai' : 'local'
+            });
+        }
+
         resetGame();
         setScreen('menu');
     };

@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Archive, Trophy, Calendar, Users, ChevronRight, Trash2, ArrowLeft, Download, Upload } from 'lucide-react';
+import { Archive, Trophy, Calendar, Users, ChevronRight, Trash2, ArrowLeft, Download, Upload, Bot, Wifi, Gamepad2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore, selectGameHistory } from '../store/gameStore';
 import { Card, CardContent } from './ui/Card';
@@ -21,6 +21,51 @@ function formatDate(isoString) {
         minute: '2-digit'
     });
 }
+
+/**
+ * Get game type badge info
+ * @param {Object} game - The game object
+ * @returns {Object} Badge info with icon, label, and color classes
+ */
+function getGameTypeBadge(game) {
+    // Check gameType first (new format)
+    if (game.gameType === 'ai') {
+        return {
+            icon: Bot,
+            label: 'vs IA',
+            bgClass: 'bg-purple-100 dark:bg-purple-900/30',
+            textClass: 'text-purple-600 dark:text-purple-400',
+            borderClass: 'border-purple-200 dark:border-purple-700'
+        };
+    }
+    if (game.gameType === 'online' || game.isOnlineGame) {
+        return {
+            icon: Wifi,
+            label: 'En ligne',
+            bgClass: 'bg-blue-100 dark:bg-blue-900/30',
+            textClass: 'text-blue-600 dark:text-blue-400',
+            borderClass: 'border-blue-200 dark:border-blue-700'
+        };
+    }
+    if (game.gameType === 'local') {
+        return {
+            icon: Gamepad2,
+            label: 'Virtuel',
+            bgClass: 'bg-emerald-100 dark:bg-emerald-900/30',
+            textClass: 'text-emerald-600 dark:text-emerald-400',
+            borderClass: 'border-emerald-200 dark:border-emerald-700'
+        };
+    }
+    // Default: Real game (score tracking mode)
+    return {
+        icon: Users,
+        label: 'Réel',
+        bgClass: 'bg-amber-100 dark:bg-amber-900/30',
+        textClass: 'text-amber-600 dark:text-amber-400',
+        borderClass: 'border-amber-200 dark:border-amber-700'
+    };
+}
+
 
 /**
  * Component showing details of a past game
@@ -64,6 +109,17 @@ function PastGameDetail({ game, onBack }) {
                     <div className="flex items-center gap-2 text-sky-100 text-sm mb-2">
                         <Calendar className="h-4 w-4" />
                         {formatDate(game.date)}
+                        {/* Game Type Badge */}
+                        {(() => {
+                            const badge = getGameTypeBadge(game);
+                            const BadgeIcon = badge.icon;
+                            return (
+                                <span className="ml-auto flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/20 text-white border border-white/30">
+                                    <BadgeIcon className="h-3 w-3" />
+                                    {badge.label}
+                                </span>
+                            );
+                        })()}
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="bg-white/20 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm">
@@ -267,10 +323,26 @@ export default function GameHistory() {
                                         <CardContent className="p-4">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex-1 min-w-0">
-                                                    {/* Date */}
+                                                    {/* Date + Game Type Badge */}
                                                     <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-1">
                                                         <Calendar className="h-3 w-3" />
                                                         {formatDate(game.date)}
+                                                        {/* Game Type Badge */}
+                                                        {(() => {
+                                                            const badge = getGameTypeBadge(game);
+                                                            const BadgeIcon = badge.icon;
+                                                            return (
+                                                                <span className={cn(
+                                                                    "ml-auto flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border",
+                                                                    badge.bgClass,
+                                                                    badge.textClass,
+                                                                    badge.borderClass
+                                                                )}>
+                                                                    <BadgeIcon className="h-3 w-3" />
+                                                                    {badge.label}
+                                                                </span>
+                                                            );
+                                                        })()}
                                                     </div>
 
                                                     {/* Winner */}
@@ -290,7 +362,14 @@ export default function GameHistory() {
                                                             <Users className="h-3 w-3" />
                                                             {game.players.length} joueurs
                                                         </span>
-                                                        <span>{game.rounds.length} manches</span>
+                                                        <span>
+                                                            {game.rounds?.length > 0
+                                                                ? `${game.rounds.length} manches`
+                                                                : game.roundsPlayed
+                                                                    ? `${game.roundsPlayed} manches`
+                                                                    : '1 manche'
+                                                            }
+                                                        </span>
                                                     </div>
                                                 </div>
 

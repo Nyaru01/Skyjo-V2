@@ -184,7 +184,52 @@ export const useGameStore = create(
                         name: playersWithScores[0].name,
                         score: playersWithScores[0].finalScore
                     } : null,
-                    isOnlineGame: true,
+                    gameType: 'online', // Partie en ligne
+                    roundsPlayed: roundsPlayed || 1
+                };
+
+                // Add to history (newest first), keep max 50 games
+                const updatedHistory = [archivedGame, ...gameHistory].slice(0, 50);
+                set({ gameHistory: updatedHistory });
+            },
+
+            /**
+             * Archive a virtual game (AI or local) to history
+             * @param {Object} params - Virtual game data
+             * @param {Array} params.players - Array of player objects with name, emoji, id
+             * @param {Object} params.totalScores - Map of player id to total score
+             * @param {Object} params.winner - Winner object with name, emoji, score
+             * @param {number} params.roundsPlayed - Number of rounds played
+             * @param {string} params.gameType - Type of game: 'ai' or 'local'
+             */
+            archiveVirtualGame: ({ players, totalScores, winner, roundsPlayed, gameType = 'ai' }) => {
+                const { gameHistory } = get();
+                if (!players || players.length === 0) return;
+
+                // Convert virtual format to archive format
+                const playersWithScores = players.map(p => ({
+                    id: p.id,
+                    name: p.name,
+                    emoji: p.emoji,
+                    finalScore: totalScores[p.id] || 0
+                })).sort((a, b) => a.finalScore - b.finalScore);
+
+                const archivedGame = {
+                    id: `game-${gameType}-${Date.now()}`,
+                    date: new Date().toISOString(),
+                    players: playersWithScores,
+                    rounds: [], // Virtual games don't track rounds the same way
+                    threshold: 100,
+                    winner: winner ? {
+                        id: winner.id || `${gameType}-winner`,
+                        name: winner.name,
+                        score: winner.score
+                    } : playersWithScores[0] ? {
+                        id: playersWithScores[0].id,
+                        name: playersWithScores[0].name,
+                        score: playersWithScores[0].finalScore
+                    } : null,
+                    gameType: gameType, // 'ai' ou 'local'
                     roundsPlayed: roundsPlayed || 1
                 };
 
