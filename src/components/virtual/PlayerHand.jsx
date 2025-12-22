@@ -18,7 +18,7 @@ const PlayerHand = memo(function PlayerHand({
     onCardClick,
     canInteract = false,
     showName = true,
-    showName = true,
+
     size = 'md',
     shakingCardIndex = null,
 }) {
