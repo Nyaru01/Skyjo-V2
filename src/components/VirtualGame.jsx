@@ -428,7 +428,7 @@ export default function VirtualGame() {
     // Render menu screen
     if (screen === 'menu') {
         return (
-            <div className="max-w-md mx-auto p-4 pt-16 space-y-6 animate-in fade-in">
+            <div className="max-w-md mx-auto p-4 pt-8 pb-20 space-y-3 animate-in fade-in">
                 <Card className="glass-premium dark:glass-dark shadow-xl relative">
                     <CardHeader className="text-center">
                         <div className="flex justify-center mb-3">
@@ -485,7 +485,7 @@ export default function VirtualGame() {
                             Contre l'IA
                         </Button>
 
-                        <div className="mt-4 p-3 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs text-slate-600 dark:text-slate-400">
+                        <div className="mt-2 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs text-slate-600 dark:text-slate-400">
                             <div className="flex items-start gap-2">
                                 <Info className="h-4 w-4 mt-0.5 shrink-0 text-slate-500" />
                                 <p>
@@ -503,7 +503,7 @@ export default function VirtualGame() {
                 {/* Rules Button */}
                 <button
                     onClick={() => setShowRulesModal(true)}
-                    className="w-full p-4 rounded-2xl glass-premium dark:glass-dark border border-amber-200/50 dark:border-amber-700/50 hover:border-amber-400 transition-all group cursor-pointer"
+                    className="w-full p-3 rounded-2xl glass-premium dark:glass-dark border border-amber-200/50 dark:border-amber-700/50 hover:border-amber-400 transition-all group cursor-pointer"
                 >
                     <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
