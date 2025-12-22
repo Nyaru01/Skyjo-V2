@@ -634,7 +634,7 @@ export default function VirtualGame() {
                         {/* Player Name */}
                         <div className="space-y-2">
                             <label className="text-sm font-medium" style={{ color: '#cbd5e1' }}>Votre pseudo</label>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 items-center">
                                 <select
                                     value={aiConfig.playerEmoji}
                                     onChange={(e) => setAIConfig({ ...aiConfig, playerEmoji: e.target.value })}
@@ -643,10 +643,10 @@ export default function VirtualGame() {
                                     {PLAYER_EMOJIS.map(e => <option key={e} value={e}>{e}</option>)}
                                 </select>
                                 <Input
-                                    placeholder="Votre nom"
+                                    placeholder="Votre pseudo"
                                     value={aiConfig.playerName}
                                     onChange={(e) => setAIConfig({ ...aiConfig, playerName: e.target.value })}
-                                    className="flex-1"
+                                    className="flex-1 h-10"
                                 />
                             </div>
                         </div>
@@ -957,22 +957,20 @@ export default function VirtualGame() {
                         )}
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Votre Pseudo</label>
-                            <div className="flex gap-2">
-                                <div className="relative">
-                                    <select
-                                        className="appearance-none h-10 w-14 text-2xl text-center bg-white border border-slate-200 rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        value={myEmoji}
-                                        onChange={(e) => setMyEmoji(e.target.value)}
-                                    >
-                                        {PLAYER_EMOJIS.map(e => <option key={e} value={e}>{e}</option>)}
-                                    </select>
-                                </div>
+                            <label className="text-sm font-medium">Votre pseudo</label>
+                            <div className="flex gap-2 items-center">
+                                <select
+                                    value={myEmoji}
+                                    onChange={(e) => setMyEmoji(e.target.value)}
+                                    className="h-10 w-14 text-2xl text-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md cursor-pointer"
+                                >
+                                    {PLAYER_EMOJIS.map(e => <option key={e} value={e}>{e}</option>)}
+                                </select>
                                 <Input
-                                    placeholder="Ex: SuperJoueur"
+                                    placeholder="Votre pseudo"
                                     value={myPseudo}
                                     onChange={(e) => setMyPseudo(e.target.value)}
-                                    className="flex-1"
+                                    className="flex-1 h-10"
                                 />
                             </div>
                         </div>
