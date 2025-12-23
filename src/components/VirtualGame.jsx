@@ -11,6 +11,7 @@ import DrawDiscardPopup from './virtual/DrawDiscardPopup';
 import DrawDiscardTrigger from './virtual/DrawDiscardTrigger';
 import CardAnimationLayer from './virtual/CardAnimationLayer';
 import SkyjoCard from './virtual/SkyjoCard';
+import LevelUpReward from './LevelUpReward';
 import ExperienceBar from './ExperienceBar';
 import { useVirtualGameStore, selectAIMode, selectAIPlayers, selectIsCurrentPlayerAI, selectIsAIThinking } from '../store/virtualGameStore';
 import { useOnlineGameStore } from '../store/onlineGameStore';
@@ -462,15 +463,18 @@ export default function VirtualGame() {
     if (screen === 'menu') {
         return (
             <div className="max-w-md mx-auto p-4 pt-8 pb-20 space-y-3 animate-in fade-in">
+                <LevelUpReward />
                 <Card className="glass-premium dark:glass-dark shadow-xl relative">
                     <CardHeader className="text-center">
                         <div className="flex justify-center mb-3">
-                            <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg animate-float overflow-hidden bg-slate-900 border border-skyjo-blue/30">
-                                <img
-                                    src="/virtual-logo.jpg"
-                                    alt="Skyjo Virtual"
-                                    className="w-full h-full object-cover scale-110"
-                                />
+                            <div className="flex justify-center mb-3">
+                                <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg animate-float overflow-hidden bg-slate-900 border border-skyjo-blue/30">
+                                    <img
+                                        src="/virtual-logo.jpg"
+                                        alt="Skyjo Virtual"
+                                        className="w-full h-full object-cover scale-110"
+                                    />
+                                </div>
                             </div>
                         </div>
                         <CardTitle className="text-2xl text-skyjo-blue font-bold">
@@ -1641,6 +1645,7 @@ export default function VirtualGame() {
             )}
 
             {/* Draw/Discard Popup Modal */}
+            <LevelUpReward />
             <DrawDiscardPopup
                 isOpen={showDrawDiscardPopup}
                 onClose={() => {

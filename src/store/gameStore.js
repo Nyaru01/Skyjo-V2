@@ -42,6 +42,7 @@ export const useGameStore = create(
             // XP & Level System
             currentXP: 0,  // 0-9, resets to 0 on level up
             level: 1,      // Starts at level 1
+            lastAcknowledgedLevel: 1, // Track which level up rewards have been seen
 
             /**
              * Add XP points (called on victory)
@@ -63,9 +64,24 @@ export const useGameStore = create(
             },
 
             /**
+             * Acknowledge that the user has seen the level up reward
+             */
+            acknowledgeLevelUp: () => {
+                set({ lastAcknowledgedLevel: get().level });
+            },
+
+            /**
              * Reset XP and Level (for testing/admin)
              */
-            resetXP: () => set({ currentXP: 0, level: 1 }),
+            resetXP: () => set({ currentXP: 0, level: 1, lastAcknowledgedLevel: 1 }),
+
+            /**
+             * Debug: Force level up
+             */
+            debugLevelUp: () => {
+                const { level } = get();
+                set({ level: level + 1, currentXP: 0 });
+            },
 
             toggleDarkMode: () => {
                 const newMode = !get().darkMode;
