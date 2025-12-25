@@ -209,11 +209,17 @@ export const decideDrawSource = (gameState, difficulty = AI_DIFFICULTY.NORMAL) =
 
     const discardValue = discardTop.value;
 
-    // Easy: 50% random
+    // Easy: Novice behavior
     if (difficulty === AI_DIFFICULTY.EASY) {
-        if (Math.random() < 0.5) {
-            return Math.random() < 0.5 ? 'DRAW_PILE' : 'DISCARD_PILE';
+        // If discard is good (low value), likely take it
+        if (discardValue <= 5) {
+            // 70% chance to see the opportunity
+            if (Math.random() < 0.7) {
+                return 'DISCARD_PILE';
+            }
         }
+        // Otherwise (bad value or missed opportunity), draw from pile
+        return 'DRAW_PILE';
     }
 
     // Normal: Take discard if value <= 4
@@ -289,21 +295,41 @@ export const decideCardAction = (gameState, difficulty = AI_DIFFICULTY.NORMAL) =
         return { action: 'REPLACE', cardIndex: finalIndex };
     }
 
-    // Easy: Random decision
+    // Easy: Novice behavior (inconsistent but reasonable)
     if (difficulty === AI_DIFFICULTY.EASY) {
-        const shouldReplace = Math.random() < 0.6;
-        if (shouldReplace) {
-            const validIndices = hand.map((c, i) => c !== null ? i : -1).filter(i => i !== -1);
-            return { action: 'REPLACE', cardIndex: getRandomElement(validIndices) };
-        } else {
-            const hiddenIndices = getHiddenCardIndices(hand);
-            if (hiddenIndices.length > 0) {
-                return { action: 'DISCARD_AND_REVEAL', cardIndex: getRandomElement(hiddenIndices) };
+        // If drawn card is "good" (low value), try to use it
+        if (drawnValue <= 5) {
+            // 70% chance to play logically
+            if (Math.random() < 0.7) {
+                // Try to replace a higher revealed card
+                const highest = findHighestRevealedCard(hand);
+                if (highest.index !== -1 && highest.value > drawnValue) {
+                    return { action: 'REPLACE', cardIndex: highest.index };
+                }
+                // If we have a good card but no obvious replacement, try a hidden one
+                const hiddenIndices = getHiddenCardIndices(hand);
+                if (hiddenIndices.length > 0) {
+                    return { action: 'REPLACE', cardIndex: getRandomElement(hiddenIndices) };
+                }
             }
-            // No hidden cards, must replace
+            // 30% chance or fallback: Replace a random card (maybe a bad move)
             const validIndices = hand.map((c, i) => c !== null ? i : -1).filter(i => i !== -1);
             return { action: 'REPLACE', cardIndex: getRandomElement(validIndices) };
         }
+
+        // If card is "bad" (high value)
+        // 90% chance to discard and reveal hidden (correct move)
+        // unless no hidden cards left
+        const hiddenIndices = getHiddenCardIndices(hand);
+        if (hiddenIndices.length > 0) {
+            if (Math.random() < 0.9) {
+                return { action: 'DISCARD_AND_REVEAL', cardIndex: getRandomElement(hiddenIndices) };
+            }
+        }
+
+        // Mistake or must replace: Replace a random card
+        const validIndices = hand.map((c, i) => c !== null ? i : -1).filter(i => i !== -1);
+        return { action: 'REPLACE', cardIndex: getRandomElement(validIndices) };
     }
 
     // Normal/Hard: Strategic decision
