@@ -193,7 +193,7 @@ export default function VirtualGame() {
     useEffect(() => {
         if (screen === 'game' && onlineRoomCode && !onlineGameStarted && !onlineIsGameOver) {
             // Game was cancelled (host left or not enough players)
-            setScreen('lobby');
+            setScreen('menu');
         }
     }, [onlineGameStarted, onlineIsGameOver, onlineRoomCode, screen]);
 
