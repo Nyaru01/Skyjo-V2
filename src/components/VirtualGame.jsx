@@ -550,6 +550,23 @@ export default function VirtualGame() {
                             </div>
                         </button>
 
+                        {/* Rules Button (Moved) */}
+                        <button
+                            onClick={() => setShowRulesModal(true)}
+                            className="w-full p-2 mt-4 rounded-2xl glass-premium dark:glass-dark border border-amber-200/50 dark:border-amber-700/50 hover:border-amber-400 transition-all group cursor-pointer"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                                    <BookOpen className="h-4 w-4 text-white" />
+                                </div>
+                                <div className="text-left flex-1">
+                                    <p className="font-bold text-sm text-slate-800 dark:text-slate-200">Règles du jeu</p>
+                                    <p className="text-[10px] text-slate-500 dark:text-slate-400">Comment jouer à Skyjo</p>
+                                </div>
+                                <span className="text-amber-500 dark:text-amber-400 text-base">→</span>
+                            </div>
+                        </button>
+
 
                     </CardContent>
                 </Card>
@@ -557,22 +574,7 @@ export default function VirtualGame() {
                 {/* Experience Bar */}
                 <ExperienceBar className="px-1" />
 
-                {/* Rules Button */}
-                <button
-                    onClick={() => setShowRulesModal(true)}
-                    className="w-full p-2 rounded-2xl glass-premium dark:glass-dark border border-amber-200/50 dark:border-amber-700/50 hover:border-amber-400 transition-all group cursor-pointer"
-                >
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                            <BookOpen className="h-4 w-4 text-white" />
-                        </div>
-                        <div className="text-left flex-1">
-                            <p className="font-bold text-sm text-slate-800 dark:text-slate-200">Règles du jeu</p>
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400">Comment jouer à Skyjo</p>
-                        </div>
-                        <span className="text-amber-500 dark:text-amber-400 text-base">→</span>
-                    </div>
-                </button>
+
 
                 {/* Rules Modal */}
                 {showRulesModal && (
