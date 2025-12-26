@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { Trophy, TrendingUp, TrendingDown, Target, Award, Zap, Crown, Flame, Users, Download, Upload, Save } from 'lucide-react';
+import { Trophy, TrendingUp, TrendingDown, Target, Award, Zap, Crown, Flame, Users, Download, Upload, Save, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useGameStore, selectGameHistory } from '../store/gameStore';
 import { Card, CardContent } from './ui/Card';
@@ -110,6 +110,8 @@ function LeaderboardItem({ player, rank, wins, avgScore, colorIndex }) {
 
 export default function Stats() {
     const gameHistory = useGameStore(selectGameHistory);
+    const level = useGameStore(state => state.level);
+    const currentXP = useGameStore(state => state.currentXP);
     const fileInputRef = useRef(null);
 
     // Export game history to JSON file
@@ -373,6 +375,47 @@ export default function Stats() {
                                     <Download className="h-4 w-4 text-skyjo-blue" />
                                     Exporter
                                 </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+
+                {/* Level / XP Card */}
+                <motion.div
+                    variants={cardVariants}
+                    custom={4}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    <Card className="glass-premium shadow-lg hover:shadow-xl transition-shadow h-full relative overflow-hidden group">
+                        {/* Background subtle glow */}
+                        <div className="absolute top-0 right-0 p-16 bg-purple-500/10 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2 group-hover:bg-purple-500/20 transition-colors duration-500" />
+
+                        <CardContent className="p-4 flex flex-col justify-between h-full relative z-10">
+                            <div className="flex items-start justify-between">
+                                <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                                    <Star className="h-5 w-5 fill-purple-500/20" />
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-3xl font-black text-slate-100 tabular-nums">{level}</div>
+                                    <div className="text-xs text-purple-300 font-medium tracking-wide uppercase">Niveau</div>
+                                </div>
+                            </div>
+
+                            <div className="mt-4 space-y-2">
+                                <div className="flex justify-between items-end text-xs">
+                                    <span className="text-slate-400 font-medium">Progression XP</span>
+                                    <span className="text-purple-300 font-bold">{currentXP} <span className="text-slate-500 font-normal">/ 10</span></span>
+                                </div>
+                                {/* Progress Bar Container */}
+                                <div className="h-2 w-full bg-slate-800/50 rounded-full overflow-hidden border border-white/5">
+                                    <div
+                                        className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 shadow-[0_0_10px_rgba(168,85,247,0.4)] relative"
+                                        style={{ width: `${(currentXP / 10) * 100}%` }}
+                                    >
+                                        <div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]" style={{ backgroundImage: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)', transform: 'skewX(-20deg)' }}></div>
+                                    </div>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
