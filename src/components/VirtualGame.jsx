@@ -1515,7 +1515,7 @@ export default function VirtualGame() {
 
     return (
         <div
-            className="max-w-3xl mx-auto p-1 sm:p-2 space-y-1 sm:space-y-3 animate-in fade-in relative"
+            className="max-w-3xl mx-auto p-1 sm:p-2 sm:space-y-3 animate-in fade-in relative h-[100dvh] flex flex-col justify-between overflow-hidden"
             style={{
                 // Vignette effect around edges based on turn
                 boxShadow: isMyTurn
@@ -1586,7 +1586,7 @@ export default function VirtualGame() {
             {!isInitialReveal && (
                 <div
                     className="flex justify-center px-4 relative z-40"
-                    style={{ marginTop: '24px', marginBottom: '24px' }}
+                    style={{ marginTop: '0', marginBottom: '0' }}
                 >
                     <div style={{ width: '100%', maxWidth: '340px' }}>
                         <DrawDiscardTrigger
@@ -1645,7 +1645,7 @@ export default function VirtualGame() {
 
             {/* Local Player at BOTTOM for thumb zone optimization */}
             {activeGameState.players[myPlayerIndex] && (
-                <div className="relative rounded-2xl transition-all duration-500 mt-24">
+                <div className="relative rounded-2xl transition-all duration-500">
                     <PlayerHand
                         player={activeGameState.players[myPlayerIndex]}
                         isCurrentPlayer={!isInitialReveal && activeGameState.currentPlayerIndex === myPlayerIndex}
