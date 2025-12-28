@@ -185,13 +185,8 @@ export default function GameSetup({ onNavigate }) {
             </Button>
 
             {/* Virtual Game Section */}
-            <div className="relative py-3">
-                <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-slate-500/40"></div>
-                </div>
-                <div className="relative flex justify-center">
-                    <span className="px-4 text-sm font-semibold text-slate-400 uppercase tracking-widest">— ou —</span>
-                </div>
+            <div className="py-4 flex justify-center">
+                <span className="text-base font-semibold text-slate-500 uppercase tracking-widest">———  OU  ———</span>
             </div>
 
             <button
