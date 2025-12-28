@@ -258,7 +258,12 @@ const DrawDiscardTrigger = memo(function DrawDiscardTrigger({
                                     ? '2px solid #f59e0b' // Amber border
                                     : '2px solid rgba(255,255,255,0.5)',
                                 background: mosaicColors.secondary,
-                                transition: 'box-shadow 0.3s ease, border-color 0.3s ease'
+                                transition: 'box-shadow 0.3s ease, border-color 0.3s ease',
+                                // Prevent text selection on long-press (mobile)
+                                userSelect: 'none',
+                                WebkitUserSelect: 'none',
+                                WebkitTouchCallout: 'none',
+                                touchAction: 'manipulation',
                             }}
                             onClick={canInteract ? () => { triggerHaptic(); (onDiscardAction || onClick)?.(); } : undefined}
                             onPointerDown={handleDiscardPointerDown}

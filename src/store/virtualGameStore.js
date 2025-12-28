@@ -14,6 +14,7 @@ import {
     calculateFinalScores,
     getValidActions,
 } from '../lib/skyjoEngine';
+import { useGameStore } from './gameStore';
 import {
     AI_DIFFICULTY,
     AI_NAMES,
@@ -552,7 +553,7 @@ export const useVirtualGameStore = create((set, get) => ({
      * End current round, update cumulative scores, check for game end
      */
     endRound: () => {
-        const { gameState, totalScores, roundNumber } = get();
+        const { gameState, totalScores, roundNumber, aiPlayers } = get();
         if (!gameState || gameState.phase !== 'FINISHED') return;
 
         const roundScores = calculateFinalScores(gameState);
@@ -562,6 +563,20 @@ export const useVirtualGameStore = create((set, get) => ({
         roundScores.forEach(score => {
             newTotalScores[score.playerId] = (newTotalScores[score.playerId] || 0) + score.finalScore;
         });
+
+        // Grant XP if human player won the round (lowest score = first in sorted array)
+        const roundWinner = roundScores[0]; // Sorted by score, lowest first
+        const humanPlayerIndex = 0; // Human is always player 0 in AI games
+        const humanPlayer = gameState.players[humanPlayerIndex];
+
+        if (roundWinner && humanPlayer && roundWinner.playerId === humanPlayer.id) {
+            // Human won this round! Grant 1 XP
+            try {
+                useGameStore.getState().addXP(1);
+            } catch (e) {
+                console.warn('Could not grant XP:', e);
+            }
+        }
 
         // Check if anyone reached 100 points (game over condition)
         const maxScore = Math.max(...Object.values(newTotalScores));
