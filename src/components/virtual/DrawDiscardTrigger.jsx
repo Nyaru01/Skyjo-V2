@@ -98,6 +98,7 @@ const DrawDiscardTrigger = memo(function DrawDiscardTrigger({
     discardPileCount = 0,
     canInteract = false,
     turnPhase,
+    instructionText = '', // Instruction text to display
     activeActionSource, // 'deck-pile' or 'discard-pile' when an animation is starting from here
 }) {
     const cardSkin = useGameStore(s => (s && s.cardSkin) ? s.cardSkin : 'classic');
@@ -308,6 +309,20 @@ const DrawDiscardTrigger = memo(function DrawDiscardTrigger({
                         </div>
                     )}
                 </div>
+
+                {/* Instruction Banner - Integrated at bottom */}
+                {instructionText && (
+                    <div className="absolute -bottom-10 left-0 right-0 flex justify-center pointer-events-none z-20">
+                        <motion.div
+                            initial={{ opacity: 0, y: -5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            key={instructionText}
+                            className="bg-indigo-600 text-white text-[11px] font-bold px-4 py-1.5 rounded-full backdrop-blur-md shadow-xl tracking-wide whitespace-nowrap flex items-center gap-2"
+                        >
+                            {instructionText}
+                        </motion.div>
+                    </div>
+                )}
             </div>
 
             {/* Discard History Overlay */}

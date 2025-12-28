@@ -1627,62 +1627,20 @@ export default function VirtualGame() {
                             activeActionSource={
                                 (onlineGameStarted ? onlinePendingAnimation?.sourceId : virtualPendingAnimation?.sourceId)
                             }
+                            instructionText={
+                                (activeGameState.phase === 'FINAL_ROUND' ? '⚠️ DERNIER TOUR ! ' : '') +
+                                (isInitialReveal ? `Retournez chacun 2 cartes ${selectedForReveal.length > 0 ? `(${selectedForReveal.length}/2)` : ''}` :
+                                    activeGameState.turnPhase === 'DRAW' ? '👆 Touchez la pioche ou la défausse' :
+                                        activeGameState.turnPhase === 'REPLACE_OR_DISCARD' ? '👆 Jouez dans votre grille ou défaussez' :
+                                            activeGameState.turnPhase === 'MUST_REPLACE' ? '👆 Remplacez une de vos cartes' :
+                                                activeGameState.turnPhase === 'MUST_REVEAL' ? '👆 Retournez une carte cachée' : '')
+                            }
                         />
                     </div>
                 </div>
             )}
 
-            {/* Instruction Banner - BELOW the PIOCHER button */}
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={activeGameState.turnPhase + activeGameState.phase}
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="text-center"
-                    style={{ marginBottom: '8px' }}
-                >
-                    <span
-                        className={cn(
-                            "inline-block px-6 py-3 rounded-2xl text-sm font-semibold shadow-lg",
-                            isInitialReveal
-                                ? "bg-purple-600 text-white"
-                                : activeGameState.turnPhase === 'DRAW'
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-violet-600 text-white"
-                        )}
-                        style={{
-                            maxWidth: '95%',
-                            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)',
-                        }}
-                    >
-                        {isInitialReveal && (
-                            <>
-                                Retournez chacun 2 cartes
-                                {selectedForReveal.length > 0 && ` (${selectedForReveal.length}/2)`}
-                            </>
-                        )}
-                        {!isInitialReveal && activeGameState.turnPhase === 'DRAW' && (
-                            '👆 Touchez la pioche ou la défausse'
-                        )}
-                        {activeGameState.turnPhase === 'REPLACE_OR_DISCARD' && (
-                            '👆 Jouez dans votre grille ou défaussez'
-                        )}
-                        {activeGameState.turnPhase === 'MUST_REPLACE' && (
-                            '👆 Remplacez une de vos cartes'
-                        )}
-                        {activeGameState.turnPhase === 'MUST_REVEAL' && (
-                            '👆 Retournez une carte cachée'
-                        )}
-                        {/* Last Round Banner */}
-                        {activeGameState.phase === 'FINAL_ROUND' && (
-                            <div className="mt-2 text-xs font-black text-amber-300 animate-pulse uppercase tracking-widest border border-amber-500/50 rounded-full px-2 py-0.5 bg-amber-900/40">
-                                ⚠️ Dernier Tour ! ⚠️
-                            </div>
-                        )}
-                    </span>
-                </motion.div>
-            </AnimatePresence>
+            {/* Instruction Banner moved inside DrawDiscardTrigger */}
 
             {/* Local Player at BOTTOM for thumb zone optimization */}
             {activeGameState.players[myPlayerIndex] && (
