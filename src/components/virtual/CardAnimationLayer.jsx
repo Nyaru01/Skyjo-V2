@@ -41,7 +41,7 @@ export default function CardAnimationLayer({ pendingAnimation, onClear }) {
                 });
             } else {
                 // Fallback if elements not found: just complete immediately
-                console.warn('Animation elements not found:', sourceId, targetId);
+                // This is expected when popup is not open or card slot not rendered
                 onComplete?.();
                 onClear();
             }

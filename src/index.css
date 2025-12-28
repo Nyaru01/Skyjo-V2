@@ -619,3 +619,18 @@ body,
 .animate-border-spin {
   animation: border-spin 4s linear infinite;
 }
+
+/* Slow spin animation for update icon */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
