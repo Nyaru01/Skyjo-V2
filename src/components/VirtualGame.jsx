@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Users, ArrowLeft, RotateCcw, Trophy, Info, Sparkles, CheckCircle, BookOpen, X, Bot, Lock, Image as ImageIcon, Palette } from 'lucide-react';
 import { Button } from './ui/Button';
@@ -288,11 +288,57 @@ export default function VirtualGame() {
 
             setHasArchivedOnline(true);
         }
+
         // Reset when starting a new game
         if (!onlineIsGameOver && hasArchivedOnline) {
             setHasArchivedOnline(false);
         }
     }, [onlineIsGameOver, onlineGameStarted, hasArchivedOnline, onlinePlayers, onlineTotalScores, onlineGameWinner, onlineRoundNumber, archiveOnlineGame, socketId, addXP]);
+
+    // Track last round we awarded XP for to prevent duplicates
+    const lastAwardedRoundRef = useRef(0);
+
+    // Award XP for winning an online ROUND
+    useEffect(() => {
+        if (!onlineGameStarted || !onlineGameState || onlineGameState.phase !== 'FINISHED') return;
+
+        const currentRound = onlineRoundNumber;
+
+        // Only proceed if we haven't processed this round yet
+        if (lastAwardedRoundRef.current === currentRound) return;
+
+        // Calculate results for this round
+        const roundResults = calculateFinalScores(onlineGameState);
+        if (!roundResults || roundResults.length === 0) return;
+
+        // Find the lowest score in this round
+        const sortedResults = [...roundResults].sort((a, b) => a.finalScore - b.finalScore);
+        const roundWinnerScore = sortedResults[0].finalScore;
+
+        // Check if WE are one of the winners (lowest score)
+        // In online mode, we need to match our ID (socketId)
+        const myResult = roundResults.find(r => r.playerId === socketId);
+
+        if (myResult && myResult.finalScore === roundWinnerScore) {
+            // We won (or tied for win) the round!
+            addXP(1);
+
+            // Show a small celebration toast? 
+            // Maybe not needed if the XP bar animates, but let's log it
+            console.log("XP Awarded for Round Win!", currentRound);
+        }
+
+        // Mark this round as processed
+        lastAwardedRoundRef.current = currentRound;
+
+    }, [onlineGameStarted, onlineGameState, onlineRoundNumber, socketId, addXP]);
+
+    // Reset awarded round tracker when game restarts
+    useEffect(() => {
+        if (!onlineGameStarted) {
+            lastAwardedRoundRef.current = 0;
+        }
+    }, [onlineGameStarted]);
 
 
 
