@@ -14,6 +14,7 @@ import GameHistory from './GameHistory';
 import Stats from './Stats';
 import VirtualGame from './VirtualGame';
 import BottomNav from './BottomNav';
+import SettingsPage from './SettingsPage';
 
 // Variants d'animation pour les transitions de pages
 const pageVariants = {
@@ -180,6 +181,20 @@ export default function Dashboard() {
                         transition={pageTransition}
                     >
                         <Stats />
+                    </motion.div>
+                );
+
+            case 'settings':
+                return (
+                    <motion.div
+                        key="settings"
+                        variants={pageVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                        transition={pageTransition}
+                    >
+                        <SettingsPage />
                     </motion.div>
                 );
 

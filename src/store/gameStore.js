@@ -293,6 +293,13 @@ export const useGameStore = create(
                 set({ gameHistory: gameHistory.filter(g => g.id !== gameId) });
             },
 
+            /**
+             * Clear all game history
+             */
+            clearArchivedGames: () => {
+                set({ gameHistory: [] });
+            },
+
             resetGame: () => {
                 set({
                     gameStatus: 'SETUP',

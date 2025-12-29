@@ -1,4 +1,4 @@
-import { Home, Archive, BarChart3, Dices } from 'lucide-react';
+import { Home, Archive, BarChart3, Dices, Settings } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useGameStore } from '../store/gameStore';
 
@@ -10,6 +10,7 @@ export default function BottomNav({ activeTab, onTabChange }) {
         { id: 'virtual', label: 'Jouer', icon: Dices, alwaysEnabled: true },
         { id: 'pastGames', label: 'Parties', icon: Archive, alwaysEnabled: true },
         { id: 'stats', label: 'Profil', icon: BarChart3, alwaysEnabled: true },
+        { id: 'settings', label: 'Réglages', icon: Settings, alwaysEnabled: true },
     ];
 
     return (
