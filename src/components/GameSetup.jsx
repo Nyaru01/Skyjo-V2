@@ -75,24 +75,23 @@ export default function GameSetup({ onNavigate }) {
     const selectedPlayerForPicker = openEmojiPicker !== null ? players[openEmojiPicker] : null;
 
     return (
-        <div className="max-w-md mx-auto p-3 space-y-2 animate-in fade-in zoom-in duration-300 h-[calc(100vh-6rem)] flex flex-col justify-center">
+        <div className="max-w-md mx-auto p-2 space-y-2 animate-in fade-in zoom-in duration-300 h-[calc(100vh-5rem)] flex flex-col justify-center overflow-hidden">
             {/* Header Premium */}
             {/* Header Premium - Uniformisé avec le bouton Virtuel */}
             {/* Unified Skyjo Score Container */}
-            <div className="w-full relative group overflow-hidden rounded-[20px] shadow-[0_0_15px_rgba(255,255,255,0.15)] transition-all">
+            <div className="w-full relative group overflow-hidden rounded-[20px] shadow-xl transition-all">
                 {/* Rotating Beam Border */}
                 <div className="absolute inset-[-150%] bg-[conic-gradient(from_0deg,transparent_0_300deg,#184766_360deg)] animate-border-spin opacity-100" />
 
                 {/* Opaque Center - Masks the center to create 2px border */}
-                <div className="absolute inset-[2px] bg-white dark:bg-slate-900/90 rounded-[18px] z-10 glass-premium dark:glass-dark" />
+                <div className="absolute inset-[2px] bg-[#1e2235] rounded-[18px] z-10" />
 
                 {/* Content Layer */}
                 <div className="relative z-20 flex flex-col">
                     {/* Background Effect - changed to simple pulse to avoid green shadow */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 animate-pulse blur-xl opacity-30 pointer-events-none rounded-[18px]" />
 
                     {/* Header Section */}
-                    <div className="relative p-5 flex items-center gap-5 border-b border-white/5">
+                    <div className="relative p-4 flex items-center gap-4 border-b border-white/5">
                         <div className="w-20 h-20 rounded-3xl flex items-center justify-center shadow-lg overflow-hidden border border-white/20 bg-slate-900 shrink-0">
                             <img
                                 src="/logo.jpg"
@@ -113,7 +112,7 @@ export default function GameSetup({ onNavigate }) {
                     </div>
 
                     {/* Players Section */}
-                    <div className="relative p-4 space-y-3 flex-1">
+                    <div className="relative p-3 space-y-2 flex-1">
                         <div className="flex items-center gap-2 text-base font-bold text-slate-800 dark:text-slate-100 mb-1 px-1">
                             <User className="h-4 w-4 text-skyjo-blue dark:text-sky-400" />
                             Joueurs
@@ -179,7 +178,7 @@ export default function GameSetup({ onNavigate }) {
                     </div>
 
                     {/* Action Section */}
-                    <div className="relative p-4 pt-2">
+                    <div className="relative p-3 pt-1">
                         <Button
                             size="lg"
                             className="w-full bg-skyjo-blue hover:bg-skyjo-blue/90 text-white font-bold shadow-xl shadow-skyjo-blue/25 border border-white/20 h-12 text-base transition-all hover:scale-[1.02]"
