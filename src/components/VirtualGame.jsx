@@ -1582,8 +1582,17 @@ export default function VirtualGame() {
                                             </>
                                         ) : (
                                             <>
-                                                <Play className="h-4 w-4 mr-1" />
-                                                Manche suivante
+                                                {isOnlineMode && !onlineIsHost ? (
+                                                    <>
+                                                        <CheckCircle className="h-4 w-4 mr-1" />
+                                                        Proposer la suite
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Play className="h-4 w-4 mr-1" />
+                                                        Manche suivante
+                                                    </>
+                                                )}
                                             </>
                                         )}
                                     </>
