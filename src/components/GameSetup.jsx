@@ -127,7 +127,7 @@ export default function GameSetup({ onNavigate }) {
                             return (
                                 <div
                                     key={index}
-                                    className="flex gap-3 animate-scale-in"
+                                    className="flex gap-3 items-center animate-scale-in"
                                     style={{ animationDelay: `${index * 80}ms` }}
                                 >
                                     {/* Avatar Selector Button */}
@@ -162,7 +162,7 @@ export default function GameSetup({ onNavigate }) {
                                             value={player.name}
                                             onChange={(e) => updateName(index, e.target.value)}
                                             className={cn(
-                                                "h-10 bg-slate-950/50 border-slate-800 focus:bg-slate-900 focus:border-sky-500 transition-all shadow-inner text-sm text-white placeholder:text-slate-600 rounded-xl",
+                                                "h-12 bg-slate-950/50 border-slate-800 focus:bg-slate-900 focus:border-sky-500 transition-all shadow-inner text-sm text-white placeholder:text-slate-600 rounded-xl",
                                                 player.name && "font-medium"
                                             )}
                                         />
@@ -174,7 +174,7 @@ export default function GameSetup({ onNavigate }) {
                                             variant="ghost"
                                             size="icon"
                                             onClick={() => removePlayer(index)}
-                                            className="shrink-0 h-10 w-10 text-slate-500 hover:text-red-400 hover:bg-red-950/30 rounded-xl transition-colors"
+                                            className="shrink-0 h-12 w-12 text-slate-500 hover:text-red-400 hover:bg-red-950/30 rounded-xl transition-colors"
                                         >
                                             <X className="h-4 w-4" />
                                         </Button>
