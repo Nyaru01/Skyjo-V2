@@ -1776,7 +1776,7 @@ export default function VirtualGame() {
                     variant="ghost"
                     size="sm"
                     onClick={handleBackToMenu}
-                    className="h-6 px-2 text-xs"
+                    className="h-9 px-4 text-sm font-medium"
                 >
                     ← Quitter
                 </Button>
@@ -1905,6 +1905,7 @@ export default function VirtualGame() {
                             activeActionSource={
                                 (onlineGameStarted ? onlinePendingAnimation?.sourceId : virtualPendingAnimation?.sourceId)
                             }
+                            isDrawing={!!(onlineGameStarted ? onlinePendingAnimation?.sourceId : virtualPendingAnimation?.sourceId)}
                             instructionText={
                                 activeGameState.phase === 'FINAL_ROUND'
                                     ? '⚠️ DERNIER TOUR'

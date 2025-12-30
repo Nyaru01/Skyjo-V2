@@ -100,10 +100,18 @@ const DrawDiscardTrigger = memo(function DrawDiscardTrigger({
     turnPhase,
     instructionText = '', // Instruction text to display
     activeActionSource, // 'deck-pile' or 'discard-pile' when an animation is starting from here
+    isDrawing = false,
 }) {
     const cardSkin = useGameStore(s => (s && s.cardSkin) ? s.cardSkin : 'classic');
+    const gameMode = useGameStore(s => (s && s.gameMode) ? s.gameMode : 'normal');
+
     const hasDrawnCard = !!drawnCard;
+    // Logique Visibilité Défausse (Mode H included)
+    // Permet l'affichage pour Normal, Difficile ET H
     const showDiscardPreview = discardTop && !hasDrawnCard;
+
+    // Disable interaction if drawing
+    const effectiveCanInteract = canInteract && !isDrawing;
 
     // Long-press state for discard history
     const [showHistory, setShowHistory] = useState(false);

@@ -103,35 +103,7 @@ const DrawDiscardPopup = memo(function DrawDiscardPopup({
                                         <SkyjoCard card={drawnCard} size="lg" isHighlighted />
                                     </div>
 
-                                    {/* Discard history - last 3 cards stacked */}
-                                    {discardPile.length > 0 && (
-                                        <div className="flex flex-col items-center">
-                                            <span className="text-xs text-slate-400 mb-2">📜 Défausse</span>
-                                            <div className="relative" style={{ width: 100, height: 70 }}>
-                                                {discardPile.slice(-3).map((card, index, arr) => (
-                                                    <div
-                                                        key={card.id || index}
-                                                        className="absolute"
-                                                        style={{
-                                                            top: index * 2,
-                                                            left: index * 25,
-                                                            zIndex: index,
-                                                            transform: `rotate(${(index - 1) * 5}deg)`,
-                                                        }}
-                                                    >
-                                                        <SkyjoCard
-                                                            card={{ ...card, isRevealed: true }}
-                                                            size="sm"
-                                                            isClickable={false}
-                                                        />
-                                                    </div>
-                                                ))}
-                                            </div>
-                                            <span className="text-[10px] text-slate-500 mt-1">
-                                                {discardPile.length} carte{discardPile.length > 1 ? 's' : ''}
-                                            </span>
-                                        </div>
-                                    )}
+
                                 </div>
 
                                 {/* Two clear action buttons */}

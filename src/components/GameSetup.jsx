@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, X, User, Sparkles, Gamepad2, RefreshCw, CheckCircle, Edit2 } from 'lucide-react';
+import { Plus, X, User, Sparkles, Gamepad2, RefreshCw, CheckCircle, Edit2, ArrowRight } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 // Card imports removed as they are no longer used
@@ -22,6 +22,24 @@ const PLAYER_COLORS = [
     { bg: 'bg-pink-500', text: 'text-pink-700', light: 'bg-pink-100' },
 ];
 
+const useSyncedAnimation = () => {
+    const ref = useRef(null);
+    useEffect(() => {
+        let frameId;
+        const animate = () => {
+            const time = Date.now() / 1000;
+            const angle = (time * 60) % 360; // 60 deg per second
+            if (ref.current) {
+                ref.current.style.setProperty('--rotation', `${angle}deg`);
+            }
+            frameId = requestAnimationFrame(animate);
+        };
+        frameId = requestAnimationFrame(animate);
+        return () => cancelAnimationFrame(frameId);
+    }, []);
+    return ref;
+};
+
 export default function GameSetup({ onNavigate }) {
     const [players, setPlayers] = useState([
         { name: '', avatarId: 'cat' },
@@ -31,6 +49,22 @@ export default function GameSetup({ onNavigate }) {
     const setConfiguration = useGameStore(state => state.setConfiguration);
     const { playStart } = useFeedback();
     const { checkForUpdates, isChecking, checkResult } = useUpdateCheck();
+
+    // Synced animation refs
+    const scoreContainerRef = useRef(null);
+    const virtualContainerRef = useRef(null);
+
+    useEffect(() => {
+        let frameId;
+        const animate = () => {
+            const angle = (Date.now() / 20) % 360;
+            if (scoreContainerRef.current) scoreContainerRef.current.style.setProperty('--border-angle', `${angle}deg`);
+            if (virtualContainerRef.current) virtualContainerRef.current.style.setProperty('--border-angle', `${(angle + 180) % 360}deg`);
+            frameId = requestAnimationFrame(animate);
+        };
+        frameId = requestAnimationFrame(animate);
+        return () => cancelAnimationFrame(frameId);
+    }, []);
 
     const addPlayer = () => {
         if (players.length < 8) {
@@ -69,14 +103,18 @@ export default function GameSetup({ onNavigate }) {
         playStart();
         setConfiguration(finalPlayers, 100); // Default threshold 100
     };
-
     return (
         <div className="max-w-md mx-auto p-2 space-y-2 animate-in fade-in zoom-in duration-300 h-[calc(100vh-5rem)] flex flex-col justify-center overflow-hidden">
             {/* Header Premium */}
             {/* Unified Skyjo Score Container - Premium Redesign */}
-            <div className="w-full relative group overflow-hidden rounded-[24px] shadow-2xl transition-all">
+            <div ref={scoreContainerRef} className="w-full relative group overflow-hidden rounded-[24px] shadow-2xl transition-all">
                 {/* Rotating Beam Border (Preserved) */}
-                <div className="absolute inset-[-150%] bg-[conic-gradient(from_0deg,transparent_0_300deg,#0ea5e9_360deg)] animate-border-spin opacity-100" />
+                <div
+                    className="absolute inset-[-150%] opacity-100"
+                    style={{
+                        background: 'conic-gradient(from var(--border-angle), transparent 0deg 300deg, #0ea5e9 360deg)'
+                    }}
+                />
 
                 {/* Glass Background (Premium) */}
                 <div className="absolute inset-[2px] bg-slate-900/90 backdrop-blur-xl rounded-[22px] z-10" />
@@ -209,7 +247,9 @@ export default function GameSetup({ onNavigate }) {
             </div>
 
             {/* Virtual Game Section */}
+            {/* Virtual Game Section */}
             <button
+                ref={virtualContainerRef}
                 onClick={() => {
                     playStart();
                     onNavigate?.('virtual');
@@ -217,7 +257,12 @@ export default function GameSetup({ onNavigate }) {
                 className="w-full relative group cursor-pointer overflow-hidden rounded-[24px] transition-all hover:scale-[1.02] shadow-2xl mt-8"
             >
                 {/* Rotating Beam Border - Pseudo-element simulation */}
-                <div className="absolute inset-[-150%] bg-[conic-gradient(from_0deg,transparent_0_300deg,#9333ea_360deg)] animate-border-spin opacity-100" />
+                <div
+                    className="absolute inset-[-150%] opacity-100"
+                    style={{
+                        background: 'conic-gradient(from var(--border-angle), transparent 0deg 300deg, #9333ea 360deg)'
+                    }}
+                />
 
                 {/* Glass Background (Premium) */}
                 <div className="absolute inset-[2px] bg-slate-900/90 backdrop-blur-xl rounded-[22px] z-10" />
@@ -246,7 +291,9 @@ export default function GameSetup({ onNavigate }) {
                         <p className="text-sm text-purple-300 font-medium mt-1">Contre l'IA ou en ligne</p>
                     </div>
                     <div className="w-10 h-10 rounded-full bg-purple-500/10 border border-purple-500/30 flex items-center justify-center relative z-30 group-hover:bg-purple-500/20 transition-colors">
-                        <span className="text-purple-400 text-xl group-hover:translate-x-0.5 transition-transform">→</span>
+                        <span className="text-purple-400 font-bold text-xl group-hover:translate-x-0.5 transition-transform">
+                            <ArrowRight strokeWidth={3} className="h-6 w-6" />
+                        </span>
                     </div>
                 </div>
             </button>
