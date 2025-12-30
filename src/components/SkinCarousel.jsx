@@ -35,10 +35,9 @@ export default function SkinCarousel({ skins, selectedSkinId, onSelect, playerLe
     };
 
     return (
-        <div className="relative w-full h-[260px] flex items-center justify-center perspective-1000 overflow-hidden py-4">
+        <div className="relative w-full h-[260px] flex items-center justify-center perspective-1000 py-4">
             {/* Background Light Effect - Updated to match new container */}
-            {/* Background Light Effect - Updated to match new container */}
-            <div className="absolute inset-0 bg-purple-500/20 blur-3xl opacity-50 pointer-events-none" />
+            {/* Background Light Effect - Moved to Parent Container */}
 
             {/* Prev Button */}
             <button
@@ -99,11 +98,24 @@ export default function SkinCarousel({ skins, selectedSkinId, onSelect, playerLe
                                     transformStyle: 'preserve-3d',
                                 }}
                             >
-                                <div className={cn(
-                                    "w-full h-full relative rounded-xl overflow-hidden border-2 shadow-2xl transition-all duration-300 bg-slate-900",
-                                    isActive ? "border-purple-400 shadow-purple-500/50" : "border-slate-700/30 shadow-black/80",
-                                    isSelected && isActive && "ring-4 ring-white ring-offset-2 ring-offset-purple-900"
-                                )}>
+                                {/* Active Card Glow/Border Effect */}
+                                {isActive && (
+                                    <>
+                                        {/* Pulsating Border - Purple Gradient (Reduced) */}
+                                        <div className="absolute -inset-[5px] rounded-[22px] bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-indigo-500 opacity-15 blur-md animate-pulse-slow" />
+
+                                        {/* Sharp Pulsing Border (Matches Main Menu Button Style - Tighter) */}
+                                        <div className="absolute -inset-[3px] bg-[#C084FC] rounded-[20px] animate-border-pulse opacity-90 shadow-[0_0_10px_#C084FC]" />
+                                    </>
+                                )}
+
+                                <div
+                                    className={cn(
+                                        "relative w-full h-full rounded-[18px] overflow-hidden transition-all duration-300",
+                                        isActive ? "ring-0" : "grayscale-[0.5] brightness-75 hover:grayscale-0 hover:brightness-100",
+                                        isLocked && "opacity-50"
+                                    )}
+                                >
                                     {/* Image */}
                                     <img
                                         src={skin.img}
