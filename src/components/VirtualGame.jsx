@@ -97,6 +97,7 @@ export default function VirtualGame() {
     const lastAction = useOnlineGameStore(s => s.lastAction);
     const onlinePendingAnimation = useOnlineGameStore(s => s.pendingAnimation);
     const clearOnlinePendingAnimation = useOnlineGameStore(s => s.clearPendingAnimation);
+    const onlineReadyStatus = useOnlineGameStore(s => s.readyStatus);
 
     // Main game store for archiving
     const archiveOnlineGame = useGameStore(s => s.archiveOnlineGame);
@@ -203,9 +204,6 @@ export default function VirtualGame() {
             if (onlineLastNotificationRaw.type === 'error') {
                 setIsNextRoundPending(false);
             }
-            if (onlineLastNotificationRaw.type === 'error') {
-                setIsNextRoundPending(false);
-            }
             // Check for sound trigger
             if (onlineLastNotificationRaw.sound === 'join') {
                 const audio = new Audio('/Sounds/whoosh-radio-ready-219487.mp3');
@@ -223,6 +221,30 @@ export default function VirtualGame() {
             }
         }
     }, [onlineLastNotificationRaw, isTabHidden, sendNotification]);
+
+    // Auto-archive online game on Game Over
+    // We use a ref to prevent double-archiving in the same mounting cycle if store updates slowly
+    const hasArchivedOnlineRef = useRef(false);
+
+    // Reset ref when game starts
+    useEffect(() => {
+        if (onlineGameStarted && !onlineIsGameOver) {
+            hasArchivedOnlineRef.current = false;
+        }
+    }, [onlineGameStarted, onlineIsGameOver]);
+
+    useEffect(() => {
+        if (onlineIsGameOver && onlineGameStarted && onlinePlayers.length > 0 && !hasArchivedOnlineRef.current) {
+            console.log("Auto-archiving online game results...");
+            hasArchivedOnlineRef.current = true;
+            archiveOnlineGame({
+                players: onlinePlayers,
+                totalScores: onlineTotalScores,
+                winner: onlineGameWinner,
+                roundsPlayed: onlineRoundNumber
+            });
+        }
+    }, [onlineIsGameOver, onlineGameStarted, onlinePlayers, onlineTotalScores, onlineGameWinner, onlineRoundNumber, archiveOnlineGame]);
 
     // Reset pending state when round number changes
     useEffect(() => {
@@ -512,9 +534,12 @@ export default function VirtualGame() {
 
 
     // Back to menu
+    // Back to menu
     const handleBackToMenu = () => {
         // Archive online game if it was started and has data (avoid duplicates)
-        if (onlineGameStarted && onlinePlayers.length > 0 && !hasArchivedOnline) {
+        // Check our ref to see if we already auto-archived
+        if (onlineGameStarted && onlinePlayers.length > 0 && !hasArchivedOnlineRef.current) {
+            console.log("Manual archiving on quit...");
             archiveOnlineGame({
                 players: onlinePlayers,
                 totalScores: onlineTotalScores,
@@ -582,22 +607,20 @@ export default function VirtualGame() {
                 <Card className="glass-premium dark:glass-dark shadow-xl relative">
                     <CardHeader className="text-center">
                         <div className="flex justify-center mb-3">
-                            <div className="flex justify-center mb-3">
-                                <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg animate-float overflow-hidden bg-slate-900 border border-skyjo-blue/30">
+                            <div className="flex justify-center mb-1">
+                                <div
+                                    className="w-80 rounded-xl flex items-center justify-center shadow-lg animate-float overflow-hidden bg-slate-900 border border-skyjo-blue/30"
+                                    style={{ aspectRatio: '32/9' }}
+                                >
                                     <img
-                                        src="/virtual-logo.jpg"
+                                        src="/virtual-logo2.jpg"
                                         alt="Skyjo Virtual"
-                                        className="w-full h-full object-cover scale-110"
+                                        className="w-full h-full object-cover"
                                     />
                                 </div>
                             </div>
                         </div>
-                        <CardTitle className="text-2xl text-skyjo-blue font-bold">
-                            Skyjo Virtuel
-                        </CardTitle>
-                        <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
-                            Défiez l'IA ou vos amis en ligne !
-                        </p>
+
                     </CardHeader>
                     <CardContent className="space-y-4">
 
@@ -666,8 +689,12 @@ export default function VirtualGame() {
                     </CardContent>
                 </Card>
 
-                {/* Experience Bar */}
-                <ExperienceBar className="px-1" />
+                {/* Experience Bar Container */}
+                <Card className="glass-premium dark:glass-dark shadow-xl border border-slate-200/50 dark:border-slate-700/50">
+                    <CardContent className="pt-4 px-4 pb-2">
+                        <ExperienceBar />
+                    </CardContent>
+                </Card>
 
 
 
@@ -1479,7 +1506,7 @@ export default function VirtualGame() {
                                         "text-lg font-bold",
                                         score.penalized ? "text-red-500" : "text-slate-200"
                                     )}>
-                                        +{score.finalScore}
+                                        +{Number(score.finalScore) || 0}
                                     </span>
                                     {score.penalized && (
                                         <span className="text-xs text-red-500 block">
@@ -1575,17 +1602,35 @@ export default function VirtualGame() {
                                     </>
                                 ) : (
                                     <>
-                                        {isNextRoundPending ? (
+                                        {isOnlineMode ? (
                                             <>
-                                                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-1" />
-                                                Attendez...
+                                                {isNextRoundPending || (onlineReadyStatus.readyCount > 0 && onlineReadyStatus.readyCount < onlineReadyStatus.totalPlayers) ? (
+                                                    <>
+                                                        <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-1" />
+                                                        Attendez... ({onlineReadyStatus.readyCount}/{onlineReadyStatus.totalPlayers})
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        {onlineIsHost ? (
+                                                            <>
+                                                                <Play className="h-4 w-4 mr-1" />
+                                                                Manche suivante
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <CheckCircle className="h-4 w-4 mr-1" />
+                                                                Proposer la suite
+                                                            </>
+                                                        )}
+                                                    </>
+                                                )}
                                             </>
                                         ) : (
                                             <>
-                                                {isOnlineMode && !onlineIsHost ? (
+                                                {isNextRoundPending ? (
                                                     <>
-                                                        <CheckCircle className="h-4 w-4 mr-1" />
-                                                        Proposer la suite
+                                                        <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-1" />
+                                                        Attendez...
                                                     </>
                                                 ) : (
                                                     <>
@@ -1601,7 +1646,7 @@ export default function VirtualGame() {
                         </div>
                     </CardContent>
                 </Card>
-            </div>
+            </div >
         );
     }
 

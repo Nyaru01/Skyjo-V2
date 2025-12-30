@@ -34,6 +34,7 @@ export const useOnlineGameStore = create((set, get) => ({
     gameStarted: false,
     isGameOver: false,
     gameWinner: null,
+    readyStatus: { readyCount: 0, totalPlayers: 0 }, // Track ready players for next round
 
     // UI Local State
     selectedCardIndex: null,
@@ -110,7 +111,8 @@ export const useOnlineGameStore = create((set, get) => ({
                     gameStarted: true,
                     isGameOver: false,
                     gameWinner: null,
-                    selectedCardIndex: null
+                    selectedCardIndex: null,
+                    readyStatus: { readyCount: 0, totalPlayers: 0 }
                 });
             });
 
@@ -232,6 +234,11 @@ export const useOnlineGameStore = create((set, get) => ({
             socket.on('player_ready_next_round', ({ playerId, playerName, playerEmoji, readyCount, totalPlayers }) => {
                 console.log(`[Socket] ${playerName} is ready (${readyCount}/${totalPlayers})`);
                 const { socketId } = get();
+
+                // Update ready status
+                set({
+                    readyStatus: { readyCount, totalPlayers }
+                });
 
                 // Only notify if someone else clicked ready
                 const isMe = playerId === socketId;

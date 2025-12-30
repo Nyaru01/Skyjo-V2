@@ -35,7 +35,7 @@ export default function SkinCarousel({ skins, selectedSkinId, onSelect, playerLe
     };
 
     return (
-        <div className="relative w-full h-[220px] flex items-center justify-center perspective-1000 overflow-hidden py-4">
+        <div className="relative w-full h-[260px] flex items-center justify-center perspective-1000 overflow-hidden py-4">
             {/* Background Light Effect */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] bg-amber-500/10 blur-[80px] rounded-full pointer-events-none" />
 
@@ -95,7 +95,7 @@ export default function SkinCarousel({ skins, selectedSkinId, onSelect, playerLe
                                 <div className={cn(
                                     "w-full h-full relative rounded-xl overflow-hidden border-2 shadow-2xl transition-all duration-300 bg-slate-900",
                                     isActive ? "border-amber-500/50 shadow-amber-500/20" : "border-slate-700/50 shadow-black/50 grayscale-[0.5]",
-                                    isSelected && isActive && "ring-4 ring-emerald-500 ring-offset-2 ring-offset-slate-900"
+                                    isSelected && isActive && "ring-4 ring-white ring-offset-2 ring-offset-slate-900"
                                 )}>
                                     {/* Image */}
                                     <img
@@ -120,26 +120,29 @@ export default function SkinCarousel({ skins, selectedSkinId, onSelect, playerLe
                                     {/* Selected Badge */}
                                     {isSelected && (
                                         <div className="absolute top-2 right-2 z-20">
-                                            <div className="bg-emerald-500 text-white p-1 rounded-full shadow-lg">
+                                            <div className="bg-white text-slate-900 p-1 rounded-full shadow-lg">
                                                 <CheckCircle className="w-4 h-4" />
                                             </div>
                                         </div>
                                     )}
 
-                                    {/* Label */}
-                                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 to-transparent p-4 flex flex-col items-center justify-end">
-                                        <span className={cn(
-                                            "font-bold text-sm",
-                                            isSelected ? "text-emerald-400" : "text-white"
-                                        )}>
-                                            {skin.name}
-                                        </span>
-                                    </div>
-
                                     {/* Shine reflection for active card */}
                                     {isActive && !isLocked && (
                                         <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 opacity-30 pointer-events-none" />
                                     )}
+                                </div>
+
+                                {/* Label - Moved Below */}
+                                <div className={cn(
+                                    "absolute -bottom-8 inset-x-0 text-center transition-opacity duration-300",
+                                    isActive ? "opacity-100" : "opacity-0"
+                                )}>
+                                    <span className={cn(
+                                        "font-bold text-sm bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm border border-white/10",
+                                        isSelected ? "text-white" : "text-slate-300"
+                                    )}>
+                                        {skin.name}
+                                    </span>
                                 </div>
                             </motion.div>
                         );

@@ -316,7 +316,10 @@ io.on('connection', (socket) => {
             if (!room.roundScored) {
                 const roundScores = calculateFinalScores(room.gameState);
                 roundScores.forEach(score => {
-                    room.totalScores[score.playerId] = (room.totalScores[score.playerId] || 0) + score.finalScore;
+                    const currentTotal = room.totalScores[score.playerId] || 0;
+                    const additional = score.finalScore || 0;
+                    room.totalScores[score.playerId] = currentTotal + additional;
+                    console.log(`Score update for ${score.playerName}: ${currentTotal} + ${additional} = ${room.totalScores[score.playerId]}`);
                 });
                 room.roundScored = true;
             }
