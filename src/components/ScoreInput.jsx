@@ -5,6 +5,7 @@ import { Input } from './ui/Input';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/Card';
 import { cn } from '../lib/utils';
 import { useFeedback } from '../hooks/useFeedback';
+import { getAvatarPath } from '../lib/avatars';
 
 export default function ScoreInput({ players, onSave, onCancel, isEmbedded = false, rounds = [] }) {
     const { playSuccess, playError, playClick } = useFeedback();
@@ -92,18 +93,25 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                         {isFinisher && <Check className="h-4 w-4" strokeWidth={3} />}
                                     </div>
 
-                                    {/* Player Avatar with Emoji + Initials */}
+                                    {/* Player Avatar */}
                                     <div className={cn(
-                                        "w-10 h-10 rounded-full flex flex-col items-center justify-center shrink-0 shadow-sm relative",
-                                        isFinisher ? "bg-skyjo-blue" : "bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-600 dark:to-slate-700"
+                                        "w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-md relative overflow-hidden group border-2",
+                                        isFinisher ? "border-white/50 bg-skyjo-blue" : "border-white/20 bg-slate-800"
                                     )}>
-                                        <span className="text-lg leading-none">{p.emoji || '👤'}</span>
-                                        <span className={cn(
-                                            "text-[8px] font-bold leading-none",
-                                            isFinisher ? "text-sky-100" : "text-slate-500 dark:text-slate-300"
-                                        )}>
-                                            {p.name.slice(0, 2).toUpperCase()}
-                                        </span>
+                                        <div className="absolute inset-0 bg-white flex items-center justify-center">
+                                            {p.avatarId ? (
+                                                <img
+                                                    src={getAvatarPath(p.avatarId)}
+                                                    alt="Avatar"
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => { e.target.src = '/avatars/cat.png' }}
+                                                />
+                                            ) : (
+                                                <span className="text-xl">{p.emoji || '👤'}</span>
+                                            )}
+                                            {/* Glossy Overlay */}
+                                            <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-white/20 to-white/0 opacity-50" />
+                                        </div>
                                     </div>
 
                                     {/* Player Name & Current Total - Hidden on small screens */}

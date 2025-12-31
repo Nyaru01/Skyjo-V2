@@ -15,6 +15,7 @@ import Stats from './Stats';
 import VirtualGame from './VirtualGame';
 import BottomNav from './BottomNav';
 import SettingsPage from './SettingsPage';
+import ConfirmModal from './ui/ConfirmModal';
 
 // Variants d'animation pour les transitions de pages
 const pageVariants = {
@@ -38,6 +39,13 @@ export default function Dashboard() {
     const resetGame = useGameStore(state => state.resetGame);
     const undoLastRound = useGameStore(state => state.undoLastRound);
     const [activeTab, setActiveTab] = useState('home');
+    const [confirmConfig, setConfirmConfig] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        onConfirm: () => { },
+        variant: "danger"
+    });
 
     // Auto-switch to 'game' tab when the game starts
     useEffect(() => {
@@ -96,7 +104,13 @@ export default function Dashboard() {
 
                                 <Button
                                     variant="danger"
-                                    onClick={() => { if (confirm('Voulez-vous vraiment quitter et réinitialiser la partie ?')) { resetGame(); setActiveTab('home'); } }}
+                                    onClick={() => setConfirmConfig({
+                                        isOpen: true,
+                                        title: "Quitter la partie ?",
+                                        message: "Voulez-vous vraiment quitter et réinitialiser la partie ?",
+                                        onConfirm: () => { resetGame(); setActiveTab('home'); },
+                                        variant: "danger"
+                                    })}
                                     className="w-full justify-start"
                                 >
                                     Arrêter la partie
@@ -230,7 +244,13 @@ export default function Dashboard() {
                                             variant="outline"
                                             size="sm"
                                             className="text-amber-600 hover:text-amber-700 hover:bg-amber-50/80 border-amber-300 bg-white/50 dark:bg-white/10 dark:text-amber-400 dark:border-amber-600"
-                                            onClick={() => { if (confirm('Annuler la dernière manche ?')) undoLastRound(); }}
+                                            onClick={() => setConfirmConfig({
+                                                isOpen: true,
+                                                title: "Annuler manche ?",
+                                                message: "Voulez-vous vraiment annuler la dernière manche ?",
+                                                onConfirm: undoLastRound,
+                                                variant: "danger"
+                                            })}
                                         >
                                             <Undo2 className="h-4 w-4 mr-1" />
                                             Annuler
@@ -240,7 +260,13 @@ export default function Dashboard() {
                                         variant="outline"
                                         size="sm"
                                         className="text-red-600 hover:text-red-700 hover:bg-red-50/80 border-red-300 bg-white/50 dark:bg-white/10 dark:text-red-400 dark:border-red-600"
-                                        onClick={() => { if (confirm('Arrêter et réinitialiser la partie ?')) { resetGame(); setActiveTab('home'); } }}
+                                        onClick={() => setConfirmConfig({
+                                            isOpen: true,
+                                            title: "Arrêter la partie ?",
+                                            message: "Arrêter et réinitialiser la partie ?",
+                                            onConfirm: () => { resetGame(); setActiveTab('home'); },
+                                            variant: "danger"
+                                        })}
                                     >
                                         Arrêter
                                     </Button>
@@ -304,6 +330,15 @@ export default function Dashboard() {
             {!isVirtualGameActive && (
                 <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
             )}
+
+            <ConfirmModal
+                isOpen={confirmConfig.isOpen}
+                onClose={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={confirmConfig.onConfirm}
+                title={confirmConfig.title}
+                message={confirmConfig.message}
+                variant={confirmConfig.variant}
+            />
         </div>
     );
 }

@@ -103,7 +103,8 @@ export const useGameStore = create(
                 const players = playerData.map((p, index) => ({
                     id: `p${Date.now()}-${index}`,
                     name: p.name || `Player ${index + 1}`,
-                    emoji: p.emoji || '👤'
+                    emoji: p.emoji || '👤',
+                    avatarId: p.avatarId || 'cat'
                 }));
                 set({
                     players,
