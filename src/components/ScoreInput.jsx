@@ -84,7 +84,7 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                 style={{ animationDelay: `${index * 100}ms` }}
                                 onClick={() => setFinisher(p.id)}
                             >
-                                <div className="flex items-center gap-3 overflow-hidden min-w-0 flex-1">
+                                <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                                     {/* Finisher Selection */}
                                     <div className={cn(
                                         "w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors",
@@ -95,7 +95,7 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
 
                                     {/* Player Avatar */}
                                     <div className={cn(
-                                        "w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-md relative overflow-hidden group border-2",
+                                        "w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 shadow-md relative overflow-hidden group border-2",
                                         isFinisher ? "border-white/50 bg-skyjo-blue" : "border-white/20 bg-slate-800"
                                     )}>
                                         <div className="absolute inset-0 bg-white flex items-center justify-center">
@@ -115,7 +115,7 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                     </div>
 
                                     {/* Player Name & Current Total */}
-                                    <div className="flex flex-col flex-1">
+                                    <div className="flex flex-col flex-1 min-w-0">
                                         <span className={cn("font-bold text-base leading-tight", isFinisher ? "text-sky-900 dark:text-sky-300" : "text-slate-900 dark:text-slate-100")}>
                                             {p.name || 'Joueur'}
                                         </span>
