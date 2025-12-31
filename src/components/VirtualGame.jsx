@@ -1767,7 +1767,7 @@ export default function VirtualGame() {
         <div
             className={cn(
                 "skyjo-game-container max-w-3xl mx-auto p-0 animate-in fade-in relative min-h-[100dvh] flex flex-col overflow-y-auto",
-                activeGameState?.players?.length <= 2 ? "justify-between py-2 pb-16" : "justify-start gap-3 py-1 pb-24"
+                activeGameState?.players?.length <= 2 ? "justify-between py-2 pb-8" : "justify-start gap-3 py-1 pb-12"
             )}
         >
             {/* Header - ultra-thin single line with glass-style elements */}
