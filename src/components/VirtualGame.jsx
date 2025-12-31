@@ -584,47 +584,47 @@ export default function VirtualGame() {
             disconnectOnline();
         }
 
-        // Archive AI/local game when quitting (even if not finished)
-        // Only archive if not already archived (avoid duplicates)
-        // If game is over, it was already archived by the "See Results" button
+        // Archive AI/local game when quitting (only if at least one round is finished)
         if (gameState && gameState.players && gameState.players.length > 0 && !onlineGameStarted && !isGameOver) {
-            // Calculate current winner based on totalScores
-            let scores = { ...totalScores } || {};
-            let currentRoundScores = [];
+            // Intelligent Archiving: Only save to history if at least one round was completed
+            const isAtLeastOneRoundDone = roundNumber > 1 || gameState.phase === 'FINISHED';
 
-            // If the current round is FINISHED but not yet committed to totalScores (e.g. user quits on result screen),
-            // we need to add these scores to the archive
-            if (gameState.phase === 'FINISHED') {
-                const roundResults = calculateFinalScores(gameState);
-                currentRoundScores = roundResults;
-                roundResults.forEach(r => {
-                    scores[r.playerId] = (scores[r.playerId] || 0) + r.finalScore;
-                });
+            if (isAtLeastOneRoundDone) {
+                // Calculate current winner based on totalScores
+                let scores = { ...totalScores } || {};
+                let currentRoundScores = [];
 
-                // Award XP if quitting after a win
-                // Find round winner (lowest score)
-                const roundWinner = roundResults.sort((a, b) => a.finalScore - b.finalScore)[0];
-                if (roundWinner && roundWinner.playerId === 'human-1') { // Assuming human-1 is always the player ID in AI mode or local P1
-                    // Check if we haven't already awarded XP for this (might be tricky if we don't track it)
-                    // But quitting implies we are leaving, so awarding here is safe as long as we don't save "game state" to resume
-                    addXP(1);
+                // If the current round is FINISHED but not yet committed to totalScores (e.g. user quits on result screen),
+                // we need to add these scores to the archive
+                if (gameState.phase === 'FINISHED') {
+                    const roundResults = calculateFinalScores(gameState);
+                    currentRoundScores = roundResults;
+                    roundResults.forEach(r => {
+                        scores[r.playerId] = (scores[r.playerId] || 0) + r.finalScore;
+                    });
+
+                    // Award XP if quitting after a win
+                    const roundWinner = roundResults.sort((a, b) => a.finalScore - b.finalScore)[0];
+                    if (roundWinner && roundWinner.playerId === 'human-1') {
+                        addXP(1);
+                    }
                 }
+
+                const playersWithScores = gameState.players.map(p => ({
+                    ...p,
+                    finalScore: scores[p.id] || 0
+                })).sort((a, b) => a.finalScore - b.finalScore);
+
+                const winner = playersWithScores[0];
+
+                archiveVirtualGame({
+                    players: gameState.players,
+                    totalScores: scores,
+                    winner: winner ? { id: winner.id, name: winner.name, score: winner.finalScore } : null,
+                    roundsPlayed: roundNumber || 1,
+                    gameType: aiMode ? 'ai' : 'local'
+                });
             }
-
-            const playersWithScores = gameState.players.map(p => ({
-                ...p,
-                finalScore: scores[p.id] || 0
-            })).sort((a, b) => a.finalScore - b.finalScore);
-
-            const winner = playersWithScores[0];
-
-            archiveVirtualGame({
-                players: gameState.players,
-                totalScores: scores,
-                winner: winner ? { id: winner.id, name: winner.name, score: winner.finalScore } : null,
-                roundsPlayed: roundNumber || 1,
-                gameType: aiMode ? 'ai' : 'local'
-            });
         }
 
         resetGame();
