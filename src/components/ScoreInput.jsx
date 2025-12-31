@@ -89,7 +89,7 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                         {/* Avatar with Status Ring */}
                                         <div className={cn(
                                             "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border-2 transition-transform duration-300 group-hover:scale-105",
-                                            isFinisher ? "border-skyjo-blue bg-skyjo-blue/20" : "border-white/30 dark:border-white/10 bg-slate-800"
+                                            isFinisher ? "border-skyjo-blue bg-white" : "border-white/30 dark:border-white/10 bg-slate-800"
                                         )}>
                                             <div className="absolute inset-0 bg-white">
                                                 {p.avatarId ? (
@@ -104,13 +104,6 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                                 )}
                                                 <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-white/10 to-white/0" />
                                             </div>
-
-                                            {/* Selection Overlay */}
-                                            {isFinisher && (
-                                                <div className="absolute inset-0 bg-skyjo-blue/30 backdrop-blur-[1px] flex items-center justify-center">
-                                                    <Check className="h-6 w-6 text-white drop-shadow-md" strokeWidth={4} />
-                                                </div>
-                                            )}
                                         </div>
 
                                         <div className="flex flex-col min-w-0">
@@ -121,16 +114,21 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                                 )}>
                                                     {p.name}
                                                 </span>
+                                                {isFinisher && (
+                                                    <span className="bg-skyjo-blue text-white text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter animate-in zoom-in duration-300">
+                                                        A fini
+                                                    </span>
+                                                )}
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-1.5 py-0.5 rounded-md bg-slate-200/50 dark:bg-slate-900/50">
-                                                    Total: {previousTotal}
+                                                    Total: {newTotal}
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Right Side: Score Input & New Total */}
+                                    {/* Right Side: Score Input */}
                                     <div className="flex items-center gap-3 shrink-0" onClick={e => e.stopPropagation()}>
                                         <div className="relative group/input">
                                             <Input
@@ -140,47 +138,29 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                                 value={scores[p.id]}
                                                 onChange={(e) => handleScoreChange(p.id, e.target.value)}
                                                 className={cn(
-                                                    "w-20 text-center font-black text-xl h-14 rounded-2xl shadow-inner transition-all",
+                                                    "w-24 text-right pr-4 font-black text-2xl h-14 rounded-2xl shadow-inner transition-all",
                                                     scores[p.id] !== ''
                                                         ? "border-skyjo-blue bg-white dark:bg-slate-900 text-skyjo-blue ring-4 ring-skyjo-blue/10"
                                                         : "bg-slate-100/50 dark:bg-slate-900/50 border-transparent text-slate-400 focus:bg-white dark:focus:bg-slate-900"
                                                 )}
                                                 placeholder="0"
                                             />
-                                            <div className="absolute -top-2 -right-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-black px-1.5 py-0.5 rounded-md shadow-sm border border-white/10">
-                                                {newTotal}
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* Active Label */}
-                                {isFinisher && (
-                                    <motion.div
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        className="absolute -left-1 top-1/2 -translate-y-1/2 w-1.5 h-8 bg-skyjo-blue rounded-full shadow-[0_0_10px_rgba(14,165,233,0.5)]"
-                                    />
-                                )}
                             </div>
                         );
                     })}
                 </div>
 
-                {/* Footer Info */}
-                <div className="flex justify-between items-center p-4 bg-slate-900/5 dark:bg-slate-900/40 rounded-3xl border border-white/10">
-                    <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Somme Manche</span>
-                        <div className="text-xl font-black text-slate-900 dark:text-white tabular-nums">
-                            {Object.values(scores).reduce((sum, val) => sum + (parseInt(val) || 0), 0)} <span className="text-sm font-bold text-slate-500">pts</span>
-                        </div>
-                    </div>
+                {/* Action Section */}
+                <div className="pt-2">
                     <Button
                         onClick={handleSubmit}
-                        className="bg-skyjo-blue hover:bg-skyjo-blue/90 h-14 px-8 rounded-2xl font-black text-lg shadow-xl shadow-skyjo-blue/20 transition-all active:scale-95 group"
+                        className="w-full bg-skyjo-blue hover:bg-skyjo-blue/90 h-16 rounded-3xl font-black text-xl shadow-xl shadow-skyjo-blue/20 transition-all active:scale-95 group"
                     >
-                        Valider
-                        <Check className="ml-2 h-5 w-5 group-hover:scale-110 transition-transform" strokeWidth={3} />
+                        Valider la manche
+                        <Check className="ml-2 h-6 w-6 group-hover:scale-110 transition-transform" strokeWidth={4} />
                     </Button>
                 </div>
             </CardContent>
