@@ -1569,7 +1569,7 @@ export default function VirtualGame() {
         // Regular end-of-round screen
         return (
             <div className="max-w-md mx-auto p-4 space-y-4 animate-in fade-in">
-                <Card className="glass-premium shadow-xl overflow-hidden min-h-[500px] flex flex-col">
+                <Card className="glass-premium shadow-xl overflow-hidden min-h-[450px] flex flex-col">
                     <div className="absolute inset-0 bg-gradient-to-br from-amber-900/20 to-orange-900/20" />
                     <CardHeader className="text-center relative py-4">
                         <Trophy className="h-10 w-10 mx-auto text-amber-500 mb-1" />
@@ -1582,7 +1582,7 @@ export default function VirtualGame() {
                             </p>
                         )}
                     </CardHeader>
-                    <CardContent className="relative space-y-4 flex-1 pb-8">
+                    <CardContent className="relative space-y-4 flex-1 pb-4">
                         {/* Round scores with cumulative totals */}
                         <div className="space-y-3">
                             {scores?.map((score, index) => (
@@ -1686,7 +1686,7 @@ export default function VirtualGame() {
                             </span>
                         </div>
 
-                        <div className="flex gap-3 pt-6">
+                        <div className="flex gap-3 pt-2">
                             <Button
                                 variant="outline"
                                 className="flex-1"
