@@ -126,6 +126,14 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                                 <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-1.5 py-0.5 rounded-md bg-slate-200/50 dark:bg-slate-900/50">
                                                     Total: {newTotal}
                                                 </span>
+                                                {/* Finisher Statistics (Pips) */}
+                                                {rounds.filter(r => r.finisherId === p.id).length > 0 && (
+                                                    <div className="flex gap-0.5 ml-1">
+                                                        {Array.from({ length: rounds.filter(r => r.finisherId === p.id).length }).map((_, i) => (
+                                                            <div key={i} className="w-1.5 h-1.5 rounded-full bg-skyjo-blue shadow-[0_0_5px_rgba(14,165,233,0.5)] animate-in zoom-in duration-300" />
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

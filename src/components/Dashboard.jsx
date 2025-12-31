@@ -247,7 +247,7 @@ export default function Dashboard() {
                         animate="animate"
                         exit="exit"
                         transition={pageTransition}
-                        className="space-y-6 pb-20"
+                        className="space-y-6 pt-12 pb-24"
                     >
                         {/* Main Game Container with glassmorphism */}
                         <Card className="glass-premium dark:glass-dark shadow-2xl overflow-hidden">
