@@ -63,7 +63,7 @@ const PlayerHand = memo(function PlayerHand({
                 backgroundColor: 'rgba(0, 0, 0, 0.85)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                padding: '20px 8px 6px 8px', // Top padding for badge, minimal sides
+                padding: '20px 8px 2px 8px', // Top padding for badge, minimal sides/bottom
                 borderRadius: '16px', // Slightly tighter corners
                 // Border handled by className for active state, remove inline default
                 ...(isCurrentPlayer ? {

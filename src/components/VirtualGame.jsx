@@ -118,6 +118,16 @@ export default function VirtualGame() {
             useGameStore.getState().setCardSkin('classic');
         }
     }, [playerLevel, playerCardSkin]);
+
+    // Force scroll to top on game mount to avoid 1-2mm shift
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            window.scrollTo(0, 0);
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }, 100);
+        return () => clearTimeout(timer);
+    }, []);
     const setPlayerInfo = useOnlineGameStore(s => s.setPlayerInfo);
     const createRoom = useOnlineGameStore(s => s.createRoom);
     const joinRoom = useOnlineGameStore(s => s.joinRoom);
@@ -1755,7 +1765,10 @@ export default function VirtualGame() {
 
     return (
         <div
-            className="skyjo-game-container max-w-3xl mx-auto p-0 py-1 animate-in fade-in relative min-h-screen supports-[min-height:100svh]:min-h-[100svh] flex flex-col justify-between overflow-y-auto"
+            className={cn(
+                "skyjo-game-container max-w-3xl mx-auto p-0 animate-in fade-in relative min-h-[100dvh] flex flex-col overflow-y-auto",
+                activeGameState?.players?.length <= 2 ? "justify-between py-2 pb-16" : "justify-start gap-3 py-1 pb-24"
+            )}
         >
             {/* Header - ultra-thin single line */}
             <div className="flex items-center justify-between px-2 py-0.5 shrink-0">
