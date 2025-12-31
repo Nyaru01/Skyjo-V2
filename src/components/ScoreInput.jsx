@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, AlertCircle, Trophy } from 'lucide-react';
+import { Check, AlertCircle, Trophy, Zap } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/Card';
@@ -126,15 +126,38 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                                 <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-1.5 py-0.5 rounded-md bg-slate-200/50 dark:bg-slate-900/50">
                                                     Total: {newTotal}
                                                 </span>
-                                                {/* Finisher Statistics (Trophy Badge) */}
-                                                {rounds.filter(r => r.finisherId === p.id).length > 0 && (
-                                                    <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 shadow-sm animate-in zoom-in duration-300">
-                                                        <Trophy className="h-3 w-3 text-amber-500" fill="currentColor" fillOpacity={0.2} />
-                                                        <span className="text-[10px] font-black text-amber-600 dark:text-amber-400">
-                                                            {rounds.filter(r => r.finisherId === p.id).length}
-                                                        </span>
-                                                    </div>
-                                                )}
+                                                {/* Differentiated Statistics (Wins & Finishes) */}
+                                                <div className="flex gap-1.5 ml-1">
+                                                    {/* Rounds Won (Lowest Score) */}
+                                                    {(() => {
+                                                        const winCount = rounds.filter(r => {
+                                                            const scores = Object.values(r.scores);
+                                                            const minScore = Math.min(...scores);
+                                                            return r.scores[p.id] === minScore;
+                                                        }).length;
+                                                        return winCount > 0 ? (
+                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 shadow-sm animate-in zoom-in duration-300">
+                                                                <Trophy className="h-3 w-3 text-amber-500" fill="currentColor" fillOpacity={0.2} />
+                                                                <span className="text-[10px] font-black text-amber-600 dark:text-amber-400">
+                                                                    {winCount}
+                                                                </span>
+                                                            </div>
+                                                        ) : null;
+                                                    })()}
+
+                                                    {/* Rounds Finished (Revealed All Cards) */}
+                                                    {(() => {
+                                                        const finishCount = rounds.filter(r => r.finisherId === p.id).length;
+                                                        return finishCount > 0 ? (
+                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 shadow-sm animate-in zoom-in duration-300">
+                                                                <Zap className="h-3 w-3 text-blue-500" fill="currentColor" fillOpacity={0.2} />
+                                                                <span className="text-[10px] font-black text-blue-600 dark:text-blue-400">
+                                                                    {finishCount}
+                                                                </span>
+                                                            </div>
+                                                        ) : null;
+                                                    })()}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
