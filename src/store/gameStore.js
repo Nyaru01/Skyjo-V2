@@ -44,9 +44,8 @@ export const useGameStore = create(
             setCardSkin: (skin) => set({ cardSkin: skin }),
 
             // XP & Level System
-            currentXP: 0,  // 0-9, resets to 0 on level up
-            level: 1,      // Starts at level 1
-            lastAcknowledgedLevel: 1, // Track which level up rewards have been seen
+            level: 5,      // Starts at level 5 for testing
+            lastAcknowledgedLevel: 5, // Track which level up rewards have been seen
 
             /**
              * Add XP points (called on victory)

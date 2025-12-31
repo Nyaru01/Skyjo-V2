@@ -4,7 +4,9 @@ import { Loader2 } from 'lucide-react';
 const CRITICAL_IMAGES = [
     '/card-back.png?v=2',
     '/card-back-papyrus.jpg',
-    '/bg-skyjo.png'
+    '/bg-skyjo.png',
+    '/virtual-logo2.jpg',
+    '/logo.jpg'
 ];
 
 export default function ImagePreloader({ children }) {
