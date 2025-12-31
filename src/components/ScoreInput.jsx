@@ -115,12 +115,12 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                     </div>
 
                                     {/* Player Name & Current Total */}
-                                    <div className="flex flex-col min-w-0">
-                                        <span className={cn("font-bold truncate text-base leading-tight", isFinisher ? "text-sky-900 dark:text-sky-300" : "text-slate-900 dark:text-slate-100")}>
-                                            {p.name}
+                                    <div className="flex flex-col flex-1">
+                                        <span className={cn("font-bold text-base leading-tight", isFinisher ? "text-sky-900 dark:text-sky-300" : "text-slate-900 dark:text-slate-100")}>
+                                            {p.name || 'Joueur'}
                                         </span>
                                         <span className={cn("text-xs font-semibold", isFinisher ? "text-sky-700 dark:text-sky-400" : "text-slate-500 dark:text-slate-400")}>
-                                            Actuel: {previousTotal}
+                                            Total: {previousTotal}
                                         </span>
                                     </div>
                                 </div>
