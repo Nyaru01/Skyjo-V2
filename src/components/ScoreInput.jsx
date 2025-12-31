@@ -114,8 +114,8 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                         </div>
                                     </div>
 
-                                    {/* Player Name & Current Total - Hidden on small screens */}
-                                    <div className="hidden sm:flex flex-col min-w-0">
+                                    {/* Player Name & Current Total */}
+                                    <div className="flex flex-col min-w-0">
                                         <span className={cn("font-bold truncate text-base leading-tight", isFinisher ? "text-sky-900 dark:text-sky-300" : "text-slate-900 dark:text-slate-100")}>
                                             {p.name}
                                         </span>
