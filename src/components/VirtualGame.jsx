@@ -1767,7 +1767,7 @@ export default function VirtualGame() {
                                     <>
                                         {isOnlineMode ? (
                                             <>
-                                                {isNextRoundPending || (onlineReadyStatus.readyCount > 0 && onlineReadyStatus.readyCount < onlineReadyStatus.totalPlayers) ? (
+                                                {isNextRoundPending ? (
                                                     <>
                                                         <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-1" />
                                                         Attendez... ({onlineReadyStatus.readyCount}/{onlineReadyStatus.totalPlayers})
