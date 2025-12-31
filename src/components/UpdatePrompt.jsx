@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, createContext, useContext } from 'react';
+import { useEffect, useState, useCallback, createContext, useContext, useRef } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, X, CheckCircle } from 'lucide-react';
@@ -53,9 +53,16 @@ export function UpdateProvider({ children }) {
         setNeedRefresh(false);
     };
 
+    // Use a ref to always have the latest state of needRefresh in the manual check
+    const needRefreshRef = useRef(needRefresh);
+    useEffect(() => {
+        needRefreshRef.current = needRefresh;
+    }, [needRefresh]);
+
     // Manual check for updates
     const checkForUpdates = useCallback(async () => {
         if (!registration) {
+            console.warn('[SW] No registration found for manual check');
             setCheckResult('up-to-date');
             setTimeout(() => setCheckResult(null), 3000);
             return;
@@ -65,22 +72,27 @@ export function UpdateProvider({ children }) {
         setCheckResult(null);
 
         try {
+            console.log('[SW] Manual update check initiated');
             await registration.update();
-            // Wait a bit to see if needRefresh gets triggered
+
+            // Wait longer (5s) to let the SW fetch the manifest and detect differences
+            // The onRegisteredSW setRefresh(true) will be triggered if an update is found
             setTimeout(() => {
-                if (!needRefresh) {
+                // If we are still checking (meaning onRegisteredSW didn't trigger needRefresh)
+                if (!needRefreshRef.current) {
+                    console.log('[SW] No update found after manual check');
                     setCheckResult('up-to-date');
                     setTimeout(() => setCheckResult(null), 3000);
                 }
                 setIsChecking(false);
-            }, 2000);
+            }, 5000);
         } catch (error) {
-            console.error('[SW] Update check failed:', error);
+            console.error('[SW] Manual update check failed:', error);
             setIsChecking(false);
             setCheckResult('up-to-date');
             setTimeout(() => setCheckResult(null), 3000);
         }
-    }, [registration, needRefresh]);
+    }, [registration]);
 
     const value = {
         checkForUpdates,
