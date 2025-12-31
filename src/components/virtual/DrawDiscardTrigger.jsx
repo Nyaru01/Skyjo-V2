@@ -1,5 +1,6 @@
 import { memo, useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import SkyjoCard from './SkyjoCard';
 import { useGameStore } from '../../store/gameStore';
@@ -234,16 +235,16 @@ const DrawDiscardTrigger = memo(function DrawDiscardTrigger({
                         >
                             {/* Left Arrow - pointing to draw pile */}
                             {isDrawPhase && canInteract && (
-                                <motion.span
-                                    className="text-emerald-400 font-black text-3xl flex items-center"
+                                <motion.div
+                                    className="text-emerald-400 font-black flex items-center"
                                     animate={{
-                                        x: [-3, 0, -3],
+                                        x: [-4, 0, -4],
                                         opacity: [0.6, 1, 0.6]
                                     }}
                                     transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
                                 >
-                                    ←
-                                </motion.span>
+                                    <ArrowLeft strokeWidth={4} className="h-8 w-8" />
+                                </motion.div>
                             )}
 
                             {/* Label */}
@@ -256,16 +257,16 @@ const DrawDiscardTrigger = memo(function DrawDiscardTrigger({
 
                             {/* Right Arrow - pointing to discard pile */}
                             {isDrawPhase && canInteract && (
-                                <motion.span
-                                    className="text-amber-400 font-black text-3xl flex items-center"
+                                <motion.div
+                                    className="text-amber-400 font-black flex items-center"
                                     animate={{
-                                        x: [3, 0, 3],
+                                        x: [4, 0, 4],
                                         opacity: [0.6, 1, 0.6]
                                     }}
                                     transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
                                 >
-                                    →
-                                </motion.span>
+                                    <ArrowRight strokeWidth={4} className="h-8 w-8" />
+                                </motion.div>
                             )}                        </motion.button>
                     )}
 
