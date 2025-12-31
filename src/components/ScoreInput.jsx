@@ -56,7 +56,7 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                 </p>
             </CardHeader>
 
-            <CardContent className="space-y-4 pt-6 px-4">
+            <CardContent className="space-y-4 pt-6 px-2 sm:px-4">
                 {error && (
                     <div className="bg-red-500/10 text-red-600 dark:text-red-400 p-3 rounded-2xl flex items-center gap-2 text-sm font-bold animate-in zoom-in duration-300 border border-red-500/20">
                         <AlertCircle className="h-4 w-4 shrink-0" />
@@ -88,8 +88,8 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                     <div className="flex items-center gap-3 flex-1 min-w-0">
                                         {/* Avatar with Status Ring */}
                                         <div className={cn(
-                                            "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border-2 transition-transform duration-300 group-hover:scale-105",
-                                            isFinisher ? "border-skyjo-blue bg-white" : "border-white/30 dark:border-white/10 bg-slate-800"
+                                            "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden border-2 transition-all duration-300 group-hover:scale-105",
+                                            isFinisher ? "border-skyjo-blue bg-skyjo-blue/20 ring-4 ring-skyjo-blue/20 scale-110 z-10" : "border-white/30 dark:border-white/10 bg-slate-800"
                                         )}>
                                             <div className="absolute inset-0 bg-white">
                                                 {p.avatarId ? (
@@ -104,21 +104,23 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                                 )}
                                                 <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-white/10 to-white/0" />
                                             </div>
+
+                                            {/* Selection Overlay */}
+                                            {isFinisher && (
+                                                <div className="absolute inset-0 bg-skyjo-blue/20 backdrop-blur-[0.5px] flex items-center justify-center">
+                                                    <Check className="h-6 w-6 text-white drop-shadow-md" strokeWidth={4} />
+                                                </div>
+                                            )}
                                         </div>
 
                                         <div className="flex flex-col min-w-0">
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-1.5 flex-wrap">
                                                 <span className={cn(
-                                                    "font-black text-base truncate",
+                                                    "font-black text-sm sm:text-base leading-tight",
                                                     isFinisher ? "text-skyjo-blue" : "text-slate-900 dark:text-white"
                                                 )}>
                                                     {p.name}
                                                 </span>
-                                                {isFinisher && (
-                                                    <span className="bg-skyjo-blue text-white text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter animate-in zoom-in duration-300">
-                                                        A fini
-                                                    </span>
-                                                )}
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-1.5 py-0.5 rounded-md bg-slate-200/50 dark:bg-slate-900/50">
@@ -129,7 +131,7 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                     </div>
 
                                     {/* Right Side: Score Input */}
-                                    <div className="flex items-center gap-3 shrink-0" onClick={e => e.stopPropagation()}>
+                                    <div className="flex items-center shrink-0" onClick={e => e.stopPropagation()}>
                                         <div className="relative group/input">
                                             <Input
                                                 type="tel"
@@ -138,7 +140,7 @@ export default function ScoreInput({ players, onSave, onCancel, isEmbedded = fal
                                                 value={scores[p.id]}
                                                 onChange={(e) => handleScoreChange(p.id, e.target.value)}
                                                 className={cn(
-                                                    "w-24 text-right pr-4 font-black text-2xl h-14 rounded-2xl shadow-inner transition-all",
+                                                    "w-16 sm:w-20 text-center font-black text-xl h-14 rounded-2xl shadow-inner transition-all",
                                                     scores[p.id] !== ''
                                                         ? "border-skyjo-blue bg-white dark:bg-slate-900 text-skyjo-blue ring-4 ring-skyjo-blue/10"
                                                         : "bg-slate-100/50 dark:bg-slate-900/50 border-transparent text-slate-400 focus:bg-white dark:focus:bg-slate-900"
