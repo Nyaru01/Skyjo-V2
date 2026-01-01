@@ -39,7 +39,8 @@ body {
   min-width: 320px;
   min-height: 100vh;
   min-height: 100dvh;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   overscroll-behavior: none;
   /* iOS safe area insets for notch and home indicator */
   padding-top: env(safe-area-inset-top);
@@ -655,4 +656,23 @@ body,
     transform: scale(0.85);
     transform-origin: center top;
   }
+}
+
+/* =============================================== */
+/* iOS SAFE AREA UTILITIES                        */
+/* =============================================== */
+
+/* Padding bottom with safe area inset */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 8px);
+}
+
+/* Margin bottom with safe area inset */
+.mb-safe {
+  margin-bottom: env(safe-area-inset-bottom, 8px);
+}
+
+/* Combined padding with extra space */
+.pb-safe-plus {
+  padding-bottom: calc(env(safe-area-inset-bottom, 8px) + 16px);
 }
