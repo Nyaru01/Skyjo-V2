@@ -100,7 +100,7 @@ const PlayerHand = memo(function PlayerHand({
                                     <img
                                         src={getAvatarPath(player.avatarId || player.emoji)}
                                         alt="Avatar"
-                                        className="w-5 h-5 object-contain"
+                                        className="w-5 h-5 object-contain rounded-full"
                                     />
                                 ) : (
                                     <span className="text-xs">{player.emoji}</span>
@@ -116,7 +116,7 @@ const PlayerHand = memo(function PlayerHand({
                                 <img
                                     src={getAvatarPath(player.avatarId || player.emoji)}
                                     alt="Avatar"
-                                    className="w-5 h-5 object-contain"
+                                    className="w-5 h-5 object-contain rounded-full"
                                 />
                             ) : (
                                 <span className="text-xs">👤</span> // Fallback icon for self if no emoji/avatar

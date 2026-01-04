@@ -1,6 +1,7 @@
 
 import { create } from 'zustand';
 import { io } from 'socket.io-client';
+import { AVATARS } from '../lib/avatars';
 
 // Dynamic socket URL: in production use same origin, in dev use localhost
 const SOCKET_URL = import.meta.env.PROD
@@ -85,10 +86,14 @@ export const useOnlineGameStore = create((set, get) => ({
             });
 
             socket.on('new_player_joined', ({ playerName, emoji }) => {
+                // Convert avatarId to real emoji (emoji field contains the avatar ID like 'cat')
+                const avatar = AVATARS.find(a => a.id === emoji);
+                const displayEmoji = avatar?.emoji || '👤';
+
                 set({
                     lastNotification: {
                         type: 'info',
-                        message: `${emoji} ${playerName} a rejoint la partie !`,
+                        message: `${displayEmoji} ${playerName} a rejoint la partie !`,
                         sound: 'join', // Custom flag to trigger sound
                         timestamp: Date.now()
                     }

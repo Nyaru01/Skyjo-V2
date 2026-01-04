@@ -1392,8 +1392,16 @@ export default function VirtualGame() {
                                             }}
                                         >
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-xl shadow-inner">
-                                                    {room.emoji}
+                                                <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-xl shadow-inner overflow-hidden">
+                                                    {getAvatarPath(room.emoji) ? (
+                                                        <img
+                                                            src={getAvatarPath(room.emoji)}
+                                                            alt="Host avatar"
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <span>{room.emoji}</span>
+                                                    )}
                                                 </div>
                                                 <div>
                                                     <p className="font-bold text-slate-200 text-sm group-hover:text-blue-400 transition-colors">
@@ -1539,7 +1547,15 @@ export default function VirtualGame() {
                                         >
                                             <div className="flex items-center gap-2">
                                                 <span className="font-bold text-slate-400">#{index + 1}</span>
-                                                <span>{player.emoji}</span>
+                                                {getAvatarPath(player.avatarId || player.emoji) ? (
+                                                    <img
+                                                        src={getAvatarPath(player.avatarId || player.emoji)}
+                                                        alt="Avatar"
+                                                        className="w-5 h-5 object-contain rounded-full"
+                                                    />
+                                                ) : (
+                                                    <span>{player.emoji || '👤'}</span>
+                                                )}
                                                 <span className="font-medium text-slate-300">{player.name}</span>
                                             </div>
                                             <span className={cn(
