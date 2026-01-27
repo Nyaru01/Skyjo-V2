@@ -257,132 +257,141 @@ export default function GameHistory() {
 
     return (
         <div className="space-y-4">
-            <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                    <Archive className="h-5 w-5 text-skyjo-blue dark:text-blue-400" />
-                    Parties terminées
-                </h2>
-                <div className="flex gap-2">
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        accept=".json"
-                        onChange={handleImport}
-                        className="hidden"
-                    />
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="text-slate-500 hover:text-skyjo-blue dark:text-slate-400 dark:hover:text-blue-400"
-                        title="Importer"
-                    >
-                        <Upload className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleExport}
-                        disabled={gameHistory.length === 0}
-                        className="text-slate-500 hover:text-skyjo-blue dark:text-slate-400 dark:hover:text-blue-400 disabled:opacity-30"
-                        title="Exporter"
-                    >
-                        <Download className="h-4 w-4" />
-                    </Button>
-                </div>
+            {/* Hero Header */}
+            <div className="relative text-center py-6 mb-6">
+                <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-16 bg-blue-500/10 blur-3xl rounded-full pointer-events-none" />
+                <h1 className="relative text-3xl font-black text-white drop-shadow-lg tracking-tight flex items-center justify-center gap-3">
+                    <Archive className="w-8 h-8 text-sky-400 animate-pulse" />
+                    HISTORIQUE
+                </h1>
+                <p className="relative text-sm text-sky-200/60 font-medium uppercase tracking-widest mt-1">
+                    Archives des parties & Détails
+                </p>
+            </div>
+            <div className="flex justify-center gap-2 mb-6 border-b border-white/5 pb-4">
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept=".json"
+                    onChange={handleImport}
+                    className="hidden"
+                />
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="text-slate-500 hover:text-skyjo-blue dark:text-slate-400 dark:hover:text-blue-400"
+                    title="Importer"
+                >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Importer
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleExport}
+                    disabled={gameHistory.length === 0}
+                    className="text-slate-500 hover:text-skyjo-blue dark:text-slate-400 dark:hover:text-blue-400 disabled:opacity-30"
+                    title="Exporter"
+                >
+                    <Download className="h-4 w-4 mr-2" />
+                    Exporter
+                </Button>
             </div>
 
-            {gameHistory.length === 0 ? (
-                <Card className="glass-premium dark:glass-dark">
-                    <CardContent className="p-8 text-center">
-                        <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Archive className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <p className="text-slate-500 dark:text-slate-400 font-medium">Aucune partie terminée.</p>
-                        <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">
-                            Les parties terminées apparaîtront ici.
-                        </p>
-                    </CardContent>
-                </Card>
-            ) : (
-                <div className="space-y-3">
-                    <AnimatePresence>
-                        {gameHistory.map((game, index) => (
-                            <motion.div
-                                key={game.id}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.95 }}
-                                transition={{ delay: index * 0.05 }}
-                            >
-                                <button
-                                    onClick={() => setSelectedGame(game)}
-                                    className="w-full text-left"
+            {
+                gameHistory.length === 0 ? (
+                    <Card className="glass-premium dark:glass-dark">
+                        <CardContent className="p-8 text-center">
+                            <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Archive className="h-8 w-8 text-slate-400" />
+                            </div>
+                            <p className="text-slate-500 dark:text-slate-400 font-medium">Aucune partie terminée.</p>
+                            <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">
+                                Les parties terminées apparaîtront ici.
+                            </p>
+                        </CardContent>
+                    </Card>
+                ) : (
+                    <div className="space-y-3">
+                        <AnimatePresence>
+                            {gameHistory.map((game, index) => (
+                                <motion.div
+                                    key={game.id}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    transition={{ delay: index * 0.05 }}
                                 >
-                                    <Card className="glass-premium dark:glass-dark shadow-md hover:shadow-lg transition-all card-hover-lift">
-                                        <CardContent className="p-4">
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex-1 min-w-0">
-                                                    {/* Date + Game Type Badge */}
-                                                    <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-1">
-                                                        <Calendar className="h-3 w-3" />
-                                                        {formatDate(game.date)}
-                                                        {/* Game Type Badge */}
-                                                        {(() => {
-                                                            const badge = getGameTypeBadge(game);
-                                                            const BadgeIcon = badge.icon;
-                                                            return (
-                                                                <span className={cn(
-                                                                    "ml-auto flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border",
-                                                                    badge.bgClass,
-                                                                    badge.textClass,
-                                                                    badge.borderClass
-                                                                )}>
-                                                                    <BadgeIcon className="h-3 w-3" />
-                                                                    {badge.label}
-                                                                </span>
-                                                            );
-                                                        })()}
+                                    <button
+                                        onClick={() => setSelectedGame(game)}
+                                        className="w-full text-left"
+                                    >
+                                        <Card className="glass-premium dark:glass-dark shadow-md hover:shadow-lg transition-all card-hover-lift">
+                                            <CardContent className="p-4">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex-1 min-w-0">
+                                                        {/* Date + Game Type Badge */}
+                                                        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-1">
+                                                            <Calendar className="h-3 w-3" />
+                                                            {formatDate(game.date)}
+                                                            {/* Game Type Badge */}
+                                                            {(() => {
+                                                                const badge = getGameTypeBadge(game);
+                                                                const BadgeIcon = badge.icon;
+                                                                return (
+                                                                    <span className={cn(
+                                                                        "ml-auto flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border",
+                                                                        badge.bgClass,
+                                                                        badge.textClass,
+                                                                        badge.borderClass
+                                                                    )}>
+                                                                        <BadgeIcon className="h-3 w-3" />
+                                                                        {badge.label}
+                                                                    </span>
+                                                                );
+                                                            })()}
+                                                        </div>
+
+                                                        {/* Winner */}
+                                                        <div className="flex items-center gap-2">
+                                                            <Trophy className="h-4 w-4 text-yellow-500" />
+                                                            <span className="font-bold text-slate-800 dark:text-slate-200 truncate">
+                                                                {game.winner.name}
+                                                            </span>
+                                                            <span className="font-mono text-skyjo-blue dark:text-blue-400 font-bold">
+                                                                {game.winner.score} pts
+                                                            </span>
+                                                        </div>
+
+                                                        {/* Meta info */}
+                                                        <div className="flex items-center gap-3 mt-1 text-xs text-slate-400 dark:text-slate-500">
+                                                            <span className="flex items-center gap-1">
+                                                                <Users className="h-3 w-3" />
+                                                                {game.players.length} joueurs
+                                                            </span>
+                                                            <span>
+                                                                {game.rounds?.length > 0
+                                                                    ? `${game.rounds.length} manches`
+                                                                    : game.roundsPlayed
+                                                                        ? `${game.roundsPlayed} manches`
+                                                                        : '1 manche'
+                                                                }
+                                                            </span>
+                                                        </div>
                                                     </div>
 
-                                                    {/* Winner */}
-                                                    <div className="flex items-center gap-2">
-                                                        <Trophy className="h-4 w-4 text-yellow-500" />
-                                                        <span className="font-bold text-slate-800 dark:text-slate-200 truncate">
-                                                            {game.winner.name}
-                                                        </span>
-                                                        <span className="font-mono text-skyjo-blue dark:text-blue-400 font-bold">
-                                                            {game.winner.score} pts
-                                                        </span>
-                                                    </div>
-
-                                                    {/* Meta info */}
-                                                    <div className="flex items-center gap-3 mt-1 text-xs text-slate-400 dark:text-slate-500">
-                                                        <span className="flex items-center gap-1">
-                                                            <Users className="h-3 w-3" />
-                                                            {game.players.length} joueurs
-                                                        </span>
-                                                        <span>
-                                                            {game.rounds?.length > 0
-                                                                ? `${game.rounds.length} manches`
-                                                                : game.roundsPlayed
-                                                                    ? `${game.roundsPlayed} manches`
-                                                                    : '1 manche'
-                                                            }
-                                                        </span>
-                                                    </div>
+                                                    <ChevronRight className="h-5 w-5 text-slate-300 dark:text-slate-500 shrink-0" />
                                                 </div>
-
-                                                <ChevronRight className="h-5 w-5 text-slate-300 dark:text-slate-500 shrink-0" />
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                </button>
-                            </motion.div>
-                        ))}
-                    </AnimatePresence>
-                </div>
-            )}
-        </div>
+                                            </CardContent>
+                                        </Card>
+                                    </button>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    </div>
+                )
+            }
+        </div >
     );
 }

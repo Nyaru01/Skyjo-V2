@@ -382,7 +382,7 @@ export const useGameStore = create(
         }),
         {
             name: 'skyjo-storage',
-            version: 3, // Increment version to force new migration
+            version: 3,
             migrate: (persistedState, version) => {
                 if (version < 2) {
                     // Handling migration from v1 to v2/v3
