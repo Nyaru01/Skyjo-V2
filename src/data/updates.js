@@ -1,11 +1,28 @@
 export const UPDATES = [
     {
+        id: -1,
+        version: "2.2.0",
+        date: "27 Janv. 2026",
+        title: "Social 100% Fiable",
+        description: "Optimisation majeure du système social et de la présence en temps réel.",
+        isNew: true,
+        type: "minor",
+        changes: [
+            { text: "Invitations Atomiques : Envoi instantané via le serveur (fini les invitations fantômes)", type: "feat" },
+            { text: "Gestion Multi-Appareils : Présence stable même avec plusieurs onglets ouverts", type: "improve" },
+            { text: "Auto-VibeID : Génération automatique de l'identifiant pour les nouveaux joueurs", type: "fix" },
+            { text: "Toast Global : Bouton 'Rejoindre' accessible depuis n'importe quel onglet", type: "feat" },
+            { text: "Notifications Sociales : Messages plus clairs et auto-fermeture automatique", type: "improve" }
+        ],
+        image: "/premium-bg.jpg"
+    },
+    {
         id: 0,
         version: "2.1.0",
         date: "27 Janv. 2026",
         title: "Stats & UI Premium",
         description: "Finalisation du design Glassmorphism et refonte complète des statistiques.",
-        isNew: true,
+        isNew: false,
         type: "minor",
         changes: [
             { text: "Nouvelle page Stats avec Podium interactif", type: "feat" },
