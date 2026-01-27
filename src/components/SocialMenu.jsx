@@ -11,7 +11,7 @@ import { useFeedback } from '../hooks/useFeedback';
 import Leaderboard from './Leaderboard';
 import { useOnlineGameStore } from '../store/onlineGameStore';
 
-export default function SocialDashboard() {
+export default function SocialDashboard(props) {
     const { userProfile, updateUserProfile, generateSkyId } = useGameStore();
     const {
         friends, fetchFriends, searchResults, isSearching,
@@ -36,8 +36,11 @@ export default function SocialDashboard() {
             fetchFriends(profileId);
             fetchLeaderboard(profileId);
             fetchGlobalLeaderboard();
-            setSocialNotification(false);
+            setSocialNotification(false); // Reset when data is explicitly refreshed
         };
+
+        // Also reset when mounting the component
+        setSocialNotification(false);
 
         initSocial();
 
@@ -300,8 +303,13 @@ export default function SocialDashboard() {
                                                                                 inviteFriend(f.id, onlineRoomCode, userProfile.name);
                                                                                 playSocialInvite();
                                                                             } else {
-                                                                                // Optional: Notify user they must be in a game
-                                                                                alert("Rejoins ou crée une partie en ligne pour inviter !");
+                                                                                // Auto-create room and invite
+                                                                                useOnlineGameStore.getState().createRoomAndInvite(f.id);
+                                                                                playSocialInvite();
+                                                                            }
+                                                                            // Switch to game tab to see the room
+                                                                            if (props?.setActiveTab) {
+                                                                                props.setActiveTab('virtual');
                                                                             }
                                                                         }}
                                                                     >

@@ -41,6 +41,7 @@ export const useOnlineGameStore = create((set, get) => ({
 
     // UI Local State
     selectedCardIndex: null,
+    pendingInvite: null, // { friendId, friendName }
 
     // Animation feedback state
     lastAction: null,
@@ -80,6 +81,14 @@ export const useOnlineGameStore = create((set, get) => ({
             socket.on('room_created', (roomCode) => {
                 console.log('[Socket] Room created:', roomCode);
                 set({ roomCode, isHost: true, error: null });
+
+                // Auto-invite if pending
+                const { pendingInvite, playerName } = get();
+                if (pendingInvite) {
+                    const { inviteFriend } = useSocialStore.getState();
+                    inviteFriend(pendingInvite.friendId, roomCode, playerName);
+                    set({ pendingInvite: null });
+                }
             });
 
             socket.on('room_list_update', (rooms) => {
@@ -311,7 +320,7 @@ export const useOnlineGameStore = create((set, get) => ({
         set({ playerName: name, playerEmoji: emoji });
     },
 
-    createRoom: () => {
+    createRoom: (isPublic = true) => {
         const { playerName, playerEmoji } = get();
         if (!playerName) {
             set({ error: "Entrez un pseudo !" });
@@ -323,11 +332,22 @@ export const useOnlineGameStore = create((set, get) => ({
         if (!socket.connected) {
             socket.connect();
             socket.once('connect', () => {
-                socket.emit('create_room', { playerName, emoji: playerEmoji, dbId });
+                socket.emit('create_room', { playerName, emoji: playerEmoji, dbId, isPublic });
             });
         } else {
-            socket.emit('create_room', { playerName, emoji: playerEmoji, dbId });
+            socket.emit('create_room', { playerName, emoji: playerEmoji, dbId, isPublic });
         }
+    },
+
+    createRoomAndInvite: (friendId) => {
+        const { userProfile } = useGameStore.getState();
+        set({
+            playerName: userProfile.name,
+            playerEmoji: userProfile.avatarId,
+            pendingInvite: { friendId }
+        });
+
+        get().createRoom(false); // Create as PRIVATE for direct play
     },
 
     joinRoom: (code) => {

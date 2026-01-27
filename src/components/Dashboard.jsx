@@ -350,7 +350,7 @@ export default function Dashboard() {
                         exit="exit"
                         transition={pageTransition}
                     >
-                        <SocialDashboard />
+                        <SocialDashboard setActiveTab={setActiveTab} />
                     </motion.div>
                 );
 

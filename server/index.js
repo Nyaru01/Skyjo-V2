@@ -395,7 +395,7 @@ io.on('connection', (socket) => {
         console.log(`[USER] Registered: ${name} (${stringId}) with socket ${socket.id}`);
     });
 
-    socket.on('create_room', ({ playerName, emoji, dbId }) => {
+    socket.on('create_room', ({ playerName, emoji, dbId, isPublic = true }) => {
         const roomCode = generateRoomCode();
         const effectiveDbId = dbId || socket.dbId;
         rooms.set(roomCode, {
@@ -406,7 +406,7 @@ io.on('connection', (socket) => {
             gameStarted: false,
             isGameOver: false,
             gameWinner: null,
-            isPublic: true
+            isPublic: !!isPublic
         });
         socket.join(roomCode);
         socket.emit('room_created', roomCode);
