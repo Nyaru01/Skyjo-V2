@@ -57,6 +57,7 @@ export default function Dashboard() {
     const playerLevel = useGameStore(state => state.level);
     const playerCardSkin = useGameStore(state => state.cardSkin);
     const setCardSkin = useGameStore(state => state.setCardSkin);
+    const generateSkyId = useGameStore(state => state.generateSkyId);
     const { playAchievement } = useFeedback();
 
     const virtualGameState = useVirtualGameStore(state => state.gameState);
