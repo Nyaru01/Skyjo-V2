@@ -96,8 +96,11 @@ export default function Dashboard() {
     }, [hasSeenTutorial, setHasSeenTutorial]);
 
     useEffect(() => {
+        if (!userProfile.vibeId) {
+            generateSkyId();
+        }
         syncProfileWithBackend();
-    }, [syncProfileWithBackend]);
+    }, [syncProfileWithBackend, userProfile.vibeId, generateSkyId]);
 
     useEffect(() => {
         if (achievements && achievements.length > 0) {
@@ -130,7 +133,7 @@ export default function Dashboard() {
         return () => {
             if (socket) socket.off('connect', handleRegistration);
         };
-    }, [userProfile?.id]); // Watch for profile ID changes!
+    }, [userProfile?.id, userProfile?.vibeId]); // Watch for profile ID and VibeID changes!
 
     // Extra safety: re-register if isConnected changes in store
     const isConnected = useOnlineGameStore(state => state.isConnected);
@@ -139,7 +142,7 @@ export default function Dashboard() {
             const { registerUser } = useSocialStore.getState();
             registerUser(userProfile.id, userProfile.name, userProfile.emoji, userProfile.vibeId);
         }
-    }, [isConnected, userProfile?.id]);
+    }, [isConnected, userProfile?.id, userProfile?.vibeId]);
 
     // Auto-switch to 'game' tab when the game starts
     useEffect(() => {
