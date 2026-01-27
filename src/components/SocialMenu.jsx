@@ -376,7 +376,7 @@ export default function SocialDashboard(props) {
             {
                 socialNotification && (
                     <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-skyjo-blue text-white text-[10px] font-black px-4 py-2 rounded-full shadow-2xl animate-bounce z-50">
-                        NOUVELLE DEMANDE D'AMI !
+                        SOCIAL : NOUVEAU !
                     </div>
                 )
             }

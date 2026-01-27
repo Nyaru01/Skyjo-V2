@@ -361,7 +361,15 @@ export const useOnlineGameStore = create((set, get) => ({
             return;
         }
         const dbId = useGameStore.getState().userProfile.id;
-        socket.emit('join_room', { roomCode: code, playerName, emoji: playerEmoji, dbId });
+
+        if (!socket.connected) {
+            socket.connect();
+            socket.once('connect', () => {
+                socket.emit('join_room', { roomCode: code, playerName, emoji: playerEmoji, dbId });
+            });
+        } else {
+            socket.emit('join_room', { roomCode: code, playerName, emoji: playerEmoji, dbId });
+        }
         set({ roomCode: code }); // Set optimistically, validated by events
     },
 

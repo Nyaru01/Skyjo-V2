@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Settings, Trophy, Sparkles, History, Undo2, BarChart3, Play, LogOut, CheckCircle2, Users, HelpCircle } from 'lucide-react';
+import { Settings, Trophy, Sparkles, History, Undo2, BarChart3, Play, LogOut, CheckCircle2, Users, HelpCircle, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore, selectPlayers, selectRounds, selectThreshold, selectGameStatus } from '../store/gameStore';
 import { useVirtualGameStore } from '../store/virtualGameStore';
@@ -62,6 +62,11 @@ export default function Dashboard() {
     const virtualGameState = useVirtualGameStore(state => state.gameState);
     const onlineGameStarted = useOnlineGameStore(state => state.gameStarted);
     const disconnectOnline = useOnlineGameStore(state => state.disconnect);
+    const joinRoom = useOnlineGameStore(state => state.joinRoom);
+    const setOnlinePlayerInfo = useOnlineGameStore(state => state.setPlayerInfo);
+
+    const gameInvitation = useSocialStore(state => state.gameInvitation);
+    const setGameInvitation = useSocialStore(state => state.setGameInvitation);
 
     const [activeTab, setActiveTab] = useState('home');
     const [virtualScreen, setVirtualScreen] = useState('menu');
@@ -552,6 +557,48 @@ export default function Dashboard() {
                 isOpen={isTutorialOpen}
                 onClose={() => setIsTutorialOpen(false)}
             />
+
+            <AnimatePresence>
+                {gameInvitation && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 50, scale: 0.9, x: '-50%' }}
+                        animate={{ opacity: 1, y: 0, scale: 1, x: '-50%' }}
+                        exit={{ opacity: 0, scale: 0.8, x: '-50%' }}
+                        className="fixed bottom-24 left-1/2 z-[100] bg-slate-900/90 backdrop-blur-xl border border-skyjo-blue/50 rounded-3xl p-4 shadow-2xl flex items-center gap-4 min-w-[320px] max-w-[90vw]"
+                    >
+                        <div className="w-12 h-12 rounded-2xl bg-skyjo-blue flex items-center justify-center shadow-lg animate-float shrink-0">
+                            <Play className="h-6 w-6 text-white" fill="white" />
+                        </div>
+                        <div className="flex-1 overflow-hidden">
+                            <p className="text-[10px] text-skyjo-blue font-black uppercase tracking-widest truncate">Invitation de {gameInvitation.fromName}</p>
+                            <p className="text-white font-bold text-sm">Partie en ligne</p>
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                            <Button
+                                size="sm"
+                                className="rounded-xl bg-skyjo-blue hover:bg-skyjo-blue/80 font-black text-xs px-4 h-10"
+                                onClick={() => {
+                                    const { userProfile } = useGameStore.getState();
+                                    setOnlinePlayerInfo(userProfile.name, userProfile.avatarId);
+
+                                    joinRoom(gameInvitation.roomCode);
+                                    setGameInvitation(null);
+                                    setVirtualScreen('lobby');
+                                    setActiveTab('virtual');
+                                }}
+                            >
+                                Rejoindre
+                            </Button>
+                            <button
+                                onClick={() => setGameInvitation(null)}
+                                className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white/50 hover:text-white"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div >
     );
 }

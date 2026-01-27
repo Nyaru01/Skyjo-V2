@@ -14,11 +14,18 @@ export const useSocialStore = create((set, get) => ({
     socialNotification: false,
     leaderboard: [],
     globalLeaderboard: [],
+    gameInvitation: null, // { roomCode, fromName }
 
     setSocialNotification: (val) => {
         set({ socialNotification: val });
         if (val) {
             setTimeout(() => set({ socialNotification: false }), 5000);
+        }
+    },
+    setGameInvitation: (val) => {
+        set({ gameInvitation: val });
+        if (val) {
+            setTimeout(() => set({ gameInvitation: null }), 10000); // 10s for game invites
         }
     },
 
@@ -167,7 +174,7 @@ socket.on('friend_request', () => {
 });
 
 socket.on('game_invitation', (invitation) => {
-    useSocialStore.getState().setSocialNotification(true);
+    useSocialStore.getState().setGameInvitation(invitation);
 });
 
 socket.on('user_presence_update', ({ userId, status }) => {
