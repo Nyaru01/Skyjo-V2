@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import Dashboard from './components/Dashboard';
 import ImagePreloader from './components/ui/ImagePreloader';
 import { UpdateProvider } from './components/UpdatePrompt';
+import { SocketProvider } from './components/SocketProvider';
 
 function App() {
   // Always force dark mode on mount
@@ -13,11 +14,13 @@ function App() {
 
   return (
     <UpdateProvider>
-      <div className="min-h-screen font-sans text-slate-900 dark:text-slate-100 selection:bg-emerald-100 dark:selection:bg-emerald-900">
-        <ImagePreloader>
-          <Dashboard />
-        </ImagePreloader>
-      </div>
+      <SocketProvider>
+        <div className="min-h-screen font-sans text-slate-900 dark:text-slate-100 selection:bg-emerald-100 dark:selection:bg-emerald-900">
+          <ImagePreloader>
+            <Dashboard />
+          </ImagePreloader>
+        </div>
+      </SocketProvider>
     </UpdateProvider>
   );
 }

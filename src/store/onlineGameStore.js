@@ -314,9 +314,15 @@ export const useOnlineGameStore = create((set, get) => ({
     getSocketId: () => socket?.id,
 
     disconnect: () => {
-        socket.disconnect();
+        // socket.disconnect(); // KEEP CONNECTION ALIVE!
+        // We only reset the game state locally.
+        // If we need to leave a room explicitly, we should emit 'leave_room'
+        if (get().roomCode) {
+            socket.emit('leave_room', get().roomCode);
+        }
+
         set({
-            isConnected: false,
+            isConnected: true, // Remain "Connected" to the server (presence), just not in a game
             roomCode: null,
             gameState: null,
             gameStarted: false,
