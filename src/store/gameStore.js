@@ -35,6 +35,7 @@ export const useGameStore = create(
             rounds: [],
             gameStatus: 'SETUP',
             gameHistory: [], // Array of archived finished games
+            achievements: [], // Array of unlocked achievements
             darkMode: true, // Always default to dark mode
             soundEnabled: true,
             musicEnabled: true,
