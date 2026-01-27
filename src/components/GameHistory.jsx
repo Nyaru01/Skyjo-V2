@@ -89,9 +89,14 @@ function PastGameDetail({ game, onBack }) {
             className="space-y-4"
         >
             {/* Header */}
-            <div className="flex items-center justify-between">
-                <Button variant="ghost" size="sm" onClick={onBack} className="gap-1 dark:text-slate-300 dark:hover:bg-slate-700">
-                    <ArrowLeft className="h-4 w-4" /> Retour
+            <div className="flex items-center justify-between py-2">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onBack}
+                    className="w-10 h-10 rounded-full bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 hover:scale-110 active:scale-95 transition-all shadow-lg"
+                >
+                    <ArrowLeft className="h-5 w-5" />
                 </Button>
                 <Button
                     variant="ghost"
