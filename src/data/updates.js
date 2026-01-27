@@ -1,11 +1,28 @@
 export const UPDATES = [
     {
+        id: 0,
+        version: "2.1.0",
+        date: "27 Janv. 2026",
+        title: "Stats & UI Premium",
+        description: "Finalisation du design Glassmorphism et refonte complète des statistiques.",
+        isNew: true,
+        type: "minor",
+        changes: [
+            { text: "Nouvelle page Stats avec Podium interactif", type: "feat" },
+            { text: "Graphiques d'évolution des scores & victoires", type: "feat" },
+            { text: "Historique des parties unifié (Hero Header)", type: "improve" },
+            { text: "Popup de mise à jour style Premium", type: "improve" },
+            { text: "Correction de crashs sur les stats vides", type: "fix" }
+        ],
+        image: "/premium-bg.jpg"
+    },
+    {
         id: 1,
         version: "2.0.0",
         date: "27 Janv. 2026",
         title: "Skyjo V2 : La Révolution Sociale",
         description: "Une refonte complète de l'expérience avec de nouvelles fonctionnalités sociales et un design premium.",
-        isNew: true,
+        isNew: false,
         type: "major",
         changes: [
             { text: "Système d'amis et recherche par VibeID", type: "feat" },
