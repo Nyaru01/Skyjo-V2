@@ -311,7 +311,8 @@ const io = new Server(httpServer, {
 
 const rooms = new Map();
 const userStatus = new Map(); // userId -> Set of socketIds
-const userMetadata = new Map(); // userId -> { status: 'ONLINE' | 'IN_GAME' }
+const userMetadata = new Map(); // userId -> {status, etc}
+const pendingDisconnections = new Map(); // userId -> setTimeout ID
 
 const getPublicRooms = () => {
     const publicRooms = [];
@@ -380,6 +381,13 @@ io.on('connection', (socket) => {
     socket.on('register_user', ({ id, name, emoji, vibeId }) => {
         const stringId = String(id);
         socket.dbId = stringId;
+
+        // CLEAR GRACE PERIOD: If user was about to go offline, cancel it
+        if (pendingDisconnections.has(stringId)) {
+            console.log(`[PRESENCE] Cancelling offline timer for ${stringId} (Reconnected)`);
+            clearTimeout(pendingDisconnections.get(stringId));
+            pendingDisconnections.delete(stringId);
+        }
 
         // Add current socket to user's socket pool
         if (!userStatus.has(stringId)) {
@@ -552,10 +560,16 @@ io.on('connection', (socket) => {
                 sockets.delete(socket.id);
                 console.log(`[USER] Socket detached: ${socket.id} from ${stringId}. Remaining: ${sockets.size}`);
                 if (sockets.size === 0) {
-                    userStatus.delete(stringId);
-                    userMetadata.delete(stringId);
-                    io.emit('user_presence_update', { userId: stringId, status: 'OFFLINE' });
-                    console.log(`[USER] Offline: ${stringId}`);
+                    // GRACE PERIOD: Wait 4 seconds before marking OFFLINE
+                    console.log(`[PRESENCE] Starting 4s grace period for ${stringId}`);
+                    const timer = setTimeout(() => {
+                        userStatus.delete(stringId);
+                        userMetadata.delete(stringId);
+                        io.emit('user_presence_update', { userId: stringId, status: 'OFFLINE' });
+                        console.log(`[USER] Offline (Timeout): ${stringId}`);
+                        pendingDisconnections.delete(stringId);
+                    }, 4000);
+                    pendingDisconnections.set(stringId, timer);
                 }
             }
         }

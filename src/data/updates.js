@@ -1,6 +1,6 @@
 export const UPDATES = [
     {
-        id: -1,
+        id: 10,
         version: "2.2.0",
         date: "27 Janv. 2026",
         title: "Social 100% Fiable",
@@ -17,7 +17,7 @@ export const UPDATES = [
         image: "/premium-bg.jpg"
     },
     {
-        id: 0,
+        id: 9,
         version: "2.1.0",
         date: "27 Janv. 2026",
         title: "Stats & UI Premium",
@@ -34,7 +34,7 @@ export const UPDATES = [
         image: "/premium-bg.jpg"
     },
     {
-        id: 1,
+        id: 8,
         version: "2.0.0",
         date: "27 Janv. 2026",
         title: "Skyjo V2 : La Révolution Sociale",
@@ -57,7 +57,7 @@ export const UPDATES = [
         image: "/premium-bg.jpg"
     },
     {
-        id: 2,
+        id: 7,
         version: "1.1.0",
         date: "15 Janv. 2025",
         title: "IA Améliorée",
