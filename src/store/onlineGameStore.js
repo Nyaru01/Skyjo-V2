@@ -41,7 +41,6 @@ export const useOnlineGameStore = create((set, get) => ({
 
     // UI Local State
     selectedCardIndex: null,
-    pendingInvite: null, // { friendId, friendName }
 
     // Animation feedback state
     lastAction: null,
@@ -81,14 +80,6 @@ export const useOnlineGameStore = create((set, get) => ({
             socket.on('room_created', (roomCode) => {
                 console.log('[Socket] Room created:', roomCode);
                 set({ roomCode, isHost: true, error: null });
-
-                // Auto-invite if pending
-                const { pendingInvite, playerName } = get();
-                if (pendingInvite) {
-                    const { inviteFriend } = useSocialStore.getState();
-                    inviteFriend(pendingInvite.friendId, roomCode, playerName);
-                    set({ pendingInvite: null });
-                }
             });
 
             socket.on('room_list_update', (rooms) => {
@@ -320,7 +311,7 @@ export const useOnlineGameStore = create((set, get) => ({
         set({ playerName: name, playerEmoji: emoji });
     },
 
-    createRoom: (isPublic = true) => {
+    createRoom: (isPublic = true, autoInviteFriendId = null) => {
         const { playerName, playerEmoji } = get();
         if (!playerName) {
             set({ error: "Entrez un pseudo !" });
@@ -329,13 +320,15 @@ export const useOnlineGameStore = create((set, get) => ({
 
         const dbId = useGameStore.getState().userProfile.id;
 
+        const payload = { playerName, emoji: playerEmoji, dbId, isPublic, autoInviteFriendId };
+
         if (!socket.connected) {
             socket.connect();
             socket.once('connect', () => {
-                socket.emit('create_room', { playerName, emoji: playerEmoji, dbId, isPublic });
+                socket.emit('create_room', payload);
             });
         } else {
-            socket.emit('create_room', { playerName, emoji: playerEmoji, dbId, isPublic });
+            socket.emit('create_room', payload);
         }
     },
 
@@ -343,11 +336,10 @@ export const useOnlineGameStore = create((set, get) => ({
         const { userProfile } = useGameStore.getState();
         set({
             playerName: userProfile.name,
-            playerEmoji: userProfile.avatarId,
-            pendingInvite: { friendId }
+            playerEmoji: userProfile.avatarId
         });
 
-        get().createRoom(false); // Create as PRIVATE for direct play
+        get().createRoom(false, friendId); // Create as PRIVATE with ATOMIC AUTO-INVITE
     },
 
     joinRoom: (code) => {

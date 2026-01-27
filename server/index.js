@@ -395,7 +395,7 @@ io.on('connection', (socket) => {
         console.log(`[USER] Registered: ${name} (${stringId}) with socket ${socket.id}. Total users: ${userStatus.size}`);
     });
 
-    socket.on('create_room', ({ playerName, emoji, dbId, isPublic = true }) => {
+    socket.on('create_room', ({ playerName, emoji, dbId, isPublic = true, autoInviteFriendId }) => {
         const roomCode = generateRoomCode();
         const effectiveDbId = dbId || socket.dbId;
         rooms.set(roomCode, {
@@ -410,6 +410,19 @@ io.on('connection', (socket) => {
         });
         socket.join(roomCode);
         socket.emit('room_created', roomCode);
+
+        // ATOMIC INVITE: If autoInviteFriendId is provided, send invitation immediately
+        if (autoInviteFriendId) {
+            const stringFriendId = String(autoInviteFriendId);
+            const sockets = userStatus.get(stringFriendId);
+            console.log(`[ATOMIC INVITE] Auto-inviting ${stringFriendId} to room ${roomCode}`);
+            if (sockets && sockets.size > 0) {
+                sockets.forEach(socketId => {
+                    io.to(socketId).emit('game_invitation', { fromName: playerName, roomCode });
+                });
+            }
+        }
+
         io.to(roomCode).emit('player_list_update', rooms.get(roomCode).players);
         io.emit('room_list_update', getPublicRooms());
     });
