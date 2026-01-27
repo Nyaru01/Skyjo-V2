@@ -32,6 +32,8 @@ Ce fichier recense les règles critiques à respecter lors des interventions sur
 - Vérifier systématiquement les variables d'environnement (`.env`) avant le build.
 - Clés VAPID (Push Notifications) : Doivent correspondre entre client (`VITE_VAPID_PUBLIC_KEY`) et serveur.
 
+
+Toujours mettre à jour le patchnote dans les règlages 
 ---
 *Dernière mise à jour : 27 Janvier 2026*
 
