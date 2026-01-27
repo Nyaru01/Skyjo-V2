@@ -98,6 +98,40 @@ export default function Dashboard() {
         }
     }, [achievements?.length, playAchievement]);
 
+    // Global Presence Logic: Register user on socket connection
+    useEffect(() => {
+        const { socket } = useOnlineGameStore.getState();
+        const { registerUser } = import('../store/socialStore').then(m => m.useSocialStore.getState()).catch(() => ({})); // dynamic import tricky, better use store access
+
+        const handleRegistration = () => {
+            const profile = useGameStore.getState().userProfile;
+            const register = useGameStore.getState().registerUser || useOnlineGameStore.getState().registerUser || (async (id, name, emoji, vibeId) => {
+                try {
+                    // Direct socket emit if store function not easily accessible
+                    socket?.emit('register_user', { id, name, emoji, vibeId });
+                } catch (e) { }
+            });
+
+            if (profile?.id && socket?.connected) {
+                socket.emit('register_user', {
+                    id: profile.id,
+                    name: profile.name,
+                    emoji: profile.emoji,
+                    vibeId: profile.vibeId
+                });
+            }
+        };
+
+        if (socket) {
+            socket.on('connect', handleRegistration);
+            handleRegistration(); // Initial check
+        }
+
+        return () => {
+            if (socket) socket.off('connect', handleRegistration);
+        };
+    }, []);
+
     // Auto-switch to 'game' tab when the game starts
     useEffect(() => {
         if (gameStatus === 'PLAYING') {
