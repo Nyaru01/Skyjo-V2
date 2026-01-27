@@ -922,26 +922,24 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
                             onDismiss={() => setCopyToast(null)}
                         />
                     )}
+                    <div className="relative flex items-center justify-center py-2 mb-2">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={handleBackToMenu}
+                            className="absolute left-0 w-10 h-10 rounded-full bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 hover:scale-110 active:scale-95 transition-all shadow-lg"
+                        >
+                            <ArrowLeft className="h-5 w-5" />
+                        </Button>
 
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleBackToMenu}
-                        className="mb-2 text-slate-300 hover:text-white"
-                    >
-                        <ArrowLeft className="h-4 w-4 mr-1" />
-                        Quitter le salon
-                    </Button>
-
-                    <div className="text-center mb-2 space-y-1">
-                        <h2 className="text-2xl font-black text-white tracking-tighter flex items-center justify-center gap-2">
-                            <Wifi className="h-8 w-8 text-blue-400 animate-pulse" />
-                            SALON EN LIGNE
-                        </h2>
-                        <div className="h-1 w-12 bg-blue-500 mx-auto rounded-full" />
-                    </div>
-
-                    <Card className="glass-premium dark:glass-dark shadow-xl border-t border-white/10 overflow-hidden relative">
+                        <div className="text-center space-y-0.5">
+                            <h2 className="text-xl font-black text-white tracking-tighter flex items-center justify-center gap-2">
+                                <Wifi className="h-6 w-6 text-blue-400 animate-pulse" />
+                                SALON EN LIGNE
+                            </h2>
+                            <div className="h-1 w-10 bg-blue-500 mx-auto rounded-full" />
+                        </div>
+                    </div>      <Card className="glass-premium dark:glass-dark shadow-xl border-t border-white/10 overflow-hidden relative">
                         {/* Ambient Background */}
                         <div className="absolute inset-0 bg-blue-500/10 blur-3xl opacity-20 pointer-events-none" />
 
