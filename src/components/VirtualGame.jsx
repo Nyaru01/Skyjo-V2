@@ -38,7 +38,7 @@ const PLAYER_COLORS = ['🐱', '🐶', '🦊', '🐻', '🐼', '🦁', '🐸', '
  * Virtual Skyjo Game Component
  * Main component for playing virtual Skyjo locally
  */
-export default function VirtualGame({ initialScreen = 'menu' }) {
+export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
     const [screen, setScreen] = useState(initialScreen); // menu, setup, game, scores
     const [players, setPlayers] = useState([
         { name: '', avatarId: 'cat' },
@@ -645,6 +645,9 @@ export default function VirtualGame({ initialScreen = 'menu' }) {
 
         resetGame();
         setScreen('menu');
+
+        // Signal parent to switch back to main menu
+        if (onBackToMenu) onBackToMenu();
     };
 
     const avatarSelectorComponent = (
@@ -662,228 +665,15 @@ export default function VirtualGame({ initialScreen = 'menu' }) {
         />
     );
 
-    // Render menu screen
+    // Redirect to main menu if screen is 'menu' (Legacy menu removal)
+    useEffect(() => {
+        if (screen === 'menu' && onBackToMenu) {
+            onBackToMenu();
+        }
+    }, [screen, onBackToMenu]);
+
     if (screen === 'menu') {
-        return (
-            <div className="max-w-md mx-auto p-4 pt-8 pb-28 space-y-3 animate-in fade-in overflow-y-auto max-h-[calc(100vh-90px)] no-scrollbar">
-                <LevelUpCelebration />
-                <Card className="glass-premium dark:glass-dark shadow-xl relative">
-                    <CardHeader className="text-center">
-                        <div className="flex justify-center mb-3">
-                            <div className="flex justify-center mb-1 w-full">
-                                <div
-                                    className="w-full rounded-xl flex items-center justify-center shadow-lg animate-float overflow-hidden bg-slate-900 border border-skyjo-blue/30"
-                                    style={{ aspectRatio: '32/9' }}
-                                >
-                                    <img
-                                        src="/virtual-logo2.jpg"
-                                        alt="Skyjo Virtual"
-                                        className="w-full h-full object-cover"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-
-
-                        {/* Online Game Button */}
-                        <button
-                            onClick={() => {
-                                setScreen('lobby');
-                                connectOnline();
-                            }}
-                            className="w-full relative group cursor-pointer rounded-[20px] transition-all hover:scale-[1.02] shadow-xl"
-                            style={{ animationDelay: '0.3s' }}
-                        >
-                            {/* Border Gradient - #5DA0F2 */}
-                            <div className="absolute inset-0 bg-[#5DA0F2] rounded-[20px] animate-border-pulse opacity-100 shadow-[0_0_20px_#5DA0F2]" />
-                            {/* Opaque Center */}
-                            <div className="absolute inset-[2px] bg-[#1e2235] rounded-[18px] z-10" />
-
-                            {/* Content */}
-                            <div className="relative z-20 flex items-center justify-center gap-3 h-16 w-full text-[#5DA0F2] font-bold text-lg">
-                                {/* Halo effect */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-[#5DA0F2]/0 via-[#5DA0F2]/5 to-[#5DA0F2]/0 opacity-0 group-hover:opacity-100 transition-opacity rounded-[18px]" />
-                                <Wifi className="h-6 w-6" />
-                                En Ligne (1v1)
-                            </div>
-                        </button>
-
-                        {/* AI Game Button */}
-                        <button
-                            onClick={() => setScreen('ai-setup')}
-                            className="w-full relative group cursor-pointer rounded-[20px] transition-all hover:scale-[1.02] shadow-xl"
-                            style={{ animationDelay: '0.6s' }}
-                        >
-                            {/* Border Gradient - #C084FC */}
-                            <div className="absolute inset-0 bg-[#C084FC] rounded-[20px] animate-border-pulse opacity-100 shadow-[0_0_20px_#C084FC]" />
-                            {/* Opaque Center */}
-                            <div className="absolute inset-[2px] bg-[#1e2235] rounded-[18px] z-10" />
-
-                            {/* Content */}
-                            <div className="relative z-20 flex items-center justify-center gap-3 h-16 w-full text-[#C084FC] font-bold text-lg">
-                                {/* Halo effect */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-[#C084FC]/0 via-[#C084FC]/5 to-[#C084FC]/0 opacity-0 group-hover:opacity-100 transition-opacity rounded-[18px]" />
-                                <Bot className="h-6 w-6" />
-                                Affronter l'IA
-                            </div>
-                        </button>
-
-                        {/* Rules Button (Moved) */}
-                        <button
-                            onClick={() => setShowRulesModal(true)}
-                            className="w-full p-2 mt-4 rounded-2xl glass-premium dark:glass-dark border border-amber-200/50 dark:border-amber-700/50 hover:border-amber-400 transition-all group cursor-pointer"
-                        >
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                                    <BookOpen className="h-4 w-4 text-white" />
-                                </div>
-                                <div className="text-left flex-1">
-                                    <p className="font-bold text-sm text-slate-800 dark:text-slate-200">Règles du jeu</p>
-                                    <p className="text-[10px] text-slate-500 dark:text-slate-400">Comment jouer à Skyjo</p>
-                                </div>
-                                <span className="text-amber-500 dark:text-amber-400 text-base">→</span>
-                            </div>
-                        </button>
-
-
-                    </CardContent>
-                </Card>
-
-                {/* Experience Bar Container */}
-                {/* Experience Bar Container - Redesigned */}
-                <div className="relative w-full rounded-[24px] shadow-2xl overflow-hidden mt-4">
-                    {/* Border & Background Effects - Amber/Gold Theme */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-amber-500 via-orange-500 to-yellow-500 opacity-20" />
-                    <div className="absolute inset-[2px] bg-slate-900/90 backdrop-blur-xl rounded-[22px] z-10" />
-
-                    {/* Decorative Top Beam */}
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-amber-400 to-transparent z-20 opacity-60" />
-
-                    <div className="relative z-20 pt-3 pb-3 pl-8 pr-4">
-                        <ExperienceBar />
-                    </div>
-                </div>
-
-
-
-                {/* Rules Modal */}
-                {showRulesModal && (
-                    <>
-                        <div
-                            className="fixed inset-0 bg-black/60 z-[100] backdrop-blur-sm"
-                            onClick={() => setShowRulesModal(false)}
-                        />
-                        <div className="fixed inset-4 top-8 bottom-8 z-[110] bg-slate-900 rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                            {/* Modal Header */}
-                            <div className="flex items-center justify-between p-4 border-b border-slate-700 bg-gradient-to-r from-amber-900/20 to-orange-900/20">
-                                <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                                    <BookOpen className="h-5 w-5 text-amber-500" />
-                                    Règles de Skyjo
-                                </h2>
-                                <button
-                                    onClick={() => setShowRulesModal(false)}
-                                    className="p-2 rounded-lg hover:bg-slate-700 transition-colors"
-                                >
-                                    <X className="h-5 w-5 text-slate-400" />
-                                </button>
-                            </div>
-                            {/* Modal Body */}
-                            <div className="flex-1 overflow-y-auto p-4 space-y-4 text-sm text-slate-300">
-                                <section>
-                                    <h3 className="font-bold text-amber-400 mb-2">🎯 Objectif</h3>
-                                    <p>Avoir le <strong>moins de points possible</strong> à la fin de la partie. Le jeu se termine quand un joueur atteint 100 points.</p>
-                                </section>
-
-                                <section>
-                                    <h3 className="font-bold text-amber-400 mb-2">🃏 Mise en place</h3>
-                                    <ul className="list-disc list-inside space-y-1">
-                                        <li>Chaque joueur reçoit <strong>12 cartes face cachée</strong> (grille 3×4)</li>
-                                        <li>Retournez <strong>2 cartes</strong> de votre choix</li>
-                                        <li>Le joueur avec la somme la plus élevée commence</li>
-                                    </ul>
-                                </section>
-
-                                <section>
-                                    <h3 className="font-bold text-amber-400 mb-2">🔄 Tour de jeu</h3>
-                                    <p className="mb-2">Piochez une carte de la <strong>pioche</strong> ou de la <strong>défausse</strong> :</p>
-                                    <ul className="list-disc list-inside space-y-1">
-                                        <li><strong>Pioche</strong> : Gardez-la pour remplacer une carte OU défaussez-la et retournez une carte cachée</li>
-                                        <li><strong>Défausse</strong> : Remplacez obligatoirement une de vos cartes</li>
-                                    </ul>
-                                </section>
-
-                                <section>
-                                    <h3 className="font-bold text-amber-400 mb-2">✨ Colonnes identiques</h3>
-                                    <p className="mb-2">Si une colonne contient <strong>3 cartes identiques</strong> (toutes face visible), elle est <strong>éliminée</strong> !</p>
-                                    <div className="p-2 bg-amber-900/20 rounded-lg text-xs border border-amber-700">
-                                        <strong>⚠️ Ordre important :</strong> D'abord défausser la carte échangée, PUIS les 3 cartes identiques par-dessus.
-                                    </div>
-                                </section>
-
-                                <section>
-                                    <h3 className="font-bold text-amber-400 mb-2">🏁 Fin de manche</h3>
-                                    <ul className="list-disc list-inside space-y-1">
-                                        <li>La manche se termine quand un joueur retourne toutes ses cartes</li>
-                                        <li>Les autres joueurs jouent <strong>un dernier tour</strong></li>
-                                        <li><strong>Attention :</strong> Si le finisseur n'a pas le score le plus bas, ses points sont <strong>doublés</strong> !</li>
-                                    </ul>
-                                </section>
-
-                                <section>
-                                    <h3 className="font-bold text-amber-400 mb-2">🏆 Valeurs des cartes</h3>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="p-2 bg-red-900/30 rounded-lg text-center">
-                                            <span className="font-bold text-red-400">-2</span> à <span className="font-bold text-red-400">12</span>
-                                        </div>
-                                        <div className="p-2 bg-blue-900/30 rounded-lg text-center">
-                                            <span className="font-bold text-blue-400">0</span> = neutre
-                                        </div>
-                                    </div>
-                                </section>
-                            </div>
-                        </div>
-                    </>
-                )}
-
-                {/* Card Customization Container */}
-                {/* Card Customization Container - Redesigned */}
-                {/* Card Customization Container - Redesigned to match Main Menu DA */}
-                <Card className="glass-premium dark:glass-dark shadow-xl relative mt-6 overflow-hidden">
-                    {/* Ambient Background Glow - Covers Header & Footer */}
-                    <div className="absolute inset-0 bg-purple-500/20 blur-3xl opacity-50 pointer-events-none" />
-
-                    <CardHeader className="pb-0 relative z-10">
-                        <div className="flex items-center justify-start gap-3 px-1">
-                            <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-purple-500/10 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.15)]">
-                                <Palette className="h-4 w-4 text-purple-400" />
-                            </div>
-                            <h3 className="text-lg font-bold text-white tracking-wide text-shadow-sm">
-                                Personnaliser vos cartes
-                            </h3>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="pt-2 pb-6 px-1">
-
-                        {/* Carousel */}
-                        <SkinCarousel
-                            skins={[
-                                { id: 'classic', name: 'Classique', img: '/card-back.png', level: 1 },
-                                { id: 'papyrus', name: 'Papyrus', img: '/card-back-papyrus.jpg', level: 3 },
-                                { id: 'neon', name: 'Neon', img: '/card-back-neon.png', level: 5 },
-                                { id: 'gold', name: 'Gold', img: '/card-back-gold.png', level: 10 },
-                                { id: 'galaxy', name: 'Galaxy', img: '/card-back-galaxy.png', level: 15 }
-                            ]}
-                            selectedSkinId={playerCardSkin}
-                            onSelect={(id) => useGameStore.getState().setCardSkin(id)}
-                            playerLevel={playerLevel}
-                        />
-                    </CardContent>
-                </Card>
-            </div>
-        );
+        return null; // Don't render anything, wait for redirect
     }
 
     // Render AI setup screen
@@ -904,7 +694,7 @@ export default function VirtualGame({ initialScreen = 'menu' }) {
                 <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setScreen('menu')}
+                    onClick={handleBackToMenu}
                     className="mb-2"
                 >
                     <ArrowLeft className="h-4 w-4 mr-1" />
@@ -1041,7 +831,7 @@ export default function VirtualGame({ initialScreen = 'menu' }) {
                 <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setScreen('menu')}
+                    onClick={handleBackToMenu}
                     className="mb-2"
                 >
                     <ArrowLeft className="h-4 w-4 mr-1" />
@@ -1144,14 +934,11 @@ export default function VirtualGame({ initialScreen = 'menu' }) {
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                            disconnectOnline();
-                            setScreen('menu');
-                        }}
+                        onClick={handleBackToMenu}
                         className="mb-2"
                     >
                         <ArrowLeft className="h-4 w-4 mr-1" />
-                        Quitter
+                        Retour
                     </Button>
                     <Card className="glass-premium dark:glass-dark shadow-xl">
                         <CardHeader className="text-center">
@@ -1277,10 +1064,7 @@ export default function VirtualGame({ initialScreen = 'menu' }) {
                 <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => {
-                        disconnectOnline();
-                        setScreen('menu');
-                    }}
+                    onClick={handleBackToMenu}
                     className="mb-2"
                 >
                     <ArrowLeft className="h-4 w-4 mr-1" />

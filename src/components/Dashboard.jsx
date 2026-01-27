@@ -59,6 +59,7 @@ export default function Dashboard() {
 
     const virtualGameState = useVirtualGameStore(state => state.gameState);
     const onlineGameStarted = useOnlineGameStore(state => state.gameStarted);
+    const disconnectOnline = useOnlineGameStore(state => state.disconnect);
 
     const [activeTab, setActiveTab] = useState('home');
     const [virtualScreen, setVirtualScreen] = useState('menu');
@@ -228,7 +229,7 @@ export default function Dashboard() {
 
 
             case 'virtual':
-                if (!virtualGameState && !onlineGameStarted) {
+                if (!virtualGameState && !onlineGameStarted && virtualScreen !== 'lobby') {
                     return (
                         <motion.div
                             key="game-menu"
@@ -277,7 +278,13 @@ export default function Dashboard() {
                                 </Button>
                             </div>
                         )}
-                        <VirtualGame initialScreen={virtualScreen} />
+                        <VirtualGame
+                            initialScreen={virtualScreen}
+                            onBackToMenu={() => {
+                                setVirtualScreen('menu'); // Return to GameMenu
+                                disconnectOnline(); // Ensure clean disconnect
+                            }}
+                        />
                     </motion.div>
                 );
 
