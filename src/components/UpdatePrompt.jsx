@@ -114,38 +114,45 @@ export function UpdateProvider({ children }) {
                         transition={{ type: 'spring', damping: 20, stiffness: 300 }}
                         className="fixed bottom-24 left-4 right-4 z-[200] max-w-md mx-auto"
                     >
-                        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl shadow-2xl p-4 border border-emerald-400/30">
-                            <div className="flex items-start gap-3">
+                        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 backdrop-blur-xl shadow-2xl p-5">
+                            {/* Glow effect */}
+                            <div className="absolute -top-10 -right-10 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
+                            <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
+
+                            <div className="relative flex items-start gap-4">
                                 {/* Icon */}
-                                <div className="p-2 bg-white/20 rounded-full shrink-0">
-                                    <RefreshCw className="w-5 h-5 text-white animate-spin-slow" />
+                                <div className="p-3 bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-white/10 rounded-xl shrink-0 shadow-inner">
+                                    <RefreshCw className="w-6 h-6 text-blue-400 animate-spin-slow" />
                                 </div>
 
                                 {/* Content */}
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="font-bold text-white text-sm">
-                                        🎉 Mise à jour disponible !
+                                <div className="flex-1 min-w-0 pt-1">
+                                    <h3 className="font-bold text-white text-base leading-none mb-1">
+                                        Mise à jour disponible
                                     </h3>
-                                    <p className="text-emerald-100 text-xs mt-1">
-                                        Une nouvelle version de Skyjo est prête.
+                                    <p className="text-slate-400 text-xs">
+                                        Une nouvelle version de Skyjo est prête à être installée.
                                     </p>
                                 </div>
 
                                 {/* Close button */}
                                 <button
                                     onClick={handleDismiss}
-                                    className="p-1 hover:bg-white/20 rounded-full transition-colors shrink-0"
+                                    className="p-1 -mr-2 -mt-2 hover:bg-white/10 text-slate-400 hover:text-white rounded-full transition-colors shrink-0"
                                 >
-                                    <X className="w-4 h-4 text-white/70" />
+                                    <X className="w-5 h-5" />
                                 </button>
                             </div>
 
                             {/* Action button */}
                             <button
                                 onClick={handleUpdate}
-                                className="w-full mt-3 py-2.5 bg-white text-emerald-700 font-bold text-sm rounded-xl hover:bg-emerald-50 transition-colors shadow-lg"
+                                className="relative w-full mt-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-sm rounded-xl hover:from-blue-500 hover:to-purple-500 transition-all shadow-lg hover:shadow-blue-500/25 active:scale-[0.98]"
                             >
-                                Mettre à jour maintenant
+                                <span className="flex items-center justify-center gap-2">
+                                    <CheckCircle className="w-4 h-4" />
+                                    Mettre à jour maintenant
+                                </span>
                             </button>
                         </div>
                     </motion.div>
