@@ -55,7 +55,25 @@ export default function SocialDashboard() {
             fetchLeaderboard(userProfile.id);
             fetchGlobalLeaderboard();
         }, 30000);
-        return () => clearInterval(interval);
+        // Listen for socket reconnection to re-register presence
+        const onConnect = () => {
+            const profile = useGameStore.getState().userProfile;
+            if (profile?.id) {
+                registerUser(profile.id, profile.name, profile.emoji, profile.vibeId);
+            }
+        };
+
+        const socket = useOnlineGameStore.getState().socket; // Access socket instance
+        if (socket) {
+            socket.on('connect', onConnect);
+            // Verify immediate registration if already connected but seemingly offline
+            if (socket.connected) onConnect();
+        }
+
+        return () => {
+            clearInterval(interval);
+            if (socket) socket.off('connect', onConnect);
+        };
     }, [userProfile.id]);
 
     const handleUpdateName = () => {
