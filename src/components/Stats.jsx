@@ -5,11 +5,13 @@ import { useGameStore, selectGameHistory } from '../store/gameStore';
 import { Card, CardContent } from './ui/Card';
 import { Button } from './ui/Button';
 import { cn } from '../lib/utils';
+import AchievementsList from './AchievementsList';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, BarChart, Bar } from 'recharts';
 
 // Palette de couleurs pour les joueurs (forced dark theme)
 const PLAYER_COLORS = [
     { bg: 'bg-emerald-500', light: 'bg-emerald-900/30', text: 'text-emerald-300' },
-    { bg: 'bg-blue-500', light: 'bg-blue-900/30', text: 'text-blue-300' },
+    { bg: 'bg-[#1A4869]', light: 'bg-[#1A4869]/30', text: 'text-sky-300' },
     { bg: 'bg-purple-500', light: 'bg-purple-900/30', text: 'text-purple-300' },
     { bg: 'bg-amber-500', light: 'bg-amber-900/30', text: 'text-amber-300' },
     { bg: 'bg-rose-500', light: 'bg-rose-900/30', text: 'text-rose-300' },
@@ -37,7 +39,7 @@ function StatCard({ icon: Icon, title, value, subtitle, colorClass = 'text-skyjo
             initial="hidden"
             animate="visible"
         >
-            <Card className={cn("glass-premium shadow-lg hover:shadow-xl transition-shadow h-full", className)}>
+            <Card className={cn("glass-premium shadow-lg hover:shadow-xl transition-shadow h-full rounded-[20px]", className)}>
                 <CardContent className="p-4 h-full flex flex-col justify-between">
                     <div className="flex items-start justify-between">
                         {imageSrc ? (
@@ -251,11 +253,55 @@ export default function Stats() {
         const bestAvg = [...playersArray].sort((a, b) => a.avgPerRound - b.avgPerRound)[0];
         const mostNegatives = [...playersArray].sort((a, b) => b.negativeRounds - a.negativeRounds)[0];
 
+        // Data for victory pie chart
+        const victoryData = playersArray
+            .filter(p => p.wins > 0)
+            .map((p, idx) => ({
+                name: p.name,
+                value: p.wins,
+                color: PLAYER_COLORS[idx % PLAYER_COLORS.length].bg.replace('bg-', '#')
+            }));
+
+        // Data for game types pie chart
+        const typeCounts = { ai: 0, local: 0, online: 0 };
+        gameHistory.forEach(g => {
+            const type = g.gameType || 'local';
+            typeCounts[type] = (typeCounts[type] || 0) + 1;
+        });
+        const gameTypeData = [
+            { name: 'IA', value: typeCounts.ai, color: '#1A4869' },
+            { name: 'Local', value: typeCounts.local, color: '#10b981' },
+            { name: 'En Ligne', value: typeCounts.online, color: '#a855f7' }
+        ].filter(d => d.value > 0);
+
+        // Radar Data for current player
+        const mainPlayer = playersArray.find(p => p.name === useGameStore.getState().userProfile.name) || playersArray[0];
+        const radarData = mainPlayer ? [
+            { subject: 'Victoires', A: mainPlayer.winRate, fullMark: 100 },
+            { subject: 'Agressivité', A: mainPlayer.finishSuccessRate, fullMark: 100 },
+            { subject: 'Précision', A: Math.max(0, 100 - mainPlayer.avgPerRound), fullMark: 100 },
+            { subject: 'Sang-froid', A: (mainPlayer.negativeRounds / Math.max(1, mainPlayer.roundsPlayed)) * 200, fullMark: 100 },
+            { subject: 'Expérience', A: Math.min(100, (mainPlayer.gamesPlayed / 20) * 100), fullMark: 100 },
+        ] : [];
+
+        // Data for score evolution chart (last 5 games)
+        const evolutionData = gameHistory.slice(0, 5).reverse().map((game, gIdx) => {
+            const dataPoint = { name: `Partie ${gIdx + 1}` };
+            game.players.forEach(p => {
+                dataPoint[p.name] = p.finalScore;
+            });
+            return dataPoint;
+        });
+
         return {
             totalGames,
             totalRounds,
             avgRoundsPerGame: totalRounds / totalGames,
             players: playersArray,
+            victoryData,
+            gameTypeData,
+            radarData,
+            evolutionData,
             records: {
                 bestRound: bestRoundEver !== Infinity ? bestRoundEver : null,
                 bestRoundPlayer,
@@ -323,7 +369,7 @@ export default function Stats() {
                     title="Manches jouées"
                     value={stats.totalRounds}
                     subtitle={`~${stats.avgRoundsPerGame.toFixed(1)}/partie`}
-                    colorClass="text-blue-600"
+                    colorClass="text-skyjo-blue"
                     index={1}
                 />
                 {stats.records.bestRound !== null && (
@@ -394,7 +440,7 @@ export default function Stats() {
                     initial="hidden"
                     animate="visible"
                 >
-                    <Card className="glass-premium shadow-lg hover:shadow-xl transition-shadow h-full relative overflow-hidden group">
+                    <Card className="glass-premium shadow-lg hover:shadow-xl transition-shadow h-full rounded-[24px] relative overflow-hidden group">
                         {/* Background subtle glow */}
                         <div className="absolute top-0 right-0 p-16 bg-purple-500/10 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2 group-hover:bg-purple-500/20 transition-colors duration-500" />
 
@@ -429,8 +475,175 @@ export default function Stats() {
                 </motion.div>
             </div>
 
+            {/* Charts Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Score Evolution Chart */}
+                <Card className="glass-premium shadow-lg border-white/5 rounded-[24px]">
+                    <div className="p-4 border-b border-white/10">
+                        <h3 className="font-bold text-slate-100 flex items-center gap-2">
+                            <TrendingUp className="h-4 w-4 text-skyjo-blue" />
+                            Évolution des scores
+                        </h3>
+                    </div>
+                    <CardContent className="p-4 h-[250px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={stats.evolutionData}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                                <XAxis
+                                    dataKey="name"
+                                    stroke="#94a3b8"
+                                    fontSize={10}
+                                    tickLine={false}
+                                    axisLine={false}
+                                />
+                                <YAxis
+                                    stroke="#94a3b8"
+                                    fontSize={10}
+                                    tickLine={false}
+                                    axisLine={false}
+                                    reversed={true} // Lower is better in Skyjo
+                                />
+                                <Tooltip
+                                    contentStyle={{
+                                        backgroundColor: '#0f172a',
+                                        borderRadius: '12px',
+                                        border: '1px solid #ffffff20',
+                                        fontSize: '12px'
+                                    }}
+                                    itemStyle={{ fontWeight: 'black' }}
+                                />
+                                {stats.players.slice(0, 3).map((p, idx) => (
+                                    <Line
+                                        key={p.name}
+                                        type="monotone"
+                                        dataKey={p.name}
+                                        stroke={PLAYER_COLORS[idx % PLAYER_COLORS.length].bg.startsWith('bg-[') ? PLAYER_COLORS[idx % PLAYER_COLORS.length].bg.slice(4, -1) : PLAYER_COLORS[idx % PLAYER_COLORS.length].bg.replace('bg-', '#').replace('emerald-500', '#10b981').replace('purple-500', '#a855f7')}
+                                        strokeWidth={3}
+                                        dot={{ r: 4, fill: '#fff', strokeWidth: 2 }}
+                                        activeDot={{ r: 6, strokeWidth: 0 }}
+                                        animationDuration={1500}
+                                    />
+                                ))}
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </CardContent>
+                </Card>
+
+                {/* Victory Distribution Chart */}
+                <Card className="glass-premium shadow-lg border-white/5 rounded-[24px]">
+                    <div className="p-4 border-b border-white/10">
+                        <h3 className="font-bold text-slate-100 flex items-center gap-2">
+                            <Trophy className="h-4 w-4 text-amber-500" />
+                            Répartition des victoires
+                        </h3>
+                    </div>
+                    <CardContent className="p-4 h-[250px] flex items-center">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={stats.victoryData}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={50}
+                                    outerRadius={70}
+                                    paddingAngle={5}
+                                    dataKey="value"
+                                    animationDuration={1500}
+                                >
+                                    {stats.victoryData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={entry.color.replace('emerald-500', '#10b981').replace('blue-500', '#3b82f6').replace('purple-500', '#a855f7')} />
+                                    ))}
+                                </Pie>
+                                <Tooltip
+                                    contentStyle={{
+                                        backgroundColor: '#0f172a',
+                                        borderRadius: '12px',
+                                        border: '1px solid #ffffff20',
+                                        fontSize: '12px'
+                                    }}
+                                />
+                                <Legend
+                                    verticalAlign="bottom"
+                                    align="center"
+                                    wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }}
+                                />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </CardContent>
+                </Card>
+
+                {/* Radar Profile Chart */}
+                <Card className="glass-premium shadow-lg border-white/5 rounded-[24px]">
+                    <div className="p-4 border-b border-white/10">
+                        <h3 className="font-bold text-slate-100 flex items-center gap-2">
+                            <Zap className="h-4 w-4 text-purple-400" />
+                            Profil de jeu
+                        </h3>
+                    </div>
+                    <CardContent className="p-4 h-[250px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={stats.radarData}>
+                                <PolarGrid stroke="#ffffff20" />
+                                <PolarAngleAxis dataKey="subject" tick={{ fill: '#94a3b8', fontSize: 10 }} />
+                                <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                                <Radar
+                                    name="Joueur"
+                                    dataKey="A"
+                                    stroke="#a855f7"
+                                    fill="#a855f7"
+                                    fillOpacity={0.5}
+                                    animationDuration={1500}
+                                />
+                                <Tooltip
+                                    contentStyle={{
+                                        backgroundColor: '#0f172a',
+                                        borderRadius: '12px',
+                                        border: '1px solid #ffffff20',
+                                        fontSize: '12px'
+                                    }}
+                                />
+                            </RadarChart>
+                        </ResponsiveContainer>
+                    </CardContent>
+                </Card>
+
+                {/* Game Modes Distribution */}
+                <Card className="glass-premium shadow-lg border-white/5 rounded-[24px]">
+                    <div className="p-4 border-b border-white/10">
+                        <h3 className="font-bold text-slate-100 flex items-center gap-2">
+                            <Users className="h-4 w-4 text-emerald-400" />
+                            Modes de jeu favoris
+                        </h3>
+                    </div>
+                    <CardContent className="p-4 h-[250px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={stats.gameTypeData}>
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10 }} />
+                                <Tooltip
+                                    cursor={{ fill: 'transparent' }}
+                                    contentStyle={{
+                                        backgroundColor: '#0f172a',
+                                        borderRadius: '12px',
+                                        border: '1px solid #ffffff20',
+                                        fontSize: '12px'
+                                    }}
+                                />
+                                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                                    {stats.gameTypeData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Achievements Section */}
+            <AchievementsList />
+
             {/* Leaderboard */}
-            <Card className="glass-premium shadow-xl overflow-hidden">
+            <Card className="glass-premium shadow-xl overflow-hidden rounded-[24px]">
                 <div className="p-4 border-b border-white/10 bg-gradient-to-r from-amber-900/20 to-orange-900/20">
                     <h3 className="font-bold text-slate-100 flex items-center gap-2">
                         <Award className="h-5 w-5 text-amber-500" />
@@ -453,7 +666,7 @@ export default function Stats() {
 
             {/* Player Details */}
             {stats.players.length > 0 && (
-                <Card className="glass-premium shadow-lg">
+                <Card className="glass-premium shadow-lg rounded-[24px]">
                     <div className="p-4 border-b border-white/10">
                         <h3 className="font-bold text-slate-100 flex items-center gap-2">
                             <Users className="h-5 w-5 text-skyjo-blue" />

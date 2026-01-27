@@ -110,6 +110,7 @@ export const useBackgroundMusic = (shouldPlay = false) => {
     const gainNodeRef = useRef(null);
     const shuffledPlaylistRef = useRef(shuffleArray(PLAYLIST));
     const currentTrackIndexRef = useRef(0);
+    const playTrackRef = useRef(null);
     const hasStartedSessionRef = useRef(false);
     const isLoadingRef = useRef(false);
     const shouldPlayRef = useRef(shouldPlay);
@@ -180,7 +181,9 @@ export const useBackgroundMusic = (shouldPlay = false) => {
                     shuffledPlaylistRef.current = shuffleArray(PLAYLIST);
                     currentTrackIndexRef.current = 0;
                 }
-                playTrack(shuffledPlaylistRef.current[currentTrackIndexRef.current]);
+                if (playTrackRef.current) {
+                    playTrackRef.current(shuffledPlaylistRef.current[currentTrackIndexRef.current]);
+                }
             }
         };
 
@@ -189,6 +192,9 @@ export const useBackgroundMusic = (shouldPlay = false) => {
         setIsPlaying(true);
         console.log(`🎵 Now playing: ${trackUrl.split('/').pop()}`);
     }, []);
+
+    // Keep ref in sync
+    playTrackRef.current = playTrack;
 
     // Stop playback
     const stopPlayback = useCallback(() => {

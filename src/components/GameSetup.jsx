@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, X, User, Sparkles, Gamepad2, RefreshCw, CheckCircle, Edit2, ArrowRight } from 'lucide-react';
+import { Plus, X, User, Sparkles, Gamepad2, RefreshCw, CheckCircle, Edit2, ArrowRight, HelpCircle } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 // Card imports removed as they are no longer used
@@ -40,7 +40,7 @@ const useSyncedAnimation = () => {
     return ref;
 };
 
-export default function GameSetup({ onNavigate }) {
+export default function GameSetup({ onNavigate, onOpenTutorial }) {
     const [players, setPlayers] = useState([
         { name: '', avatarId: 'cat' },
         { name: '', avatarId: 'dog' }
@@ -132,7 +132,7 @@ export default function GameSetup({ onNavigate }) {
                         <div className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden border border-white/10 bg-slate-900 shrink-0 relative z-30">
                             <div className="absolute inset-0 bg-sky-500/20 mix-blend-overlay" />
                             <img
-                                src="/logo.jpg"
+                                src="/Gemini_Generated_Image_auzhtfauzhtfauzh.png"
                                 alt="Skyjo Logo"
                                 className="w-full h-full object-cover scale-110"
                             />
@@ -295,6 +295,15 @@ export default function GameSetup({ onNavigate }) {
                         </span>
                     </div>
                 </div>
+            </button>
+
+            {/* Discover Tutorial Button */}
+            <button
+                onClick={onOpenTutorial}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl transition-all text-sm font-bold bg-slate-700/50 hover:bg-slate-600/50 text-sky-400 border border-slate-600/30 active:scale-95 group mb-1"
+            >
+                <HelpCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                DÉCOUVRIR LE TUTORIEL
             </button>
 
             {/* Check for Updates Button */}

@@ -2,13 +2,14 @@
 import { create } from 'zustand';
 import { io } from 'socket.io-client';
 import { AVATARS } from '../lib/avatars';
+import { useGameStore } from './gameStore';
 
 // Dynamic socket URL: in production use same origin, in dev use localhost
 const SOCKET_URL = import.meta.env.PROD
     ? window.location.origin
     : 'http://localhost:3000';
 
-const socket = io(SOCKET_URL, {
+export const socket = io(SOCKET_URL, {
     autoConnect: false,
     transports: ['websocket', 'polling']
 });
@@ -317,23 +318,15 @@ export const useOnlineGameStore = create((set, get) => ({
             return;
         }
 
+        const dbId = useGameStore.getState().userProfile.id;
+
         if (!socket.connected) {
-            socket.on('connect', () => {
-                socket.emit('create_room', { playerName, emoji: playerEmoji });
-                // Remove this specific one-time listener to avoid duplicates if reconnect logic handles it
-                // Actually this is tricky if we use .once('connect') but we might already be connected
-            }); // This is risky if already connecting.
-
-            // Better approach: Check if connecting?
-            // If disconnected, try to connect and emit ONCE connected.
             socket.connect();
-
-            // Wait for connection with a once listener
             socket.once('connect', () => {
-                socket.emit('create_room', { playerName, emoji: playerEmoji });
+                socket.emit('create_room', { playerName, emoji: playerEmoji, dbId });
             });
         } else {
-            socket.emit('create_room', { playerName, emoji: playerEmoji });
+            socket.emit('create_room', { playerName, emoji: playerEmoji, dbId });
         }
     },
 
@@ -347,7 +340,8 @@ export const useOnlineGameStore = create((set, get) => ({
             set({ error: "Entrez un code de salle !" });
             return;
         }
-        socket.emit('join_room', { roomCode: code, playerName, emoji: playerEmoji });
+        const dbId = useGameStore.getState().userProfile.id;
+        socket.emit('join_room', { roomCode: code, playerName, emoji: playerEmoji, dbId });
         set({ roomCode: code }); // Set optimistically, validated by events
     },
 

@@ -40,31 +40,88 @@ export const useGameStore = create(
             musicEnabled: true,
             vibrationEnabled: true,
             cardSkin: 'classic', // classic, papyrus
+            userProfile: {
+                id: `u-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                name: 'Joueur',
+                avatarId: 'cat',
+                emoji: '🐱',
+                vibeId: '',
+                level: 1,
+                currentXP: 0
+            },
 
             setCardSkin: (skin) => set({ cardSkin: skin }),
 
             // XP & Level System
-            level: 1,      // Starts at level 1
-            lastAcknowledgedLevel: 1, // Track which level up rewards have been seen
+            // Note: We'll keep these values in parallel with userProfile for backward compatibility 
+            // but sync them to userProfile when they change
+            level: 1,
+            lastAcknowledgedLevel: 1,
             currentXP: 0,
+
+            generateSkyId: () => {
+                const { userProfile, syncProfileWithBackend } = get();
+                if (userProfile.vibeId) return;
+                const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
+                const newVibeId = `#${randomPart}`;
+                set(state => ({
+                    userProfile: { ...state.userProfile, vibeId: newVibeId }
+                }));
+                // Sync after ID generation
+                syncProfileWithBackend();
+            },
+
+            updateUserProfile: (updates) => {
+                set(state => ({
+                    userProfile: { ...state.userProfile, ...updates }
+                }));
+                // Sync after update
+                get().syncProfileWithBackend();
+            },
+
+            syncProfileWithBackend: async () => {
+                const { userProfile } = get();
+                try {
+                    await fetch('/api/social/profile', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(userProfile)
+                    });
+                } catch (err) {
+                    console.error('[STORE] Sync error:', err);
+                }
+            },
 
             /**
              * Add XP points (called on victory)
              * @param {number} amount - XP to add (default 1)
              */
             addXP: (amount = 1) => {
-                const { currentXP, level } = get();
+                const { currentXP, level, userProfile, syncProfileWithBackend } = get();
                 const newXP = currentXP + amount;
 
                 if (newXP >= 10) {
                     // Level up!
-                    set({
-                        currentXP: newXP - 10,  // Carry over excess XP
-                        level: level + 1
-                    });
+                    set(state => ({
+                        currentXP: newXP - 10,
+                        level: level + 1,
+                        userProfile: {
+                            ...state.userProfile,
+                            level: level + 1,
+                            currentXP: newXP - 10
+                        }
+                    }));
                 } else {
-                    set({ currentXP: newXP });
+                    set(state => ({
+                        currentXP: newXP,
+                        userProfile: {
+                            ...state.userProfile,
+                            currentXP: newXP
+                        }
+                    }));
                 }
+                // Sync XP/Level change
+                syncProfileWithBackend();
             },
 
             /**

@@ -1,5 +1,5 @@
 {
-    "name": "Skyjo Score",
+    "name": "Avec vos cartes",
     "short_name": "Skyjo",
     "description": "Calculateur de points pour le jeu Skyjo",
     "start_url": "/",
@@ -9,21 +9,21 @@
     "orientation": "portrait",
     "icons": [
         {
-            "src": "/pwa-192x192.png?v=2",
+            "src": "/virtual-logo.jpg",
             "sizes": "192x192",
-            "type": "image/png",
+            "type": "image/jpeg",
             "purpose": "any"
         },
         {
-            "src": "/pwa-512x512.png?v=2",
+            "src": "/virtual-logo.jpg",
             "sizes": "512x512",
-            "type": "image/png",
+            "type": "image/jpeg",
             "purpose": "any"
         },
         {
-            "src": "/apple-touch-icon.png?v=2",
+            "src": "/virtual-logo.jpg",
             "sizes": "180x180",
-            "type": "image/png",
+            "type": "image/jpeg",
             "purpose": "maskable"
         }
     ],

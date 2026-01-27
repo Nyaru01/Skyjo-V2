@@ -1,0 +1,71 @@
+/* Glassmorphisme premium avec halo animé */
+.glass-premium {
+    position: relative;
+    background: transparent !important;
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.glass-premium::before {
+    content: '';
+    position: absolute;
+    top: -150%;
+    left: -50%;
+    width: 200%;
+    height: 400%;
+    background: conic-gradient(transparent,
+            rgba(99, 102, 241, 0.4),
+            rgba(168, 85, 247, 0.5),
+            rgba(99, 102, 241, 0.4),
+            transparent 40%);
+    animation: border-rotate 4s linear infinite;
+    z-index: -2;
+    pointer-events: none;
+}
+
+.glass-premium::after {
+    content: '';
+    position: absolute;
+    inset: 1.5px;
+    background: rgba(15, 23, 42, 0.96);
+    border-radius: inherit;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Hover glow effect */
+.glass-premium:hover::before {
+    animation-duration: 2.5s;
+}
+
+@keyframes border-rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Animation pulse-slow pour le halo du joueur actif */
+@keyframes pulse-slow {
+
+    0%,
+    100% {
+        opacity: 1;
+        box-shadow: 0 0 30px rgba(52, 211, 153, 0.6), 0 0 60px rgba(52, 211, 153, 0.3);
+    }
+
+    50% {
+        opacity: 0.95;
+        box-shadow: 0 0 50px rgba(52, 211, 153, 0.8), 0 0 80px rgba(52, 211, 153, 0.4);
+    }
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 2.5s ease-in-out infinite;
+}

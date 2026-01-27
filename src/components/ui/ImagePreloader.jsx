@@ -1,12 +1,18 @@
 import { useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
+import SkyjoLoader from '../SkyjoLoader';
 
 const CRITICAL_IMAGES = [
     '/card-back.png?v=2',
     '/card-back-papyrus.jpg',
+    '/card-back-neon.png',
+    '/card-back-gold.png',
+    '/card-back-galaxy.png',
+    '/card-snow.png',
     '/bg-skyjo.png',
-    '/virtual-logo2.jpg',
+    '/premium-bg.jpg',
+    '/virtual-logo.jpg',
     '/logo.jpg',
+    '/virtual-logo2.jpg',
     // Avatar images
     '/avatars/cat.png?v=2',
     '/avatars/dog.png?v=2',
@@ -18,6 +24,15 @@ const CRITICAL_IMAGES = [
     '/avatars/monkey.png?v=2'
 ];
 
+const CRITICAL_AUDIO = [
+    '/Sounds/Start.mp3',
+    '/Sounds/victory.mp3',
+    '/Sounds/whoosh-radio-ready-219487.mp3',
+    '/Music/track-344542.mp3',
+    '/Music/scizzie - aquatic ambience.mp3',
+    '/Music/reveil-239031.mp3'
+];
+
 export default function ImagePreloader({ children }) {
     const [isLoading, setIsLoading] = useState(true);
     const [progress, setProgress] = useState(0);
@@ -25,18 +40,22 @@ export default function ImagePreloader({ children }) {
     useEffect(() => {
         let mounted = true;
         let loadedCount = 0;
-        const total = CRITICAL_IMAGES.length;
+        const total = CRITICAL_IMAGES.length + CRITICAL_AUDIO.length;
+        const startTime = Date.now();
+        const minLoadingTime = 4000; // Minimum 4 seconds to show the premium loader
 
-        const handleImageLoad = () => {
+        const handleAssetLoad = () => {
             if (!mounted) return;
             loadedCount++;
             setProgress(Math.round((loadedCount / total) * 100));
 
             if (loadedCount === total) {
-                // Short delay to ensure texture decoding is done
+                const elapsedTime = Date.now() - startTime;
+                const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+
                 setTimeout(() => {
                     if (mounted) setIsLoading(false);
-                }, 500);
+                }, remainingTime);
             }
         };
 
@@ -44,8 +63,17 @@ export default function ImagePreloader({ children }) {
         CRITICAL_IMAGES.forEach(src => {
             const img = new Image();
             img.src = src;
-            img.onload = handleImageLoad;
-            img.onerror = handleImageLoad; // Proceed even if fails
+            img.onload = handleAssetLoad;
+            img.onerror = handleAssetLoad;
+        });
+
+        // Start loading all audio
+        CRITICAL_AUDIO.forEach(src => {
+            const audio = new Audio();
+            audio.src = src;
+            audio.oncanplaythrough = handleAssetLoad;
+            audio.onerror = handleAssetLoad;
+            audio.load(); // Force load
         });
 
         return () => {
@@ -54,18 +82,7 @@ export default function ImagePreloader({ children }) {
     }, []);
 
     if (isLoading) {
-        return (
-            <div className="fixed inset-0 bg-slate-900 flex flex-col items-center justify-center z-50">
-                <div className="w-16 h-16 relative mb-4">
-                    <div className="absolute inset-0 border-4 border-slate-700 rounded-full"></div>
-                    <div className="absolute inset-0 border-4 border-t-emerald-500 rounded-full animate-spin"></div>
-                </div>
-                <div className="text-emerald-500 font-bold text-xl animate-pulse">
-                    Chargement... {progress}%
-                </div>
-                <p className="text-slate-500 text-sm mt-2">Optimisation des ressources</p>
-            </div>
-        );
+        return <SkyjoLoader progress={progress} />;
     }
 
     return <>{children}</>;

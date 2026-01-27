@@ -317,6 +317,25 @@ export const useFeedback = () => {
         playBeep(200, 80, 0.1); // Lower thud
     }, [soundEnabled]);
 
+    // Social notification sound
+    const playSocialNotify = useCallback(() => {
+        if (soundEnabled) {
+            playBeep(700, 50, 0.1);
+            setTimeout(() => playBeep(900, 70, 0.1), 50);
+        }
+        vibrate([30, 30]);
+    }, [soundEnabled, vibrate]);
+
+    // Social invitation sound
+    const playSocialInvite = useCallback(() => {
+        if (soundEnabled) {
+            playBeep(800, 40, 0.1);
+            setTimeout(() => playBeep(1000, 40, 0.1), 50);
+            setTimeout(() => playBeep(1200, 60, 0.1), 100);
+        }
+        vibrate([40, 30, 40]);
+    }, [soundEnabled, vibrate]);
+
     return {
         playSuccess,
         playClick,
@@ -327,6 +346,8 @@ export const useFeedback = () => {
         playCardFlip,
         playCardDraw,
         playCardPlace,
+        playSocialNotify,
+        playSocialInvite,
         vibrate: (pattern) => {
             if (vibrationEnabled && navigator.vibrate) {
                 navigator.vibrate(pattern);

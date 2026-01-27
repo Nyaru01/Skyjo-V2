@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { Volume2, VolumeX, Music, Music2, Trash2, MessageSquare, ExternalLink, AlertTriangle, Smartphone, Settings } from 'lucide-react';
+import { Volume2, VolumeX, Music, Music2, Trash2, MessageSquare, ExternalLink, AlertTriangle, Smartphone, Settings, HelpCircle, Sparkles } from 'lucide-react';
+import Tutorial from './Tutorial';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/Card';
 import { Button } from './ui/Button';
 import { useGameStore } from '../store/gameStore';
 import { cn } from '../lib/utils';
+import { pushManager } from '../lib/pushManager';
+import { Bell, BellOff } from 'lucide-react';
 
-export default function SettingsPage() {
+export default function SettingsPage({ onViewChangelog }) {
     const soundEnabled = useGameStore(state => state.soundEnabled);
     const musicEnabled = useGameStore(state => state.musicEnabled);
     const vibrationEnabled = useGameStore(state => state.vibrationEnabled);
@@ -15,6 +18,32 @@ export default function SettingsPage() {
     const clearArchivedGames = useGameStore(state => state.clearArchivedGames);
 
     const [showConfirmReset, setShowConfirmReset] = useState(false);
+    const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+    const [pushSubscription, setPushSubscription] = useState(null);
+    const [isPushLoading, setIsPushLoading] = useState(false);
+
+    const userProfile = useGameStore(state => state.userProfile);
+
+    // Initial check for push subscription
+    useState(() => {
+        const checkPush = async () => {
+            const sub = await pushManager.getSubscription();
+            setPushSubscription(sub);
+        };
+        checkPush();
+    }, []);
+
+    const handleTogglePush = async () => {
+        setIsPushLoading(true);
+        if (pushSubscription) {
+            await pushManager.unsubscribe(userProfile.id);
+            setPushSubscription(null);
+        } else {
+            const sub = await pushManager.subscribe(userProfile.id);
+            setPushSubscription(sub);
+        }
+        setIsPushLoading(false);
+    };
 
     const handleResetHistory = () => {
         clearArchivedGames();
@@ -129,8 +158,87 @@ export default function SettingsPage() {
                             />
                         </button>
                     </div>
+
+                    {/* Notifications Push Toggle */}
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                        <div className="flex items-center gap-3">
+                            {pushSubscription ? (
+                                <Bell className="h-5 w-5 text-emerald-400" />
+                            ) : (
+                                <BellOff className="h-5 w-5 text-slate-500" />
+                            )}
+                            <div>
+                                <p className="font-medium text-slate-200">Notifications Push</p>
+                                <p className="text-xs text-slate-400">Invitations aux parties en ligne</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={handleTogglePush}
+                            disabled={isPushLoading}
+                            className={cn(
+                                "relative w-14 h-8 rounded-full transition-all duration-300",
+                                pushSubscription
+                                    ? "bg-gradient-to-r from-emerald-500 to-teal-500"
+                                    : "bg-slate-600",
+                                isPushLoading && "opacity-50 cursor-wait"
+                            )}
+                        >
+                            <span
+                                className={cn(
+                                    "absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-300",
+                                    pushSubscription ? "left-7" : "left-1"
+                                )}
+                            />
+                        </button>
+                    </div>
+
+                    {/* Changelog */}
+                    <button
+                        onClick={onViewChangelog}
+                        className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 active:scale-[0.98] transition-all group border border-white/5 hover:border-emerald-500/30"
+                    >
+                        <div className="flex items-center gap-3 text-left">
+                            <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 group-hover:bg-emerald-500/20 transition-colors">
+                                <Sparkles className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <p className="font-bold text-slate-200">Nouveautés</p>
+                                <p className="text-[10px] text-slate-400 uppercase tracking-widest font-medium">Découvrir les mises à jour</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                            <div className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-black tracking-widest uppercase border border-emerald-500/20 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                Voir
+                            </div>
+                        </div>
+                    </button>
+
+                    {/* Tutorial Replay */}
+                    <button
+                        onClick={() => setIsTutorialOpen(true)}
+                        className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 active:scale-[0.98] transition-all group border border-white/5 hover:border-sky-500/30"
+                    >
+                        <div className="flex items-center gap-3 text-left">
+                            <div className="p-2 rounded-lg bg-sky-500/10 text-sky-400 group-hover:bg-sky-500/20 transition-colors">
+                                <HelpCircle className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <p className="font-bold text-slate-200">Règles du jeu</p>
+                                <p className="text-[10px] text-slate-400 uppercase tracking-widest font-medium">Revoir le guide interactif</p>
+                            </div>
+                        </div>
+                        <div className="px-3 py-1 rounded-full bg-sky-500/10 text-sky-400 text-[10px] font-black tracking-widest uppercase border border-sky-500/20 group-hover:bg-sky-500 group-hover:text-white transition-all">
+                            Voir
+                        </div>
+                    </button>
                 </CardContent>
             </Card>
+
+            <Tutorial
+                isOpen={isTutorialOpen}
+                onClose={() => setIsTutorialOpen(false)}
+            />
 
             {/* Data Management */}
             <Card className="glass-premium dark:glass-dark shadow-xl">

@@ -5,6 +5,10 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import pkg from 'pg';
+const { Pool } = pkg;
+import webpush from 'web-push';
+import dotenv from 'dotenv';
 import {
     initializeGame,
     revealInitialCards,
@@ -16,14 +20,204 @@ import {
     endTurn
 } from '../src/lib/skyjoEngine.js';
 
+dotenv.config();
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 
 // Serve static files from the dist folder (built React app)
 app.use(express.static(path.join(__dirname, '../dist')));
+
+// --- Database Configuration ---
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+});
+
+const initDb = async () => {
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS users (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                emoji TEXT,
+                avatar_id TEXT,
+                vibe_id TEXT UNIQUE,
+                level INTEGER DEFAULT 1,
+                xp INTEGER DEFAULT 0,
+                last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE TABLE IF NOT EXISTS friends (
+                user_id TEXT REFERENCES users(id),
+                friend_id TEXT REFERENCES users(id),
+                status TEXT DEFAULT 'PENDING',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (user_id, friend_id)
+            );
+
+            CREATE TABLE IF NOT EXISTS push_subscriptions (
+                user_id TEXT PRIMARY KEY REFERENCES users(id),
+                subscription JSONB NOT NULL
+            );
+        `);
+        console.log('[DB] Database initialized');
+    } catch (err) {
+        console.error('[DB] Init error:', err);
+    }
+};
+
+initDb();
+
+// --- Web Push Configuration ---
+if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+    webpush.setVapidDetails(
+        'mailto:nyaru@skyjo.offline',
+        process.env.VAPID_PUBLIC_KEY,
+        process.env.VAPID_PRIVATE_KEY
+    );
+    console.log('[PUSH] VAPID keys configured');
+}
+
+// --- Social & Profile API ---
+
+app.post('/api/social/profile', async (req, res) => {
+    const { id, name, emoji, avatarId, vibeId, level, currentXP } = req.body;
+    try {
+        await pool.query(`
+            INSERT INTO users (id, name, emoji, avatar_id, vibe_id, level, xp, last_seen)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP)
+            ON CONFLICT (id) DO UPDATE SET
+                name = EXCLUDED.name,
+                emoji = EXCLUDED.emoji,
+                avatar_id = EXCLUDED.avatar_id,
+                vibe_id = EXCLUDED.vibe_id,
+                level = EXCLUDED.level,
+                xp = EXCLUDED.xp,
+                last_seen = CURRENT_TIMESTAMP
+        `, [id, name, emoji, avatarId, vibeId, level, currentXP]);
+        res.json({ status: 'ok' });
+    } catch (err) {
+        console.error('[API] Profile Sync error:', err);
+        res.status(500).json({ error: 'Sync failed' });
+    }
+});
+
+app.get('/api/social/search', async (req, res) => {
+    const { query } = req.query;
+    try {
+        const result = await pool.query(`
+            SELECT id, name, avatar_id, vibe_id FROM users
+            WHERE name ILIKE $1 OR vibe_id ILIKE $1
+            LIMIT 10
+        `, [`%${query}%`]);
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: 'Search failed' });
+    }
+});
+
+app.get('/api/social/friends/:userId', async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const result = await pool.query(`
+            SELECT u.id, u.name, u.avatar_id, u.vibe_id, f.status, f.user_id as requester_id
+            FROM users u
+            JOIN friends f ON (f.user_id = $1 AND f.friend_id = u.id) OR (f.friend_id = $1 AND f.user_id = u.id)
+            WHERE u.id != $1
+        `, [userId]);
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: 'Fetch friends failed' });
+    }
+});
+
+app.post('/api/social/friends/request', async (req, res) => {
+    const { userId, friendId } = req.body;
+    try {
+        await pool.query(`
+            INSERT INTO friends (user_id, friend_id, status)
+            VALUES ($1, $2, 'PENDING')
+            ON CONFLICT DO NOTHING
+        `, [userId, friendId]);
+        res.json({ status: 'sent' });
+    } catch (err) {
+        res.status(500).json({ error: 'Request failed' });
+    }
+});
+
+app.post('/api/social/friends/accept', async (req, res) => {
+    const { userId, friendId } = req.body;
+    try {
+        await pool.query(`
+            UPDATE friends SET status = 'ACCEPTED'
+            WHERE (user_id = $1 AND friend_id = $2) OR (user_id = $2 AND friend_id = $1)
+        `, [userId, friendId]);
+        res.json({ status: 'accepted' });
+    } catch (err) {
+        res.status(500).json({ error: 'Accept failed' });
+    }
+});
+
+app.get('/api/social/leaderboard/global', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT id, name, avatar_id, vibe_id, level, xp FROM users
+            ORDER BY level DESC, xp DESC LIMIT 20
+        `);
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: 'Leaderboard failed' });
+    }
+});
+
+app.get('/api/social/leaderboard/:userId', async (req, res) => {
+    const { userId } = req.params;
+    try {
+        // Includes user and their accepted friends
+        const result = await pool.query(`
+            SELECT u.id, u.name, u.avatar_id, u.vibe_id, u.level, u.xp FROM users u
+            WHERE u.id = $1 OR u.id IN (
+                SELECT CASE WHEN user_id = $1 THEN friend_id ELSE user_id END
+                FROM friends WHERE (user_id = $1 OR friend_id = $1) AND status = 'ACCEPTED'
+            )
+            ORDER BY level DESC, xp DESC
+        `, [userId]);
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: 'Friend leaderboard failed' });
+    }
+});
+
+app.post('/api/push/subscribe', async (req, res) => {
+    const { userId, subscription } = req.body;
+    try {
+        await pool.query(`
+            INSERT INTO push_subscriptions (user_id, subscription)
+            VALUES ($1, $2)
+            ON CONFLICT (user_id) DO UPDATE SET subscription = EXCLUDED.subscription
+        `, [userId, subscription]);
+        res.json({ status: 'subscribed' });
+    } catch (err) {
+        res.status(500).json({ error: 'Subscription failed' });
+    }
+});
+
+app.post('/api/push/unsubscribe', async (req, res) => {
+    const { userId } = req.body;
+    try {
+        await pool.query('DELETE FROM push_subscriptions WHERE user_id = $1', [userId]);
+        res.json({ status: 'unsubscribed' });
+    } catch (err) {
+        res.status(500).json({ error: 'Unsubscription failed' });
+    }
+});
+
+// --- Server Utilities ---
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -34,6 +228,7 @@ const io = new Server(httpServer, {
 });
 
 const rooms = new Map();
+const userStatus = new Map(); // userId -> { socketId, status: 'ONLINE' | 'IN_GAME' }
 
 const getPublicRooms = () => {
     const publicRooms = [];
@@ -54,506 +249,222 @@ const generateRoomCode = () => {
     return Math.random().toString(36).substring(2, 6).toUpperCase();
 };
 
-/**
- * Helper function to start the next round for a room
- * Extracted for reuse with timeout and force-start logic
- */
 const startNextRoundForRoom = (roomCode, room, ioInstance) => {
-    // Reset ready set and timeout
     room.playersReadyForNextRound = new Set();
     if (room.nextRoundTimeout) {
         clearTimeout(room.nextRoundTimeout);
         room.nextRoundTimeout = null;
     }
 
-    // Calculate scores adding to total (only once per round)
     if (!room.roundScored) {
         const roundScores = calculateFinalScores(room.gameState);
         roundScores.forEach(score => {
             const currentTotal = room.totalScores[score.playerId] || 0;
             const additional = score.finalScore || 0;
             room.totalScores[score.playerId] = currentTotal + additional;
-            console.log(`[Score] ${score.playerName}: ${currentTotal} + ${additional} = ${room.totalScores[score.playerId]}`);
         });
         room.roundScored = true;
     }
 
-    // Check 100 points threshold
     const maxScore = Math.max(...Object.values(room.totalScores));
-    console.log(`[Game] Max score after round ${room.roundNumber}: ${maxScore}`);
-
     if (maxScore >= 100) {
         room.isGameOver = true;
         const minScore = Math.min(...Object.values(room.totalScores));
         const winnerId = Object.keys(room.totalScores).find(id => room.totalScores[id] === minScore);
         const winnerPlayer = room.players.find(p => p.id === winnerId);
-        room.gameWinner = {
-            id: winnerId,
-            name: winnerPlayer?.name,
-            emoji: winnerPlayer?.emoji,
-            score: minScore
-        };
+        room.gameWinner = { id: winnerId, name: winnerPlayer?.name, emoji: winnerPlayer?.emoji, score: minScore };
+        ioInstance.to(roomCode).emit('game_over', { totalScores: room.totalScores, winner: room.gameWinner });
 
-        console.log(`[Game Over] Winner: ${room.gameWinner.name} with ${minScore} points`);
-        ioInstance.to(roomCode).emit('game_over', {
-            totalScores: room.totalScores,
-            winner: room.gameWinner
+        // Return players to 'ONLINE' status
+        room.players.forEach(p => {
+            if (userStatus.has(p.dbId)) {
+                userStatus.set(p.dbId, { ...userStatus.get(p.dbId), status: 'ONLINE' });
+                io.emit('user_presence_update', { userId: p.dbId, status: 'ONLINE' });
+            }
         });
     } else {
-        // Next Round
         room.roundNumber++;
         room.roundScored = false;
-        const gamePlayers = room.players.map(p => ({
-            id: p.id, name: p.name, emoji: p.emoji
-        }));
+        const gamePlayers = room.players.map(p => ({ id: p.id, name: p.name, emoji: p.emoji }));
         room.gameState = initializeGame(gamePlayers);
-
-        console.log(`[Game] Starting round ${room.roundNumber} for room ${roomCode}`);
-        ioInstance.to(roomCode).emit('game_started', {
-            gameState: room.gameState,
-            totalScores: room.totalScores,
-            roundNumber: room.roundNumber
-        });
+        ioInstance.to(roomCode).emit('game_started', { gameState: room.gameState, totalScores: room.totalScores, roundNumber: room.roundNumber });
     }
 };
 
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
-
-    // Send initial list
     socket.emit('room_list_update', getPublicRooms());
 
-    socket.on('get_public_rooms', () => {
-        socket.emit('room_list_update', getPublicRooms());
+    socket.on('register_user', ({ id, name, emoji, vibeId }) => {
+        socket.dbId = id;
+        userStatus.set(id, { socketId: socket.id, status: 'ONLINE' });
+        io.emit('user_presence_update', { userId: id, status: 'ONLINE' });
+        console.log(`[USER] Registered: ${name} (${id})`);
     });
 
-    // --- Lobby Events ---
-
-    socket.on('create_room', ({ playerName, emoji }) => {
+    socket.on('create_room', ({ playerName, emoji, dbId }) => {
         const roomCode = generateRoomCode();
+        const effectiveDbId = dbId || socket.dbId;
         rooms.set(roomCode, {
             gameState: null,
-            players: [{ id: socket.id, name: playerName, emoji, isHost: true }],
+            players: [{ id: socket.id, dbId: effectiveDbId, name: playerName, emoji, isHost: true }],
             totalScores: {},
             roundNumber: 1,
             gameStarted: false,
             isGameOver: false,
             gameWinner: null,
-            isPublic: true // Par défaut public
+            isPublic: true
         });
-
         socket.join(roomCode);
         socket.emit('room_created', roomCode);
         io.to(roomCode).emit('player_list_update', rooms.get(roomCode).players);
-        console.log(`Room ${roomCode} created by ${playerName}`);
-
-        // Broadcast update to all for lobby list
         io.emit('room_list_update', getPublicRooms());
     });
 
-    socket.on('join_room', ({ roomCode, playerName, emoji }) => {
-        // Normalize room code?
+    socket.on('join_room', ({ roomCode, playerName, emoji, dbId }) => {
         const room = rooms.get(roomCode?.toUpperCase());
-        if (!room) {
-            socket.emit('error', 'Salle introuvable');
-            return;
-        }
+        if (!room) { socket.emit('error', 'Salle introuvable'); return; }
+        if (room.gameStarted) { socket.emit('error', 'La partie a déjà commencé'); return; }
+        if (room.players.some(p => p.id === socket.id)) return;
+        if (room.players.length >= 8) { socket.emit('error', 'Salle pleine'); return; }
 
-        if (room.gameStarted) {
-            socket.emit('error', 'La partie a déjà commencé');
-            return;
-        }
-
-        if (room.players.some(p => p.id === socket.id)) {
-            return; // Already joined
-        }
-
-        if (room.players.length >= 8) {
-            socket.emit('error', 'Salle pleine');
-            return;
-        }
-
-        room.players.push({ id: socket.id, name: playerName, emoji, isHost: false });
+        const effectiveDbId = dbId || socket.dbId;
+        room.players.push({ id: socket.id, dbId: effectiveDbId, name: playerName, emoji, isHost: false });
         socket.join(roomCode.toUpperCase());
-
         io.to(roomCode.toUpperCase()).emit('player_list_update', room.players);
-        io.to(roomCode.toUpperCase()).emit('player_list_update', room.players);
-        console.log(`${playerName} joined room ${roomCode}`);
-
-        // Update lobby list (player count changed)
         io.emit('room_list_update', getPublicRooms());
-
-        // Notify others in room
         socket.to(roomCode.toUpperCase()).emit('new_player_joined', { playerName, emoji });
     });
 
     socket.on('start_game', (roomCode) => {
         const room = rooms.get(roomCode);
         if (!room) return;
-
-        // Verify host?
-        // const player = room.players.find(p => p.id === socket.id);
-        // if (!player?.isHost) return;
-
-        const gamePlayers = room.players.map(p => ({
-            id: p.id,
-            name: p.name,
-            emoji: p.emoji
-        }));
-
+        const gamePlayers = room.players.map(p => ({ id: p.id, name: p.name, emoji: p.emoji }));
         room.gameState = initializeGame(gamePlayers);
         room.gameStarted = true;
-        io.emit('room_list_update', getPublicRooms()); // Update list (room no longer available)
 
-        // Init scores if first game
-        if (Object.keys(room.totalScores).length === 0) {
-            gamePlayers.forEach(p => room.totalScores[p.id] = 0);
-        }
-
-        io.to(roomCode).emit('game_started', {
-            gameState: room.gameState,
-            totalScores: room.totalScores,
-            roundNumber: room.roundNumber
+        // Update presence to IN_GAME
+        room.players.forEach(p => {
+            if (p.dbId) {
+                userStatus.set(p.dbId, { ...userStatus.get(p.dbId), status: 'IN_GAME' });
+                io.emit('user_presence_update', { userId: p.dbId, status: 'IN_GAME' });
+            }
         });
-    });
 
-    // --- Gameplay Events ---
+        io.emit('room_list_update', getPublicRooms());
+        if (Object.keys(room.totalScores).length === 0) gamePlayers.forEach(p => room.totalScores[p.id] = 0);
+        io.to(roomCode).emit('game_started', { gameState: room.gameState, totalScores: room.totalScores, roundNumber: room.roundNumber });
+    });
 
     socket.on('game_action', ({ roomCode, action, payload }) => {
         const room = rooms.get(roomCode);
         if (!room || !room.gameState) return;
+        const pIdx = room.gameState.players.findIndex(p => p.id === socket.id);
+        if (pIdx === -1) return;
 
-        const currentPlayer = room.gameState.players[room.gameState.currentPlayerIndex];
+        let lastAction = { type: action, playerId: socket.id, playerName: room.gameState.players[pIdx]?.name, card: null, timestamp: Date.now() };
 
         try {
             let newState = { ...room.gameState };
-            // Find player index in game state based on socket ID
-            // Be careful: gameState.players[i].id matches socket.id because we mapped it in start_game
-            const pIdx = room.gameState.players.findIndex(p => p.id === socket.id);
-            if (pIdx === -1) return;
-
-            // Track the last action for animation feedback
-            let lastAction = {
-                type: action,
-                playerId: socket.id,
-                playerName: room.gameState.players[pIdx]?.name,
-                card: null, // Card that went to discard (if any)
-                timestamp: Date.now()
-            };
-
-            // Initial Reveal Phase
             if (newState.phase === 'INITIAL_REVEAL') {
-                if (action === 'reveal_initial') {
-                    // payload: { cardIndices: [...] }
-                    newState = revealInitialCards(newState, pIdx, payload.cardIndices);
-                }
+                if (action === 'reveal_initial') newState = revealInitialCards(newState, pIdx, payload.cardIndices);
             } else {
-                // Game Loop
-                // Verify it is this player's turn
-                if (currentPlayer.id !== socket.id) return;
-
+                if (room.gameState.players[room.gameState.currentPlayerIndex].id !== socket.id) return;
                 switch (action) {
-                    case 'draw_pile':
-                        newState = drawFromPile(newState);
-                        break;
-                    case 'draw_discard':
-                        newState = drawFromDiscard(newState);
-                        break;
+                    case 'draw_pile': newState = drawFromPile(newState); break;
+                    case 'draw_discard': newState = drawFromDiscard(newState); break;
                     case 'replace_card':
-                        // Capture the card being replaced BEFORE the action
                         const replacedCard = room.gameState.players[pIdx].hand[payload.cardIndex];
                         lastAction.card = replacedCard ? { ...replacedCard, isRevealed: true } : null;
                         newState = replaceCard(newState, payload.cardIndex);
                         newState = endTurn(newState);
                         break;
-                    case 'discard_and_reveal':
-                        newState = discardAndReveal(newState, payload.cardIndex);
-                        newState = endTurn(newState);
-                        break;
+                    case 'discard_and_reveal': newState = discardAndReveal(newState, payload.cardIndex); newState = endTurn(newState); break;
                     case 'discard_drawn':
                         if (!newState.drawnCard) return;
-                        // Capture the drawn card being discarded
                         lastAction.card = { ...newState.drawnCard, isRevealed: true };
-                        newState = {
-                            ...newState,
-                            discardPile: [...newState.discardPile, { ...newState.drawnCard, isRevealed: true }],
-                            drawnCard: null,
-                            turnPhase: 'MUST_REVEAL',
-                        };
+                        newState = { ...newState, discardPile: [...newState.discardPile, { ...newState.drawnCard, isRevealed: true }], drawnCard: null, turnPhase: 'MUST_REVEAL' };
                         break;
                     case 'reveal_hidden':
                         const player = newState.players[pIdx];
-                        const newHand = player.hand.map((card, i) =>
-                            i === payload.cardIndex ? { ...card, isRevealed: true } : card
-                        );
+                        const newHand = player.hand.map((card, i) => i === payload.cardIndex ? { ...card, isRevealed: true } : card);
                         newState.players[pIdx] = { ...player, hand: newHand };
-
-                        // After revealing, turn is over
-                        // But we must construct state correctly for endTurn
-                        // Wait, `revealHiddenCard` in store set turnPhase='DRAW' then called endTurn.
-                        newState.turnPhase = 'DRAW'; // Reset phase expected by endTurn?
+                        newState.turnPhase = 'DRAW';
                         newState = endTurn(newState);
                         break;
                     case 'undo_draw_discard':
-                        // Only allowed if we just took from discard (implies MUST_REPLACE phase in this engine)
                         if (newState.turnPhase !== 'MUST_REPLACE' || !newState.drawnCard) return;
-
-                        // Put card back on discard pile
-                        newState = {
-                            ...newState,
-                            discardPile: [...newState.discardPile, newState.drawnCard],
-                            drawnCard: null,
-                            turnPhase: 'DRAW'
-                        };
-                        // Clear last action type to avoid confusing clients? 
-                        // Or send specific type so client can handle it (e.g. clear drawn card slot)
+                        newState = { ...newState, discardPile: [...newState.discardPile, newState.drawnCard], drawnCard: null, turnPhase: 'DRAW' };
                         lastAction.type = 'undo_draw_discard';
                         lastAction.card = null;
                         break;
                 }
             }
-
             room.gameState = newState;
             io.to(roomCode).emit('game_update', { gameState: newState, lastAction });
-
         } catch (e) {
-            console.error("Action Error:", e.message);
             socket.emit('error', e.message);
         }
     });
 
-    socket.on('next_round', (roomCode) => {
-        const room = rooms.get(roomCode);
+    socket.on('invite_friend', async ({ friendId, roomCode, fromName }) => {
+        const friend = userStatus.get(friendId);
+        if (friend) {
+            io.to(friend.socketId).emit('game_invitation', { fromName, roomCode });
 
-        if (!room) {
-            socket.emit('error', 'Salle introuvable ou expirée');
-            return;
-        }
-
-        // If game is already restarted (e.g. other player triggered it), sync this client
-        if (room.gameState && (room.gameState.phase === 'INITIAL_REVEAL' || room.gameState.phase === 'PLAYING')) {
-            console.log(`[next_round] Resyncing ${socket.id} to new round ${room.roundNumber}`);
-            socket.emit('game_started', {
-                gameState: room.gameState,
-                totalScores: room.totalScores,
-                roundNumber: room.roundNumber
-            });
-            return;
-        }
-
-        if (!room.gameState || room.gameState.phase !== 'FINISHED') {
-            socket.emit('error', 'La manche n\'est pas terminée');
-            return;
-        }
-
-        // Initialize ready set if not exists
-        if (!room.playersReadyForNextRound) {
-            room.playersReadyForNextRound = new Set();
-        }
-
-        // Find the player who clicked
-        const player = room.players.find(p => p.id === socket.id);
-        if (!player) return;
-
-        const isHost = player.isHost;
-
-        // Mark this player as ready
-        room.playersReadyForNextRound.add(socket.id);
-        console.log(`[next_round] ${player.name} is ready (${room.playersReadyForNextRound.size}/${room.players.length}) - Host: ${isHost}`);
-
-        // Notify all players about who is ready
-        io.to(roomCode).emit('player_ready_next_round', {
-            playerId: socket.id,
-            playerName: player.name,
-            playerEmoji: player.emoji,
-            readyCount: room.playersReadyForNextRound.size,
-            totalPlayers: room.players.length,
-            isHost: isHost
-        });
-
-        // Start 10-second timeout when first player clicks ready
-        if (room.playersReadyForNextRound.size === 1 && !room.nextRoundTimeout) {
-            console.log(`[next_round] Starting 10s timeout for room ${roomCode}`);
-            room.nextRoundTimeoutStart = Date.now();
-            room.nextRoundTimeout = setTimeout(() => {
-                console.log(`[next_round] 10s timeout reached for room ${roomCode}`);
-                // Check if host is ready, then auto-start
-                const hostPlayer = room.players.find(p => p.isHost);
-                if (hostPlayer && room.playersReadyForNextRound.has(hostPlayer.id)) {
-                    console.log(`[next_round] Host is ready - auto-starting next round`);
-                    startNextRoundForRoom(roomCode, room, io);
-                } else {
-                    console.log(`[next_round] Host not ready - waiting for host to start`);
-                    // Notify that timeout expired but host needs to start
-                    io.to(roomCode).emit('timeout_expired', {
-                        message: 'Délai expiré - En attente de l\'hôte',
-                        hostMustStart: true
+            // Try Push Notification
+            try {
+                const subResp = await pool.query('SELECT subscription FROM push_subscriptions WHERE user_id = $1', [friendId]);
+                if (subResp.rows.length > 0) {
+                    const payload = JSON.stringify({
+                        title: 'Invitation SkyJo',
+                        body: `${fromName} t'invite à rejoindre sa partie !`,
+                        icon: '/logo.jpg',
+                        data: { url: `/?room=${roomCode}` }
                     });
+                    await webpush.sendNotification(subResp.rows[0].subscription, payload);
                 }
-                room.nextRoundTimeout = null;
-            }, 10000); // 10 seconds
-        }
-
-        // If ALL players are ready - start immediately
-        if (room.playersReadyForNextRound.size >= room.players.length) {
-            console.log(`[next_round] All ${room.players.length} players ready! Starting immediately`);
-            startNextRoundForRoom(roomCode, room, io);
-            return;
-        }
-
-        // If this is the HOST clicking and timeout has elapsed OR only one player left
-        // Allow host to force start if they're ready and it's been at least 10 seconds
-        if (isHost && room.nextRoundTimeoutStart) {
-            const elapsed = Date.now() - room.nextRoundTimeoutStart;
-            if (elapsed >= 10000) {
-                console.log(`[next_round] Host clicked after timeout - forcing start`);
-                startNextRoundForRoom(roomCode, room, io);
+            } catch (err) {
+                console.error('[PUSH] Invite error:', err);
             }
         }
     });
 
-    // New event: Host can force start after timeout
-    socket.on('force_next_round', (roomCode) => {
-        const room = rooms.get(roomCode);
-        if (!room) {
-            socket.emit('error', 'Salle introuvable');
-            return;
-        }
-
-        const player = room.players.find(p => p.id === socket.id);
-        if (!player || !player.isHost) {
-            socket.emit('error', 'Seul l\'hôte peut forcer le démarrage');
-            return;
-        }
-
-        if (!room.playersReadyForNextRound?.has(socket.id)) {
-            socket.emit('error', 'Vous devez d\'abord être prêt');
-            return;
-        }
-
-        // Check if timeout has elapsed
-        const elapsed = room.nextRoundTimeoutStart ? Date.now() - room.nextRoundTimeoutStart : 0;
-        if (elapsed < 10000 && room.playersReadyForNextRound.size < room.players.length) {
-            const remaining = Math.ceil((10000 - elapsed) / 1000);
-            socket.emit('error', `Attendez encore ${remaining}s ou que tous soient prêts`);
-            return;
-        }
-
-        console.log(`[force_next_round] Host ${player.name} forcing start for room ${roomCode}`);
-        startNextRoundForRoom(roomCode, room, io);
-    });
-
-    socket.on('rematch', (roomCode) => {
-        const room = rooms.get(roomCode);
-        if (!room) return;
-
-        // Reset everything
-        const gamePlayers = room.players.map(p => ({
-            id: p.id, name: p.name, emoji: p.emoji
-        }));
-
-        room.totalScores = {};
-        gamePlayers.forEach(p => room.totalScores[p.id] = 0);
-        room.roundNumber = 1;
-        room.isGameOver = false;
-        room.gameWinner = null;
-        room.roundScored = false;
-
-        room.gameState = initializeGame(gamePlayers);
-
-        io.to(roomCode).emit('game_started', {
-            gameState: room.gameState,
-            totalScores: room.totalScores,
-            roundNumber: room.roundNumber
-        });
-    });
-
     socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
-
-        // Find and clean up the player's room
+        if (socket.dbId) {
+            userStatus.delete(socket.dbId);
+            io.emit('user_presence_update', { userId: socket.dbId, status: 'OFFLINE' });
+        }
         for (const [roomCode, room] of rooms.entries()) {
             const playerIndex = room.players.findIndex(p => p.id === socket.id);
             if (playerIndex !== -1) {
                 const leavingPlayer = room.players[playerIndex];
-                const wasHost = leavingPlayer.isHost;
-
-                // Remove player from room
                 room.players.splice(playerIndex, 1);
-
-                console.log(`${leavingPlayer.name} left room ${roomCode}`);
-
-                if (room.players.length === 0) {
-                    // Delete empty room
-                    rooms.delete(roomCode);
-                    rooms.delete(roomCode);
-                    console.log(`Room ${roomCode} deleted (empty)`);
-                    io.emit('room_list_update', getPublicRooms());
-                } else {
-                    // Transfer host role if needed
+                if (room.players.length === 0) { rooms.delete(roomCode); }
+                else {
                     let newHostName = null;
-                    if (wasHost && room.players.length > 0) {
-                        room.players[0].isHost = true;
-                        newHostName = room.players[0].name;
-                        console.log(`New host for ${roomCode}: ${newHostName}`);
-                    }
-
-                    // Notify remaining players
-                    io.to(roomCode).emit('player_left', {
-                        playerId: socket.id,
-                        playerName: leavingPlayer.name,
-                        playerEmoji: leavingPlayer.emoji,
-                        newHost: newHostName
-                    });
+                    if (leavingPlayer.isHost) { room.players[0].isHost = true; newHostName = room.players[0].name; }
+                    io.to(roomCode).emit('player_left', { playerId: socket.id, playerName: leavingPlayer.name, newHost: newHostName });
                     io.to(roomCode).emit('player_list_update', room.players);
-                    io.emit('room_list_update', getPublicRooms()); // Update player count
-
-                    // If game was in progress and < 2 players remain, end the game
                     if (room.gameStarted && room.players.length < 2) {
-                        room.gameStarted = false;
-                        room.gameState = null;
-                        io.to(roomCode).emit('game_cancelled', {
-                            reason: 'Pas assez de joueurs pour continuer'
-                        });
-                        // Update because game cancelled = room might be available or gone? 
-                        // Actually if < 2 players and game cancelled, it becomes a lobby again? 
-                        // Logic in 'game_cancelled' usually implies reset. 
-                        // Let's ensure we update the list.
-                        io.emit('room_list_update', getPublicRooms());
+                        room.gameStarted = false; room.gameState = null;
+                        io.to(roomCode).emit('game_cancelled', { reason: 'Pas assez de joueurs' });
                     }
                 }
+                io.emit('room_list_update', getPublicRooms());
                 break;
             }
         }
     });
 });
 
-// Health check endpoint for Railway
-app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+app.get('/api/health', (req, res) => res.json({ status: 'ok', db: 'connected' }));
 
-// Catch-all route for SPA (React Router)
 app.get('*', (req, res) => {
-    const indexPath = path.join(__dirname, '../dist', 'index.html');
-    res.sendFile(indexPath, (err) => {
-        if (err) {
-            // If index.html doesn't exist, send a basic response
-            res.status(200).send(`
-                <!DOCTYPE html>
-                <html>
-                <head><title>SkyJo</title></head>
-                <body>
-                    <h1>SkyJo Server Running</h1>
-                    <p>Build files not found. The app may still be building.</p>
-                </body>
-                </html>
-            `);
-        }
+    res.sendFile(path.join(__dirname, '../dist', 'index.html'), (err) => {
+        if (err) res.status(200).send('<h1>SkyJo Server Running</h1>');
     });
 });
 
 const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${PORT}`);
-});
+httpServer.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));

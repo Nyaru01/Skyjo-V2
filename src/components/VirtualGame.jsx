@@ -11,7 +11,7 @@ import DrawDiscardPopup from './virtual/DrawDiscardPopup';
 import DrawDiscardTrigger from './virtual/DrawDiscardTrigger';
 import CardAnimationLayer from './virtual/CardAnimationLayer';
 import SkyjoCard from './virtual/SkyjoCard';
-import LevelUpReward from './LevelUpReward';
+import LevelUpCelebration from './LevelUpCelebration';
 import ExperienceBar from './ExperienceBar';
 import SkinCarousel from './SkinCarousel';
 import { useVirtualGameStore, selectAIMode, selectAIPlayers, selectIsCurrentPlayerAI, selectIsAIThinking } from '../store/virtualGameStore';
@@ -26,6 +26,7 @@ import { cn } from '../lib/utils';
 import { Copy, Wifi, WifiOff, Share2, Music, Music2 } from 'lucide-react';
 import { AVATARS, getAvatarPath } from '../lib/avatars';
 import AvatarSelector from './AvatarSelector';
+import SkyjoLoader from './SkyjoLoader';
 
 // Player colors for avatars
 
@@ -37,8 +38,8 @@ const PLAYER_COLORS = ['🐱', '🐶', '🦊', '🐻', '🐼', '🦁', '🐸', '
  * Virtual Skyjo Game Component
  * Main component for playing virtual Skyjo locally
  */
-export default function VirtualGame() {
-    const [screen, setScreen] = useState('menu'); // menu, setup, game, scores
+export default function VirtualGame({ initialScreen = 'menu' }) {
+    const [screen, setScreen] = useState(initialScreen); // menu, setup, game, scores
     const [players, setPlayers] = useState([
         { name: '', avatarId: 'cat' },
         { name: '', avatarId: 'dog' },
@@ -185,9 +186,6 @@ export default function VirtualGame() {
     // Browser notifications for lobby
     const { requestPermission, sendNotification, isTabHidden, hasPermission } = useNotifications();
 
-    // Play music when in game or lobby
-    useBackgroundMusic(screen === 'game' || screen === 'lobby');
-
     // Save pseudo and emoji to localStorage when they change
     useEffect(() => {
         if (aiConfig.playerName) {
@@ -207,6 +205,23 @@ export default function VirtualGame() {
             localStorage.setItem('skyjo_player_avatar_id', myAvatarId);
         }
     }, [myPseudo, myAvatarId]);
+    // Sync screen with initialScreen prop
+    useEffect(() => {
+        if (initialScreen) {
+            setScreen(initialScreen);
+        }
+    }, [initialScreen]);
+
+    // Auto-navigate to game screen when any game starts
+    useEffect(() => {
+        const activeState = onlineGameStarted ? onlineGameState : gameState;
+
+        if (activeState && activeState.phase !== 'FINISHED' && screen !== 'game') {
+            setScreen('game');
+            setInitialReveals({});
+        }
+    }, [onlineGameStarted, onlineGameState, gameState, screen]);
+
     // Sync notifications from store
     useEffect(() => {
         if (virtualLastNotification) {
@@ -273,14 +288,6 @@ export default function VirtualGame() {
         setIsNextRoundPending(false);
         setInitialReveals({}); // Clear any previous round's initial reveals
     }, [onlineRoundNumber]);
-
-    // Auto-navigate to game screen when online game starts
-    useEffect(() => {
-        if (onlineGameStarted && onlineGameState && screen === 'lobby') {
-            setScreen('game');
-            setInitialReveals({}); // Reset initial reveals for new game
-        }
-    }, [onlineGameStarted, onlineGameState, screen]);
 
     // Return to lobby when online game is cancelled (host quits)
     useEffect(() => {
@@ -659,7 +666,7 @@ export default function VirtualGame() {
     if (screen === 'menu') {
         return (
             <div className="max-w-md mx-auto p-4 pt-8 pb-28 space-y-3 animate-in fade-in overflow-y-auto max-h-[calc(100vh-90px)] no-scrollbar">
-                <LevelUpReward />
+                <LevelUpCelebration />
                 <Card className="glass-premium dark:glass-dark shadow-xl relative">
                     <CardHeader className="text-center">
                         <div className="flex justify-center mb-3">
@@ -1441,14 +1448,12 @@ export default function VirtualGame() {
     const activeTotalScores = isOnlineMode ? onlineTotalScores : totalScores;
     const activeRoundNumber = isOnlineMode ? onlineRoundNumber : roundNumber;
 
-    // If no active game state and we're on game screen, show loading or redirect
+    // If no active game state and we're on game screen, show loading indicator
     if (!activeGameState && screen === 'game') {
         return (
-            <div className="max-w-md mx-auto p-4 flex items-center justify-center min-h-[300px]">
-                <div className="text-center">
-                    <div className="animate-spin h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full mx-auto mb-4" />
-                    <p className="text-slate-500">Chargement de la partie...</p>
-                </div>
+            <div className="flex flex-col items-center justify-center p-12 text-slate-400">
+                <Bot className="w-12 h-12 mb-4 opacity-20 animate-pulse" />
+                <p className="text-sm font-medium">Initialisation de la partie...</p>
             </div>
         );
     }
@@ -2027,12 +2032,13 @@ export default function VirtualGame() {
                                     : (isInitialReveal ? `Retournez chacun 2 cartes ${selectedForReveal.length > 0 ? `(${selectedForReveal.length}/2)` : ''}` :
                                         // Only show action instructions when it's the human player's turn (virtual mode only)
                                         activeGameState.currentPlayerIndex !== myPlayerIndex && !isOnlineMode
-                                            ? "🤖 Tour de l'IA..."
+                                            ? (isAIThinking ? `🤖 ${currentPlayer?.name} réfléchit...` : `🤖 Tour de ${currentPlayer?.name}`)
                                             : (activeGameState.turnPhase === 'DRAW' ? 'Piocher ou défausser' :
                                                 activeGameState.turnPhase === 'REPLACE_OR_DISCARD' ? '👆 Jouez dans votre grille ou défaussez' :
                                                     activeGameState.turnPhase === 'MUST_REPLACE' ? '👆 Remplacez une de vos cartes' :
                                                         activeGameState.turnPhase === 'MUST_REVEAL' ? '👆 Retournez une carte cachée' : ''))
                             }
+                            isAIThinking={isAIThinking}
                         />
                     </div>
                 </div>
@@ -2066,7 +2072,7 @@ export default function VirtualGame() {
                                 handleCardClick(index);
                             }
                         }}
-                        size="md"
+                        size="sm"
                         shakingCardIndex={shakingCard?.playerIndex === myPlayerIndex ? shakingCard.cardIndex : null}
                     />
                 </div>
@@ -2141,7 +2147,7 @@ export default function VirtualGame() {
             )}
 
             {/* Draw/Discard Popup Modal */}
-            <LevelUpReward />
+            <LevelUpCelebration />
             <DrawDiscardPopup
                 isOpen={showDrawDiscardPopup}
                 onClose={() => {

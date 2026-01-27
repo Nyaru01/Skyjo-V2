@@ -44,7 +44,6 @@ export const useVirtualGameStore = create((set, get) => ({
     aiMode: false,
     aiPlayers: [], // Indices of AI players
     aiDifficulty: AI_DIFFICULTY.NORMAL,
-    aiDifficulty: AI_DIFFICULTY.NORMAL,
     isAIThinking: false,
 
     // Notifications
@@ -377,22 +376,6 @@ export const useVirtualGameStore = create((set, get) => ({
         set({ gameState: newState, selectedCardIndex: null });
     },
 
-    discardDrawnCard: () => {
-        const { gameState } = get();
-        if (!gameState || !gameState.drawnCard) return;
-
-        // Move drawn card to discard pile
-        const newDiscardPile = [...gameState.discardPile, { ...gameState.drawnCard, isRevealed: true }];
-
-        set({
-            gameState: {
-                ...gameState,
-                discardPile: newDiscardPile,
-                drawnCard: null,
-                turnPhase: 'MUST_REVEAL' // New phase: player MUST reveal a hidden card
-            }
-        });
-    },
 
     /**
      * Reveal a card on the grid (used when in MUST_REVEAL phase)

@@ -1,0 +1,492 @@
+
+> skyjo-score-app@0.0.0 lint
+> eslint . --max-warnings 0
+
+
+D:\VibeCoding\SkyJo_refonte\Nouveauté\Dashboard.jsx
+   1:31  error    'useCallback' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              no-unused-vars
+   1:44  error    'useMemo' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  no-unused-vars
+   3:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   no-unused-vars
+  77:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  75 |     useEffect(() => {
+  76 |         if (!hasSeenTutorial) {
+> 77 |             setIsTutorialOpen(true);
+     |             ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  78 |             setHasSeenTutorial(true);
+  79 |         }
+  80 |     }, [hasSeenTutorial, setHasSeenTutorial]);  react-hooks/set-state-in-effect
+  86:8   warning  React Hook useEffect has a missing dependency: 'playAchievement'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              react-hooks/exhaustive-deps
+  91:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  89 |     useEffect(() => {
+  90 |         if (gameStatus === 'PLAYING') {
+> 91 |             setActiveTab('game');
+     |             ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  92 |         }
+  93 |     }, [gameStatus]);
+  94 |                                                                 react-hooks/set-state-in-effect
+
+D:\VibeCoding\SkyJo_refonte\Nouveauté\Stats.jsx
+    3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+   34:27  error  'Icon' is defined but never used                                               no-unused-vars
+  158:22  error  'err' is defined but never used                                                no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\server\index.js
+   37:23  error  'process' is not defined                                                                               no-undef
+   77:5   error  'process' is not defined                                                                               no-undef
+   77:37  error  'process' is not defined                                                                               no-undef
+   80:9   error  'process' is not defined                                                                               no-undef
+   81:9   error  'process' is not defined                                                                               no-undef
+  119:14  error  'err' is defined but never used                                                                        no-unused-vars
+  134:14  error  'err' is defined but never used                                                                        no-unused-vars
+  148:14  error  'err' is defined but never used                                                                        no-unused-vars
+  161:14  error  'err' is defined but never used                                                                        no-unused-vars
+  173:14  error  'err' is defined but never used                                                                        no-unused-vars
+  191:14  error  'err' is defined but never used                                                                        no-unused-vars
+  205:14  error  'err' is defined but never used                                                                        no-unused-vars
+  242:7   error  'startNextRoundForRoom' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  288:45  error  'emoji' is defined but never used                                                                      no-unused-vars
+  288:52  error  'vibeId' is defined but never used                                                                     no-unused-vars
+  365:25  error  Unexpected lexical declaration in case block                                                           no-case-declarations
+  377:25  error  Unexpected lexical declaration in case block                                                           no-case-declarations
+  378:25  error  Unexpected lexical declaration in case block                                                           no-case-declarations
+  457:14  error  'process' is not defined                                                                               no-undef
+
+D:\VibeCoding\SkyJo_refonte\src\components\AvatarSelector.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\components\Changelog.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\components\Dashboard.jsx
+   1:31  error    'useCallback' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              no-unused-vars
+   1:44  error    'useMemo' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  no-unused-vars
+   3:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   no-unused-vars
+  77:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  75 |     useEffect(() => {
+  76 |         if (!hasSeenTutorial) {
+> 77 |             setIsTutorialOpen(true);
+     |             ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  78 |             setHasSeenTutorial(true);
+  79 |         }
+  80 |     }, [hasSeenTutorial, setHasSeenTutorial]);  react-hooks/set-state-in-effect
+  86:8   warning  React Hook useEffect has a missing dependency: 'playAchievement'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              react-hooks/exhaustive-deps
+  91:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  89 |     useEffect(() => {
+  90 |         if (gameStatus === 'PLAYING') {
+> 91 |             setActiveTab('game');
+     |             ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  92 |         }
+  93 |     }, [gameStatus]);
+  94 |                                                                 react-hooks/set-state-in-effect
+
+D:\VibeCoding\SkyJo_refonte\src\components\ExperienceBar.jsx
+  3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\components\GameHistory.jsx
+    3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  241:22  error  'err' is defined but never used                                                no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\components\GameSetup.jsx
+   25:7   error  'useSyncedAnimation' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  164:35  error  'color' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u               no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\components\Leaderboard.jsx
+  3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\components\LevelUpCelebration.jsx
+   2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            no-unused-vars
+  25:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  23 |         // And we have a reward defined (or generic)
+  24 |         if (level > lastAcknowledgedLevel) {
+> 25 |             setReward(LEVEL_REWARDS[level] || {
+     |             ^^^^^^^^^ Avoid calling setState() directly within an effect
+  26 |                 type: 'generic',
+  27 |                 content: '🎁',
+  28 |                 name: `Niveau ${level}`,  react-hooks/set-state-in-effect
+
+D:\VibeCoding\SkyJo_refonte\src\components\LoadingScreen.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\components\ScoreInput.jsx
+   2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u              no-unused-vars
+  11:55  error  'onCancel' is defined but never used                                                       no-unused-vars
+  12:37  error  'playClick' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\components\SkinCarousel.jsx
+   2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                no-unused-vars
+   2:35  error  'useMotionValue' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        no-unused-vars
+   2:51  error  'useTransform' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          no-unused-vars
+   2:65  error  'useSpring' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             no-unused-vars
+   5:10  error  'useGameStore' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          no-unused-vars
+   9:11  error  'containerRef' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 no-unused-vars
+  14:27  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  12 |     useEffect(() => {
+  13 |         const index = skins.findIndex(s => s.id === selectedSkinId);
+> 14 |         if (index !== -1) setActiveIndex(index);
+     |                           ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  15 |     }, [selectedSkinId, skins]);
+  16 |
+  17 |     const handleNext = () => {  react-hooks/set-state-in-effect
+
+D:\VibeCoding\SkyJo_refonte\src\components\SocialMenu.jsx
+   3:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                 no-unused-vars
+  65:8   warning  React Hook useEffect has missing dependencies: 'fetchFriends', 'fetchGlobalLeaderboard', 'fetchLeaderboard', 'generateSkyId', 'registerUser', 'setSocialNotification', 'userProfile.emoji', 'userProfile.name', and 'userProfile.vibeId'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\VibeCoding\SkyJo_refonte\src\components\Stats.jsx
+    3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+   10:32  error  'children' is defined but never used                                           no-unused-vars
+   36:27  error  'Icon' is defined but never used                                               no-unused-vars
+  160:22  error  'err' is defined but never used                                                no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\components\Tutorial.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\components\UpdatePrompt.jsx
+    3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   no-unused-vars
+   41:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  39 |     useEffect(() => {
+  40 |         if (needRefresh) {
+> 41 |             setShowPrompt(true);
+     |             ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  42 |             setCheckResult('update-available');
+  43 |             setIsChecking(false);
+  44 |         }  react-hooks/set-state-in-effect
+  161:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  react-refresh/only-export-components
+
+D:\VibeCoding\SkyJo_refonte\src\components\VirtualGame.jsx
+     1:20  error  'useCallback' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-unused-vars
+     2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          no-unused-vars
+    47:12  error  'localPlayerIndex' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       no-unused-vars
+    47:30  error  'setLocalPlayerIndex' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    no-unused-vars
+    60:11  error  'discardAndRevealCard' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   no-unused-vars
+    61:11  error  'discardDrawnCard' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       no-unused-vars
+    67:11  error  'getFinalScores' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         no-unused-vars
+   100:11  error  'lastAction' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             no-unused-vars
+   139:11  error  'selectOnlineCard' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       no-unused-vars
+   155:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  153 |     useEffect(() => {
+  154 |         if (onlineGameState?.phase === 'INITIAL_REVEAL') {
+> 155 |             setIsNextRoundPending(false);
+      |             ^^^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  156 |         }
+  157 |     }, [onlineGameState?.phase]);
+  158 |                                                                                                                                                                 react-hooks/set-state-in-effect
+   172:25  error  'setShakingCard' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         no-unused-vars
+   180:9   error  'playStart' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              no-unused-vars
+   186:63  error  'hasPermission' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          no-unused-vars
+   213:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  211 |     useEffect(() => {
+  212 |         if (virtualLastNotification) {
+> 213 |             setNotification(virtualLastNotification);
+      |             ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  214 |             // Auto clear from store to avoid re-triggering
+  215 |             setTimeout(() => {
+  216 |                 clearNotification();                                                                                           react-hooks/set-state-in-effect
+   224:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  222 |     useEffect(() => {
+  223 |         if (onlineLastNotificationRaw) {
+> 224 |             setNotification(onlineLastNotificationRaw);
+      |             ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  225 |             // If we got an error or info, likely the pending state should be cleared (especially error)
+  226 |             if (onlineLastNotificationRaw.type === 'error') {
+  227 |                 setIsNextRoundPending(false);  react-hooks/set-state-in-effect
+   273:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  271 |     // Reset pending state when round number changes
+  272 |     useEffect(() => {
+> 273 |         setIsNextRoundPending(false);
+      |         ^^^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  274 |         setInitialReveals({}); // Clear any previous round's initial reveals
+  275 |     }, [onlineRoundNumber]);
+  276 |                                                                                                                 react-hooks/set-state-in-effect
+   280:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  278 |     useEffect(() => {
+  279 |         if (onlineGameStarted && onlineGameState && screen === 'lobby') {
+> 280 |             setScreen('game');
+      |             ^^^^^^^^^ Avoid calling setState() directly within an effect
+  281 |             setInitialReveals({}); // Reset initial reveals for new game
+  282 |         }
+  283 |     }, [onlineGameStarted, onlineGameState, screen]);                                                                            react-hooks/set-state-in-effect
+   289:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  287 |         if (screen === 'game' && onlineRoomCode && !onlineGameStarted && !onlineIsGameOver) {
+  288 |             // Game was cancelled (host left or not enough players)
+> 289 |             setScreen('menu');
+      |             ^^^^^^^^^ Avoid calling setState() directly within an effect
+  290 |         }
+  291 |     }, [onlineGameStarted, onlineIsGameOver, onlineRoomCode, screen]);
+  292 |                                                                  react-hooks/set-state-in-effect
+   301:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  299 |         if (isGameFinished && !hasPlayedVictory) {
+  300 |             playVictory();
+> 301 |             setHasPlayedVictory(true);
+      |             ^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  302 |         }
+  303 |         // Reset flag when game restarts (not finished anymore)
+  304 |         if (!isGameFinished && hasPlayedVictory) {                                                                                        react-hooks/set-state-in-effect
+   316:11  error  'gameMode' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               no-unused-vars
+   333:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  331 |             }
+  332 |
+> 333 |             setHasArchivedOnline(true);
+      |             ^^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  334 |         }
+  335 |
+  336 |         // Reset when starting a new game                                                                                                                                                                                                                               react-hooks/set-state-in-effect
+   603:30  error  Unexpected constant truthiness on the left-hand side of a `||` expression                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              no-constant-binary-expression
+   610:21  error  'currentRoundScores' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-unused-vars
+  1861:11  error  'isMyTurn' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               no-unused-vars
+  1862:11  error  'isOpponentTurn' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\components\ui\ConfirmModal.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\components\ui\Toast.jsx
+   2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              no-unused-vars
+  14:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  12 |     useEffect(() => {
+  13 |         if (notification) {
+> 14 |             setVisible(true);
+     |             ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  15 |             const timer = setTimeout(() => {
+  16 |                 setVisible(false);
+  17 |                 setTimeout(onDismiss, 300);  react-hooks/set-state-in-effect
+
+D:\VibeCoding\SkyJo_refonte\src\components\virtual\CardAnimationLayer.jsx
+   2:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         no-unused-vars
+  20:17  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  18 |     // Random rotation for natural card toss effect
+  19 |     const randomRotation = useMemo(() => {
+> 20 |         return (Math.random() * 10 - 5); // ±5 degrees
+     |                 ^^^^^^^^^^^^^ Cannot call impure function
+  21 |     }, [pendingAnimation]);
+  22 |
+  23 |     useEffect(() => {  react-hooks/purity
+  21:8   warning  React Hook useMemo has an unnecessary dependency: 'pendingAnimation'. Either exclude it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                react-hooks/exhaustive-deps
+
+D:\VibeCoding\SkyJo_refonte\src\components\virtual\DiscardHistoryOverlay.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\components\virtual\DrawDiscard.jsx
+   2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-unused-vars
+  29:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  27 |     useEffect(() => {
+  28 |         if (lastDiscardedCard) {
+> 29 |             setShowNewDiscardGlow(true);
+     |             ^^^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  30 |             setDiscardKey(prev => prev + 1);
+  31 |             const timer = setTimeout(() => {
+  32 |                 setShowNewDiscardGlow(false);  react-hooks/set-state-in-effect
+
+D:\VibeCoding\SkyJo_refonte\src\components\virtual\DrawDiscardPopup.jsx
+   2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  23:5   error  'discardPile' is assigned a value but never used                               no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\components\virtual\DrawDiscardTrigger.jsx
+    2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                         no-unused-vars
+   98:5   error  'drawPileCount' is defined but never used                                                             no-unused-vars
+  108:11  error  'gameMode' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u              no-unused-vars
+  116:11  error  'effectiveCanInteract' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  149:11  error  'isReplacePhase' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u        no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\components\virtual\PlayerHand.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\components\virtual\SkyjoCard.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\hooks\useBackgroundMusic.js
+   38:18  error  'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-unused-vars
+  132:22  error  'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-unused-vars
+  143:22  error  'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-unused-vars
+  183:17  error  Error: Cannot access variable before it is declared
+
+`playTrack` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  181 |                     currentTrackIndexRef.current = 0;
+  182 |                 }
+> 183 |                 playTrack(shuffledPlaylistRef.current[currentTrackIndexRef.current]);
+      |                 ^^^^^^^^^ `playTrack` accessed before it is declared
+  184 |             }
+  185 |         };
+  186 |
+
+  122 |
+  123 |     // Play a specific track using Web Audio API
+> 124 |     const playTrack = useCallback(async (trackUrl) => {
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 125 |         const ctx = getAudioContext();
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 126 |         if (!ctx) return;
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 190 |         console.log(`🎵 Now playing: ${trackUrl.split('/').pop()}`);
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 191 |     }, []);
+      | ^^^^^^^^^^^^ `playTrack` is declared here
+  192 |
+  193 |     // Stop playback
+  194 |     const stopPlayback = useCallback(() => {  react-hooks/immutability
+  199:22  error  'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\hooks\useFeedback.js
+   31:18  error  'e' is defined but never used  no-unused-vars
+   65:14  error  'e' is defined but never used  no-unused-vars
+  154:14  error  'e' is defined but never used  no-unused-vars
+  199:14  error  'e' is defined but never used  no-unused-vars
+  302:26  error  'e' is defined but never used  no-unused-vars
+  302:29  error  Empty block statement          no-empty
+
+D:\VibeCoding\SkyJo_refonte\src\hooks\useNotifications.js
+  13:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  11 |     useEffect(() => {
+  12 |         if ('Notification' in window) {
+> 13 |             setPermission(Notification.permission);
+     |             ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  14 |         }
+  15 |     }, []);
+  16 |  react-hooks/set-state-in-effect
+
+D:\VibeCoding\SkyJo_refonte\src\lib\skyjoAI.js
+  404:9  error  'minDiff' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\store\gameStore.js
+  96:43  error  'userProfile' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\store\socialStore.js
+  133:31  error  'invitation' is defined but never used  no-unused-vars
+
+D:\VibeCoding\SkyJo_refonte\src\store\virtualGameStore.js
+  173:21  error  'newState' is defined but never used. Allowed unused vars must match /^[A-Z_]/u              no-unused-vars
+  539:41  error  'roundNumber' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  539:54  error  'aiPlayers' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u    no-unused-vars
+
+✖ 126 problems (122 errors, 4 warnings)
+

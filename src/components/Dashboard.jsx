@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
-import { Settings, Trophy, Sparkles, History, Undo2, BarChart3, Play, LogOut, CheckCircle2 } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Settings, Trophy, Sparkles, History, Undo2, BarChart3, Play, LogOut, CheckCircle2, Users, HelpCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore, selectPlayers, selectRounds, selectThreshold, selectGameStatus } from '../store/gameStore';
 import { useVirtualGameStore } from '../store/virtualGameStore';
 import { useOnlineGameStore } from '../store/onlineGameStore';
+import { useFeedback } from '../hooks/useFeedback';
 import { Button } from './ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/Card';
 import ScoreInput from './ScoreInput';
@@ -13,9 +14,15 @@ import GameSetup from './GameSetup';
 import GameHistory from './GameHistory';
 import Stats from './Stats';
 import VirtualGame from './VirtualGame';
-import BottomNav from './BottomNav';
+import BottomNav from './Navbar';
 import SettingsPage from './SettingsPage';
 import ConfirmModal from './ui/ConfirmModal';
+import SocialDashboard from './SocialMenu';
+import Tutorial from './Tutorial';
+import LevelUpCelebration from './LevelUpCelebration';
+import Changelog from './Changelog';
+import GameMenu from './GameMenu';
+import { useBackgroundMusic } from '../hooks/useBackgroundMusic';
 
 // Variants d'animation pour les transitions de pages
 const pageVariants = {
@@ -38,7 +45,31 @@ export default function Dashboard() {
     const addRound = useGameStore(state => state.addRound);
     const resetGame = useGameStore(state => state.resetGame);
     const undoLastRound = useGameStore(state => state.undoLastRound);
+    const level = useGameStore(state => state.level);
+    const lastAcknowledgedLevel = useGameStore(state => state.lastAcknowledgedLevel);
+    const acknowledgeLevelUp = useGameStore(state => state.acknowledgeLevelUp);
+    const hasSeenTutorial = useGameStore(state => state.hasSeenTutorial);
+    const setHasSeenTutorial = useGameStore(state => state.setHasSeenTutorial);
+    const achievements = useGameStore(state => state.achievements);
+    const syncProfileWithBackend = useGameStore(state => state.syncProfileWithBackend);
+    const playerLevel = useGameStore(state => state.level);
+    const playerCardSkin = useGameStore(state => state.cardSkin);
+    const setCardSkin = useGameStore(state => state.setCardSkin);
+    const { playAchievement } = useFeedback();
+
+    const virtualGameState = useVirtualGameStore(state => state.gameState);
+    const onlineGameStarted = useOnlineGameStore(state => state.gameStarted);
+
     const [activeTab, setActiveTab] = useState('home');
+    const [virtualScreen, setVirtualScreen] = useState('menu');
+    const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+
+    // Activer la musique uniquement pendant une partie (virtuelle ou comptage manuel)
+    const isManualGameActive = gameStatus === 'PLAYING' && (activeTab === 'game' || activeTab === 'home');
+    const isVirtualGameActive = activeTab === 'virtual' && (!!virtualGameState || onlineGameStarted);
+
+    useBackgroundMusic(isManualGameActive || isVirtualGameActive);
+
     const [confirmConfig, setConfirmConfig] = useState({
         isOpen: false,
         title: "",
@@ -47,10 +78,29 @@ export default function Dashboard() {
         variant: "danger"
     });
 
+    useEffect(() => {
+        if (!hasSeenTutorial) {
+            setTimeout(() => {
+                setIsTutorialOpen(true);
+                setHasSeenTutorial(true);
+            }, 0);
+        }
+    }, [hasSeenTutorial, setHasSeenTutorial]);
+
+    useEffect(() => {
+        syncProfileWithBackend();
+    }, [syncProfileWithBackend]);
+
+    useEffect(() => {
+        if (achievements.length > 0) {
+            playAchievement();
+        }
+    }, [achievements.length, playAchievement]);
+
     // Auto-switch to 'game' tab when the game starts
     useEffect(() => {
         if (gameStatus === 'PLAYING') {
-            setActiveTab('game');
+            setTimeout(() => setActiveTab('game'), 0);
         }
     }, [gameStatus]);
 
@@ -76,7 +126,10 @@ export default function Dashboard() {
                             transition={pageTransition}
                             className="flex flex-col items-center justify-center min-h-[60vh]"
                         >
-                            <GameSetup onNavigate={setActiveTab} />
+                            <GameSetup
+                                onNavigate={setActiveTab}
+                                onOpenTutorial={() => setIsTutorialOpen(true)}
+                            />
                         </motion.div>
                     );
                 }
@@ -92,8 +145,17 @@ export default function Dashboard() {
                     >
                         <Card className="glass-premium shadow-xl card-hover-lift">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-slate-100">
-                                    <Settings className="h-5 w-5 text-emerald-600 dark:text-emerald-400" /> Menu Principal
+                                <CardTitle className="flex items-center justify-between text-slate-900 dark:text-slate-100">
+                                    <div className="flex items-center gap-2">
+                                        <Settings className="h-5 w-5 text-emerald-600 dark:text-emerald-400" /> Menu Principal
+                                    </div>
+                                    <button
+                                        onClick={() => setIsTutorialOpen(true)}
+                                        className="p-2 hover:bg-sky-500/10 rounded-xl transition-colors text-skyjo-blue group"
+                                        title="Revoir le tutoriel"
+                                    >
+                                        <HelpCircle className="h-6 w-6 group-hover:scale-110 transition-transform" />
+                                    </button>
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
@@ -166,6 +228,30 @@ export default function Dashboard() {
 
 
             case 'virtual':
+                if (!virtualGameState && !onlineGameStarted) {
+                    return (
+                        <motion.div
+                            key="game-menu"
+                            variants={pageVariants}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                            transition={pageTransition}
+                        >
+                            <GameMenu
+                                setScreen={(screen) => {
+                                    setVirtualScreen(screen);
+                                    setActiveTab('virtual');
+                                }}
+                                setShowRulesModal={setIsTutorialOpen}
+                                showRulesModal={isTutorialOpen}
+                                playerCardSkin={playerCardSkin}
+                                playerLevel={playerLevel}
+                                setCardSkin={setCardSkin}
+                            />
+                        </motion.div>
+                    );
+                }
                 return (
                     <motion.div
                         key="virtual"
@@ -191,7 +277,7 @@ export default function Dashboard() {
                                 </Button>
                             </div>
                         )}
-                        <VirtualGame />
+                        <VirtualGame initialScreen={virtualScreen} />
                     </motion.div>
                 );
 
@@ -206,6 +292,20 @@ export default function Dashboard() {
                         transition={pageTransition}
                     >
                         <GameHistory />
+                    </motion.div>
+                );
+
+            case 'social':
+                return (
+                    <motion.div
+                        key="social"
+                        variants={pageVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                        transition={pageTransition}
+                    >
+                        <SocialDashboard />
                     </motion.div>
                 );
 
@@ -233,7 +333,25 @@ export default function Dashboard() {
                         exit="exit"
                         transition={pageTransition}
                     >
-                        <SettingsPage />
+                        <SettingsPage onViewChangelog={() => setActiveTab('changelog')} />
+                    </motion.div>
+                );
+
+            case 'changelog':
+                return (
+                    <motion.div
+                        key="changelog"
+                        variants={pageVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                        transition={pageTransition}
+                    >
+                        <div className="flex items-center gap-2 mb-6 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setActiveTab('settings')}>
+                            <Undo2 className="h-5 w-5 text-slate-400" />
+                            <span className="text-slate-400 font-bold">Retour aux réglages</span>
+                        </div>
+                        <Changelog />
                     </motion.div>
                 );
 
@@ -256,45 +374,54 @@ export default function Dashboard() {
                                 <h2 className="font-bold text-slate-900 dark:text-slate-100 text-lg flex items-center gap-3">
                                     <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-md animate-float overflow-hidden bg-slate-900 border border-skyjo-blue/30">
                                         <img
-                                            src="/logo.jpg"
+                                            src="/Gemini_Generated_Image_auzhtfauzhtfauzh.png"
                                             alt="Skyjo Logo"
                                             className="w-full h-full object-cover scale-110"
                                         />
                                     </div>
                                     Partie en cours
                                 </h2>
-                                <div className="flex gap-2">
-                                    {rounds.length > 0 && (
+                                <div className="flex gap-2 items-center">
+                                    <button
+                                        onClick={() => setIsTutorialOpen(true)}
+                                        className="p-2 text-slate-400 hover:text-skyjo-blue transition-colors"
+                                        title="Règles du jeu"
+                                    >
+                                        <HelpCircle className="w-5 h-5" />
+                                    </button>
+                                    <div className="flex gap-2">
+                                        {rounds.length > 0 && (
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="text-amber-600 hover:text-amber-700 hover:bg-amber-50/80 border-amber-300 bg-white/50 dark:bg-white/10 dark:text-amber-400 dark:border-amber-600"
+                                                onClick={() => setConfirmConfig({
+                                                    isOpen: true,
+                                                    title: "Annuler manche ?",
+                                                    message: "Voulez-vous vraiment annuler la dernière manche ?",
+                                                    onConfirm: undoLastRound,
+                                                    variant: "danger"
+                                                })}
+                                            >
+                                                <Undo2 className="h-4 w-4 mr-1" />
+                                                Annuler
+                                            </Button>
+                                        )}
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            className="text-amber-600 hover:text-amber-700 hover:bg-amber-50/80 border-amber-300 bg-white/50 dark:bg-white/10 dark:text-amber-400 dark:border-amber-600"
+                                            className="text-red-600 hover:text-red-700 hover:bg-red-50/80 border-red-300 bg-white/50 dark:bg-white/10 dark:text-red-400 dark:border-red-600"
                                             onClick={() => setConfirmConfig({
                                                 isOpen: true,
-                                                title: "Annuler manche ?",
-                                                message: "Voulez-vous vraiment annuler la dernière manche ?",
-                                                onConfirm: undoLastRound,
+                                                title: "Arrêter la partie ?",
+                                                message: "Arrêter et réinitialiser la partie ?",
+                                                onConfirm: () => { resetGame(); setActiveTab('home'); },
                                                 variant: "danger"
                                             })}
                                         >
-                                            <Undo2 className="h-4 w-4 mr-1" />
-                                            Annuler
+                                            Arrêter
                                         </Button>
-                                    )}
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="text-red-600 hover:text-red-700 hover:bg-red-50/80 border-red-300 bg-white/50 dark:bg-white/10 dark:text-red-400 dark:border-red-600"
-                                        onClick={() => setConfirmConfig({
-                                            isOpen: true,
-                                            title: "Arrêter la partie ?",
-                                            message: "Arrêter et réinitialiser la partie ?",
-                                            onConfirm: () => { resetGame(); setActiveTab('home'); },
-                                            variant: "danger"
-                                        })}
-                                    >
-                                        Arrêter
-                                    </Button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -336,22 +463,17 @@ export default function Dashboard() {
         }
     };
 
-    const virtualGameState = useVirtualGameStore(state => state.gameState);
-    const onlineGameStarted = useOnlineGameStore(state => state.gameStarted);
-
     // Determines if we are in an active virtual game (local or online)
-    const isVirtualGameActive = activeTab === 'virtual' && (!!virtualGameState || onlineGameStarted);
+    // (Déjà déclaré plus haut pour la musique)
 
     return (
         <div className="min-h-screen">
-            <div className={`max-w-3xl mx-auto p-4 ${isVirtualGameActive ? 'pb-2' : 'pb-24'}`}>
+            <div className={`max-w-3xl mx-auto p-3 ${isVirtualGameActive ? 'pb-2' : 'pb-24'}`}>
                 <AnimatePresence mode="wait">
                     {renderContent()}
                 </AnimatePresence>
                 {gameStatus === 'FINISHED' && <GameOver />}
             </div>
-
-            {/* Hide bottom nav ONLY during active virtual game for full screen experience */}
             {!isVirtualGameActive && (
                 <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
             )}
@@ -364,7 +486,20 @@ export default function Dashboard() {
                 message={confirmConfig.message}
                 variant={confirmConfig.variant}
             />
-        </div>
+
+            {
+                level > lastAcknowledgedLevel && (
+                    <LevelUpCelebration
+                        level={level}
+                        onComplete={() => acknowledgeLevelUp()}
+                    />
+                )
+            }
+
+            <Tutorial
+                isOpen={isTutorialOpen}
+                onClose={() => setIsTutorialOpen(false)}
+            />
+        </div >
     );
 }
-

@@ -63,8 +63,8 @@ const PlayerHand = memo(function PlayerHand({
                 backgroundColor: 'rgba(0, 0, 0, 0.85)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                padding: '20px 8px 2px 8px', // Top padding for badge, minimal sides/bottom
-                borderRadius: '16px', // Slightly tighter corners
+                padding: '16px 6px 2px 6px', // Reduced padding
+                borderRadius: '16px',
                 // Border handled by className for active state, remove inline default
                 ...(isCurrentPlayer ? {
                     boxShadow: isOpponent
@@ -87,9 +87,9 @@ const PlayerHand = memo(function PlayerHand({
                                     : "bg-emerald-600 text-white"
                     )}
                     style={{
-                        fontSize: '11px',
+                        fontSize: '10px',
                         zIndex: 50,
-                        top: '-15px', // Position above the container
+                        top: '-12px', // Positioned lower
                     }}
                     id={`player-badge-${player.id}`}
                 >
@@ -128,7 +128,7 @@ const PlayerHand = memo(function PlayerHand({
                     <span
                         className="font-black"
                         style={{
-                            fontSize: '14pt',
+                            fontSize: '13pt',
                             fontFamily: "'Outfit', system-ui, sans-serif",
                         }}
                     >
