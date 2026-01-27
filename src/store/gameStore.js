@@ -84,7 +84,31 @@ export const useGameStore = create(
             },
 
             syncProfileWithBackend: async () => {
-                const { userProfile } = get();
+                let { userProfile } = get();
+
+                // Safety: Ensure ID exists before syncing
+                if (!userProfile?.id) {
+                    const newId = `u-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                    console.warn('[STORE] Fixed missing user ID:', newId);
+
+                    // Update state locally first
+                    set(state => ({
+                        userProfile: {
+                            ...state.userProfile,
+                            id: newId,
+                            // Ensure other fields have defaults if completely missing
+                            name: state.userProfile?.name || 'Joueur',
+                            avatarId: state.userProfile?.avatarId || 'cat',
+                            emoji: state.userProfile?.emoji || '🐱',
+                            level: state.userProfile?.level || 1,
+                            currentXP: state.userProfile?.currentXP || 0
+                        }
+                    }));
+
+                    // Refresh local reference
+                    userProfile = get().userProfile;
+                }
+
                 try {
                     await fetch('/api/social/profile', {
                         method: 'POST',
@@ -382,10 +406,25 @@ export const useGameStore = create(
         }),
         {
             name: 'skyjo-storage',
-            version: 3,
+            version: 4,
             migrate: (persistedState, version) => {
+                // Ensure usedProfile exists and has an ID during migration
+                if (!persistedState.userProfile || !persistedState.userProfile.id) {
+                    const newId = `u-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                    persistedState = {
+                        ...persistedState,
+                        userProfile: {
+                            ...(persistedState.userProfile || {}),
+                            id: newId,
+                            name: persistedState.userProfile?.name || 'Joueur',
+                            avatarId: 'cat',
+                            level: 1,
+                            currentXP: 0
+                        }
+                    };
+                }
+
                 if (version < 2) {
-                    // Handling migration from v1 to v2/v3
                     return {
                         ...persistedState,
                         hasSeenTutorial: false,
@@ -393,7 +432,6 @@ export const useGameStore = create(
                     };
                 }
                 if (version < 3) {
-                    // Start fresh with tutorial seen if it was missing to avoid spam
                     return {
                         ...persistedState,
                         hasSeenTutorial: persistedState.hasSeenTutorial ?? false,
