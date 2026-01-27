@@ -128,20 +128,26 @@ export const useSocialStore = create((set, get) => ({
     },
 
     deleteFriend: async (userId, friendId) => {
+        // Optimistic update
+        const previousFriends = get().friends;
+        set(state => ({
+            friends: state.friends.filter(f => String(f.id) !== String(friendId))
+        }));
+
         try {
             const res = await fetch('/api/social/friends/delete', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: String(userId), friendId: String(friendId) })
             });
-            if (res.ok) {
-                set(state => ({
-                    friends: state.friends.filter(f => f.id !== friendId)
-                }));
+            if (!res.ok) {
+                // Rollback on failure
+                set({ friends: previousFriends });
             }
             return res.ok;
         } catch (err) {
             console.error('[SOCIAL] Delete error:', err);
+            set({ friends: previousFriends });
             return false;
         }
     }
@@ -158,4 +164,11 @@ socket.on('game_invitation', (invitation) => {
 
 socket.on('user_presence_update', ({ userId, status }) => {
     useSocialStore.getState().updatePresence(userId, status);
+});
+
+socket.on('presence_refresh', () => {
+    const userId = useGameStore.getState().userProfile?.id;
+    if (userId) {
+        useSocialStore.getState().fetchFriends(userId);
+    }
 });

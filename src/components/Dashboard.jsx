@@ -102,7 +102,10 @@ export default function Dashboard() {
 
     // Global Presence Logic: Register user on socket connection
     useEffect(() => {
-        const { socket } = useOnlineGameStore.getState();
+        const { socket, connect } = useOnlineGameStore.getState();
+
+        // Ensure global connection
+        connect();
 
         const handleRegistration = () => {
             const profile = useGameStore.getState().userProfile;

@@ -31,18 +31,8 @@ export default function SocialDashboard() {
 
     useEffect(() => {
         const initSocial = async () => {
-            const currentProfile = useGameStore.getState().userProfile;
-
-            if (!currentProfile.vibeId) {
-                generateSkyId();
-            }
-
-            // Sync handled by generateSkyId if it was missing, or explicit call
-            await useGameStore.getState().syncProfileWithBackend();
-
-            const profile = useGameStore.getState().userProfile;
-            const profileId = String(profile.id);
-            registerUser(profileId, profile.name, profile.emoji, profile.vibeId);
+            if (!userProfile?.id) return;
+            const profileId = String(userProfile.id);
             fetchFriends(profileId);
             fetchLeaderboard(profileId);
             fetchGlobalLeaderboard();
@@ -59,24 +49,9 @@ export default function SocialDashboard() {
                 fetchGlobalLeaderboard();
             }
         }, 30000);
-        // Listen for socket reconnection to re-register presence
-        const onConnect = () => {
-            const profile = useGameStore.getState().userProfile;
-            if (profile?.id) {
-                registerUser(String(profile.id), profile.name, profile.emoji, profile.vibeId);
-            }
-        };
-
-        const socket = useOnlineGameStore.getState().socket; // Access socket instance
-        if (socket) {
-            socket.on('connect', onConnect);
-            // Verify immediate registration if already connected but seemingly offline
-            if (socket.connected) onConnect();
-        }
 
         return () => {
             clearInterval(interval);
-            if (socket) socket.off('connect', onConnect);
         };
     }, [userProfile.id]);
 

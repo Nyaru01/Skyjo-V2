@@ -166,6 +166,13 @@ app.post('/api/social/friends/request', async (req, res) => {
             VALUES ($1, $2, 'PENDING')
             ON CONFLICT DO NOTHING
         `, [userId, friendId]);
+
+        // Real-time notification
+        const friend = userStatus.get(String(friendId));
+        if (friend) {
+            io.to(friend.socketId).emit('friend_request', { fromUserId: userId });
+        }
+
         res.json({ status: 'sent' });
     } catch (err) {
         res.status(500).json({ error: 'Request failed' });
@@ -179,6 +186,15 @@ app.post('/api/social/friends/accept', async (req, res) => {
             UPDATE friends SET status = 'ACCEPTED'
             WHERE (user_id = $1 AND friend_id = $2) OR (user_id = $2 AND friend_id = $1)
         `, [userId, friendId]);
+
+        // Refresh lists for both
+        [userId, friendId].forEach(id => {
+            const user = userStatus.get(String(id));
+            if (user) {
+                io.to(user.socketId).emit('presence_refresh');
+            }
+        });
+
         res.json({ status: 'accepted' });
     } catch (err) {
         res.status(500).json({ error: 'Accept failed' });
