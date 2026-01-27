@@ -23,9 +23,10 @@ export const useSocialStore = create((set, get) => ({
 
     fetchFriends: async (userId) => {
         if (!userId) return;
+        const stringId = String(userId);
         set({ isLoading: true });
         try {
-            const res = await fetch(`/api/social/friends/${userId}`);
+            const res = await fetch(`/api/social/friends/${stringId}`);
             if (res.ok) {
                 const data = await res.json();
                 set({ friends: data });
@@ -86,13 +87,14 @@ export const useSocialStore = create((set, get) => ({
     },
 
     inviteFriend: (friendId, roomCode, fromName) => {
-        socket.emit('invite_friend', { friendId, roomCode, fromName });
+        socket.emit('invite_friend', { friendId: String(friendId), roomCode, fromName });
     },
 
     fetchLeaderboard: async (userId) => {
         if (!userId) return;
+        const stringId = String(userId);
         try {
-            const res = await fetch(`/api/social/leaderboard/${userId}`);
+            const res = await fetch(`/api/social/leaderboard/${stringId}`);
             if (res.ok) {
                 const data = await res.json();
                 set({ leaderboard: data });
@@ -130,7 +132,7 @@ export const useSocialStore = create((set, get) => ({
             const res = await fetch('/api/social/friends/delete', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, friendId })
+                body: JSON.stringify({ userId: String(userId), friendId: String(friendId) })
             });
             if (res.ok) {
                 set(state => ({

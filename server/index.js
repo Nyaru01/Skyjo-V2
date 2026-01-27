@@ -301,9 +301,10 @@ const startNextRoundForRoom = (roomCode, room, ioInstance) => {
 
         // Return players to 'ONLINE' status
         room.players.forEach(p => {
-            if (userStatus.has(p.dbId)) {
-                userStatus.set(p.dbId, { ...userStatus.get(p.dbId), status: 'ONLINE' });
-                io.emit('user_presence_update', { userId: p.dbId, status: 'ONLINE' });
+            const stringId = String(p.dbId);
+            if (userStatus.has(stringId)) {
+                userStatus.set(stringId, { ...userStatus.get(stringId), status: 'ONLINE' });
+                io.emit('user_presence_update', { userId: stringId, status: 'ONLINE' });
             }
         });
     } else {
@@ -434,7 +435,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('invite_friend', async ({ friendId, roomCode, fromName }) => {
-        const friend = userStatus.get(friendId);
+        const stringFriendId = String(friendId);
+        const friend = userStatus.get(stringFriendId);
         if (friend) {
             io.to(friend.socketId).emit('game_invitation', { fromName, roomCode });
 
