@@ -689,27 +689,28 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
         };
 
         return (
-            <div className="max-w-md mx-auto p-4 space-y-6 animate-in fade-in pt-10">
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleBackToMenu}
-                    className="mb-2 text-slate-300 hover:text-white"
-                >
-                    <ArrowLeft className="h-4 w-4 mr-1" />
-                    Retour
-                </Button>
+            <div className="max-w-md mx-auto p-4 space-y-3 animate-in fade-in">
+                <div className="relative flex items-center justify-center py-2 mb-2">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleBackToMenu}
+                        className="absolute left-0 text-slate-300 hover:text-white px-2"
+                    >
+                        <ArrowLeft className="h-4 w-4" />
+                    </Button>
 
-                <div className="text-center mb-6 space-y-1">
-                    <h2 className="text-2xl font-black text-white tracking-tighter flex items-center justify-center gap-2">
-                        <Bot className="h-8 w-8 text-purple-400" />
-                        CONTRE L'IA
-                    </h2>
-                    <div className="h-1 w-12 bg-purple-500 mx-auto rounded-full" />
+                    <div className="text-center space-y-0.5">
+                        <h2 className="text-xl font-black text-white tracking-tighter flex items-center justify-center gap-2">
+                            <Bot className="h-6 w-6 text-purple-400" />
+                            CONTRE L'IA
+                        </h2>
+                        <div className="h-1 w-10 bg-purple-500 mx-auto rounded-full" />
+                    </div>
                 </div>
 
                 <Card className="glass-premium dark:glass-dark shadow-xl border-t border-white/10">
-                    <CardContent className="space-y-6 pt-6">
+                    <CardContent className="space-y-4 pt-6">
                         {/* Player Name */}
                         <div className="space-y-3">
                             <label className="text-xs font-bold uppercase tracking-wider text-purple-200 ml-1">Votre Profil</label>
@@ -756,7 +757,7 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
                             <label className="text-xs font-bold uppercase tracking-wider text-purple-200 ml-1">Niveau de difficulté</label>
                             <div className="grid grid-cols-1 gap-3">
                                 {[
-                                    { level: AI_DIFFICULTY.NORMAL, label: 'Normal', color: 'bg-emerald-500', icon: '🙂', desc: 'Idéal pour débuter' },
+                                    { level: AI_DIFFICULTY.NORMAL, label: 'Normal', color: 'bg-indigo-500', icon: '🙂', desc: 'Idéal pour débuter' },
                                     { level: AI_DIFFICULTY.HARD, label: 'Difficile', color: 'bg-amber-500', icon: '🤖', desc: 'Un véritable défi' },
                                     { level: AI_DIFFICULTY.HARDCORE, label: 'HARDCORE', color: 'bg-red-600', icon: '🔥', desc: 'IA impitoyable' }
                                 ].map((mode) => (
@@ -798,7 +799,7 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
                 <Button
                     size="lg"
                     className={cn(
-                        "w-full h-16 text-lg font-black uppercase tracking-widest text-white shadow-xl transition-all rounded-2xl relative overflow-hidden group",
+                        "w-full h-14 text-lg font-black uppercase tracking-widest text-white shadow-xl transition-all rounded-2xl relative overflow-hidden group",
                         aiConfig.playerName.trim()
                             ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 hover:scale-[1.02] hover:shadow-purple-500/25"
                             : "bg-slate-700 cursor-not-allowed opacity-50"
@@ -808,7 +809,7 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
                 >
 
                     <span className="relative flex items-center gap-2">
-                        🚀 Affronter l'IA
+                        Affronter l'IA
                     </span>
                 </Button>
                 {avatarSelectorComponent}
