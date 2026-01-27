@@ -313,6 +313,7 @@ const rooms = new Map();
 const userStatus = new Map(); // userId -> Set of socketIds
 const userMetadata = new Map(); // userId -> {status, etc}
 const pendingDisconnections = new Map(); // userId -> setTimeout ID
+const connectionAttempts = new Map(); // userId -> { count, lastAttempt }
 
 const getPublicRooms = () => {
     const publicRooms = [];
@@ -380,6 +381,37 @@ io.on('connection', (socket) => {
 
     socket.on('register_user', ({ id, name, emoji, vibeId }) => {
         const stringId = String(id);
+        const now = Date.now();
+
+        // --- 1. RATE LIMITING ---
+        const attempt = connectionAttempts.get(stringId) || { count: 0, lastAttempt: 0 };
+        if (attempt.count >= 3 && (now - attempt.lastAttempt) < 5000) {
+            console.warn(`[RATE LIMIT] ${name} (${stringId}) connecting too fast`);
+            socket.emit('error', 'Trop de connexions. Attends 5 secondes.');
+            socket.disconnect(true);
+            return;
+        }
+        if (now - attempt.lastAttempt > 5000) attempt.count = 0;
+        attempt.count++;
+        attempt.lastAttempt = now;
+        connectionAttempts.set(stringId, attempt);
+
+        // --- 2. ZOMBIE CLEANUP ---
+        // If this user already has active sockets, they might be zombies from a crash/refresh
+        const existingSockets = userStatus.get(stringId);
+        if (existingSockets && existingSockets.size > 0) {
+            console.log(`[CLEANUP] Found ${existingSockets.size} existing socket(s) for ${stringId}. Replacing...`);
+            existingSockets.forEach(oldSocketId => {
+                if (oldSocketId !== socket.id) {
+                    io.to(oldSocketId).emit('error', 'Connexion remplacée par un nouvel onglet.');
+                    // Note: We don't force disconnect here to avoid loops, 
+                    // but we'll remove them from our status map.
+                }
+            });
+            // Clear the set for a fresh start
+            existingSockets.clear();
+        }
+
         socket.dbId = stringId;
 
         // CLEAR GRACE PERIOD: If user was about to go offline, cancel it
@@ -400,7 +432,7 @@ io.on('connection', (socket) => {
 
         // Broadcast presence update
         io.emit('user_presence_update', { userId: stringId, status: 'ONLINE' });
-        console.log(`[USER] Registered: ${name} (${stringId}) with socket ${socket.id}. Total users: ${userStatus.size}`);
+        console.log(`[USER] Registered: ${name} (${stringId}). Socket: ${socket.id}. Pool size: ${userStatus.get(stringId).size}`);
     });
 
     socket.on('create_room', ({ playerName, emoji, dbId, isPublic = true, autoInviteFriendId }) => {
@@ -419,22 +451,35 @@ io.on('connection', (socket) => {
         socket.join(roomCode);
         socket.emit('room_created', roomCode);
 
-        // ATOMIC INVITE: If autoInviteFriendId is provided, send invitation after a short delay
+        // ATOMIC INVITE v2: Invitation with Retry and Feedback
         if (autoInviteFriendId) {
             const stringFriendId = String(autoInviteFriendId);
-            setTimeout(() => {
+            console.log(`[ATOMIC INVITE] Starting retry loop for ${stringFriendId}`);
+
+            const sendWithRetry = async (retriesLeft) => {
                 const sockets = userStatus.get(stringFriendId);
                 if (sockets && sockets.size > 0) {
-                    console.log(`[ATOMIC INVITE] Sending to ${stringFriendId} (${sockets.size} sockets)`);
+                    console.log(`[ATOMIC INVITE] Success on attempt ${4 - retriesLeft}. Sending to ${sockets.size} sockets.`);
                     sockets.forEach(socketId => {
                         io.to(socketId).emit('game_invitation', { fromName: playerName, roomCode });
                     });
                     socket.emit('invitation_sent', { friendId: stringFriendId });
-                } else {
-                    console.log(`[ATOMIC INVITE] Failed: ${stringFriendId} is OFFLINE`);
-                    socket.emit('invitation_failed', { reason: 'OFFLINE', friendId: stringFriendId });
+                    return true;
                 }
-            }, 500); // 500ms grace for recipient to be ready
+
+                if (retriesLeft > 0) {
+                    const delay = (4 - retriesLeft) * 300; // 300ms, 600ms, 900ms
+                    console.log(`[ATOMIC INVITE] Friend ${stringFriendId} offline. Retrying in ${delay}ms...`);
+                    setTimeout(() => sendWithRetry(retriesLeft - 1), delay);
+                    return false;
+                }
+
+                console.log(`[ATOMIC INVITE] Final Failure for ${stringFriendId}`);
+                socket.emit('invitation_failed', { reason: 'OFFLINE', friendId: stringFriendId });
+                return false;
+            };
+
+            sendWithRetry(3); // Start with 3 retries
         }
 
         io.to(roomCode).emit('player_list_update', rooms.get(roomCode).players);
