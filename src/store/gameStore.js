@@ -40,6 +40,7 @@ export const useGameStore = create(
             soundEnabled: true,
             musicEnabled: true,
             vibrationEnabled: true,
+            hasSeenTutorial: false,
             cardSkin: 'classic', // classic, papyrus
             userProfile: {
                 id: `u-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -52,6 +53,8 @@ export const useGameStore = create(
             },
 
             setCardSkin: (skin) => set({ cardSkin: skin }),
+
+            setHasSeenTutorial: (seen) => set({ hasSeenTutorial: seen }),
 
             // XP & Level System
             // Note: We'll keep these values in parallel with userProfile for backward compatibility 
@@ -379,7 +382,26 @@ export const useGameStore = create(
         }),
         {
             name: 'skyjo-storage',
-            version: 2, // Force migration to fix potential state issues
+            version: 3, // Increment version to force new migration
+            migrate: (persistedState, version) => {
+                if (version < 2) {
+                    // Handling migration from v1 to v2/v3
+                    return {
+                        ...persistedState,
+                        hasSeenTutorial: false,
+                        achievements: [],
+                    };
+                }
+                if (version < 3) {
+                    // Start fresh with tutorial seen if it was missing to avoid spam
+                    return {
+                        ...persistedState,
+                        hasSeenTutorial: persistedState.hasSeenTutorial ?? false,
+                        achievements: persistedState.achievements || [],
+                    };
+                }
+                return persistedState;
+            },
         }
     )
 );
