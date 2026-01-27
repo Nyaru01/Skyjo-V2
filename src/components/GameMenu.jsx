@@ -22,10 +22,7 @@ export default function GameMenu({
     const setPlayerInfo = useOnlineGameStore(state => state.setPlayerInfo);
 
     const handleStartAIBattle = () => {
-        startAIGame({
-            name: userProfile.name,
-            emoji: userProfile.emoji || '🐱'
-        }, 1); // Default 1 AI
+        setScreen('ai-setup');
     };
 
     const handleStartOnline = () => {

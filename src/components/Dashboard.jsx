@@ -229,7 +229,7 @@ export default function Dashboard() {
 
 
             case 'virtual':
-                if (!virtualGameState && !onlineGameStarted && virtualScreen !== 'lobby') {
+                if (!virtualGameState && !onlineGameStarted && virtualScreen !== 'lobby' && virtualScreen !== 'ai-setup') {
                     return (
                         <motion.div
                             key="game-menu"

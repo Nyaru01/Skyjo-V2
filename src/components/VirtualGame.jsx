@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Users, ArrowLeft, RotateCcw, Trophy, Info, Sparkles, CheckCircle, BookOpen, X, Bot, Lock, Image as ImageIcon, Palette } from 'lucide-react';
+import { Play, Users, ArrowLeft, RotateCcw, Trophy, Info, Sparkles, CheckCircle, BookOpen, X, Bot, Lock, Image as ImageIcon, Palette, Copy, Share2, Wifi, Globe, Plus, ChevronRight, WifiOff, Music, Music2 } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/Card';
 import { Input } from './ui/Input';
@@ -23,7 +23,7 @@ import { useFeedback } from '../hooks/useFeedback';
 import { useBackgroundMusic } from '../hooks/useBackgroundMusic';
 import { useNotifications } from '../hooks/useNotifications';
 import { cn } from '../lib/utils';
-import { Copy, Wifi, WifiOff, Share2, Music, Music2 } from 'lucide-react';
+
 import { AVATARS, getAvatarPath } from '../lib/avatars';
 import AvatarSelector from './AvatarSelector';
 import SkyjoLoader from './SkyjoLoader';
@@ -679,10 +679,9 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
     // Render AI setup screen
     if (screen === 'ai-setup') {
         const handleStartAIGame = () => {
-            // playStart(); // Removed
             startAIGame(
                 { name: aiConfig.playerName || 'Joueur', emoji: aiConfig.playerEmoji },
-                aiConfig.aiCount,
+                1, // Forced to 1 AI opponent
                 aiConfig.difficulty
             );
             setInitialReveals({});
@@ -690,33 +689,35 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
         };
 
         return (
-            <div className="max-w-md mx-auto p-4 space-y-4 animate-in fade-in">
+            <div className="max-w-md mx-auto p-4 space-y-6 animate-in fade-in pt-10">
                 <Button
                     variant="ghost"
                     size="sm"
                     onClick={handleBackToMenu}
-                    className="mb-2"
+                    className="mb-2 text-slate-300 hover:text-white"
                 >
                     <ArrowLeft className="h-4 w-4 mr-1" />
                     Retour
                 </Button>
 
-                <Card className="glass-premium dark:glass-dark shadow-xl">
-                    <CardHeader>
-                        <CardTitle className="text-lg flex items-center gap-2" style={{ color: '#e2e8f0' }}>
-                            <Bot className="h-5 w-5 text-purple-600" />
-                            Partie contre l'IA
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
+                <div className="text-center mb-6 space-y-1">
+                    <h2 className="text-2xl font-black text-white tracking-tighter flex items-center justify-center gap-2">
+                        <Bot className="h-8 w-8 text-purple-400" />
+                        CONTRE L'IA
+                    </h2>
+                    <div className="h-1 w-12 bg-purple-500 mx-auto rounded-full" />
+                </div>
+
+                <Card className="glass-premium dark:glass-dark shadow-xl border-t border-white/10">
+                    <CardContent className="space-y-6 pt-6">
                         {/* Player Name */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium" style={{ color: '#cbd5e1' }}>Votre pseudo</label>
-                            <div className="flex gap-2 items-center">
+                        <div className="space-y-3">
+                            <label className="text-xs font-bold uppercase tracking-wider text-purple-200 ml-1">Votre Profil</label>
+                            <div className="flex gap-3 items-center bg-slate-900/40 p-2 rounded-2xl border border-white/5">
                                 {/* Avatar Button */}
                                 <button
                                     onClick={() => setOpenAvatarSelector('ai-player')}
-                                    className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-105 border border-white/10 overflow-hidden relative group bg-slate-800 ring-2 ring-white/5 hover:ring-white/20"
+                                    className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-all hover:scale-105 border-2 border-purple-500/30 overflow-hidden relative group bg-slate-800"
                                 >
                                     <div className="absolute inset-0 bg-white">
                                         <img
@@ -725,82 +726,70 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
                                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                             onError={(e) => { e.target.src = '/avatars/cat.png' }}
                                         />
-                                        {/* Glossy Overlay */}
-                                        <div className="absolute inset-0 bg-gradient-to-tr from-black/0 via-white/20 to-white/0 opacity-50 pointer-events-none" />
+                                        <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/20 to-transparent pointer-events-none" />
+                                    </div>
+                                    <div className="absolute bottom-0 inset-x-0 h-4 bg-black/60 flex items-center justify-center">
+                                        <Palette className="w-2 h-2 text-white/80" />
                                     </div>
                                 </button>
 
-                                <Input
-                                    placeholder="Votre pseudo"
-                                    value={aiConfig.playerName}
-                                    onChange={(e) => setAIConfig({ ...aiConfig, playerName: e.target.value })}
-                                    className="flex-1 h-10"
-                                    required
-                                    style={{
-                                        borderColor: '#5742e2',
-                                        borderWidth: '2px'
-                                    }}
-                                />
+                                <div className="flex-1">
+                                    <Input
+                                        placeholder="Votre pseudo"
+                                        value={aiConfig.playerName}
+                                        onChange={(e) => setAIConfig({ ...aiConfig, playerName: e.target.value })}
+                                        className="h-12 bg-transparent border-0 text-lg font-bold text-white placeholder:text-slate-500 focus-visible:ring-0 px-2"
+                                        required
+                                    />
+                                    <div className="h-0.5 w-full bg-gradient-to-r from-purple-500/50 to-transparent" />
+                                </div>
                             </div>
                             {!aiConfig.playerName.trim() && (
-                                <p className="text-xs text-amber-400 mt-1">* Pseudo obligatoire</p>
+                                <p className="text-xs text-red-400 pl-2 font-medium flex items-center gap-1">
+                                    <Info className="w-3 h-3" /> Pseudo obligatoire
+                                </p>
                             )}
                         </div>
 
-                        {/* AI Count */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium" style={{ color: '#cbd5e1' }}>Nombre d'adversaires IA</label>
-                            <div className="flex gap-2">
-                                {[1, 2, 3].map(count => (
-                                    <Button
-                                        key={count}
-                                        variant={aiConfig.aiCount === count ? 'default' : 'outline'}
-                                        className={cn(
-                                            "flex-1 flex items-center justify-center gap-1",
-                                            aiConfig.aiCount === count && "bg-purple-600 hover:bg-purple-700 text-white"
-                                        )}
-                                        onClick={() => setAIConfig({ ...aiConfig, aiCount: count })}
-                                    >
-                                        {count} <Bot className="h-4 w-4" />
-                                    </Button>
-                                ))}
-                            </div>
-                        </div>
-
                         {/* Difficulty */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium" style={{ color: '#cbd5e1' }}>Difficulté</label>
-                            <div className="grid grid-cols-3 gap-2">
-                                <Button
-                                    variant={aiConfig.difficulty === AI_DIFFICULTY.NORMAL ? 'default' : 'outline'}
-                                    className={cn(
-                                        "w-full px-2 text-sm",
-                                        aiConfig.difficulty === AI_DIFFICULTY.NORMAL && "bg-emerald-600 hover:bg-emerald-700 text-white"
-                                    )}
-                                    onClick={() => setAIConfig({ ...aiConfig, difficulty: AI_DIFFICULTY.NORMAL })}
-                                >
-                                    Normal
-                                </Button>
-                                <Button
-                                    variant={aiConfig.difficulty === AI_DIFFICULTY.HARD ? 'default' : 'outline'}
-                                    className={cn(
-                                        "w-full px-2 text-sm",
-                                        aiConfig.difficulty === AI_DIFFICULTY.HARD && "bg-amber-600 hover:bg-amber-700 text-white"
-                                    )}
-                                    onClick={() => setAIConfig({ ...aiConfig, difficulty: AI_DIFFICULTY.HARD })}
-                                >
-                                    Difficile
-                                </Button>
-                                <Button
-                                    variant={aiConfig.difficulty === AI_DIFFICULTY.HARDCORE ? 'default' : 'outline'}
-                                    className={cn(
-                                        "w-full px-2 text-sm font-extrabold",
-                                        aiConfig.difficulty === AI_DIFFICULTY.HARDCORE && "bg-red-800 hover:bg-red-900 border border-red-500 text-white shadow-[0_0_10px_rgba(220,38,38,0.5)] animate-pulse"
-                                    )}
-                                    onClick={() => setAIConfig({ ...aiConfig, difficulty: AI_DIFFICULTY.HARDCORE })}
-                                >
-                                    HARDCORE
-                                </Button>
+                        <div className="space-y-3 pt-2">
+                            <label className="text-xs font-bold uppercase tracking-wider text-purple-200 ml-1">Niveau de difficulté</label>
+                            <div className="grid grid-cols-1 gap-3">
+                                {[
+                                    { level: AI_DIFFICULTY.NORMAL, label: 'Normal', color: 'bg-emerald-500', icon: '🙂', desc: 'Idéal pour débuter' },
+                                    { level: AI_DIFFICULTY.HARD, label: 'Difficile', color: 'bg-amber-500', icon: '🤖', desc: 'Un véritable défi' },
+                                    { level: AI_DIFFICULTY.HARDCORE, label: 'HARDCORE', color: 'bg-red-600', icon: '🔥', desc: 'IA impitoyable' }
+                                ].map((mode) => (
+                                    <button
+                                        key={mode.level}
+                                        onClick={() => setAIConfig({ ...aiConfig, difficulty: mode.level })}
+                                        className={cn(
+                                            "relative w-full p-4 rounded-2xl border transition-all duration-300 flex items-center gap-4 text-left group overflow-hidden",
+                                            aiConfig.difficulty === mode.level
+                                                ? `border-${mode.color.replace('bg-', '')} bg-slate-800/80 ring-1 ring-${mode.color.replace('bg-', '')} shadow-lg`
+                                                : "border-white/5 bg-slate-900/40 hover:bg-slate-800/60 hover:border-white/10"
+                                        )}
+                                    >
+                                        <div className={cn(
+                                            "w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-lg transition-transform group-hover:scale-110",
+                                            aiConfig.difficulty === mode.level ? mode.color : "bg-slate-800"
+                                        )}>
+                                            {mode.icon}
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className={cn(
+                                                "font-bold text-base transition-colors",
+                                                aiConfig.difficulty === mode.level ? "text-white" : "text-slate-300"
+                                            )}>
+                                                {mode.label}
+                                            </div>
+                                            <div className="text-xs text-slate-500 font-medium">{mode.desc}</div>
+                                        </div>
+                                        {aiConfig.difficulty === mode.level && (
+                                            <div className="absolute right-4 w-3 h-3 rounded-full bg-white shadow-[0_0_10px_white]" />
+                                        )}
+                                    </button>
+                                ))}
                             </div>
                         </div>
                     </CardContent>
@@ -809,15 +798,18 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
                 <Button
                     size="lg"
                     className={cn(
-                        "w-full text-white shadow-lg transition-all",
+                        "w-full h-16 text-lg font-black uppercase tracking-widest text-white shadow-xl transition-all rounded-2xl relative overflow-hidden group",
                         aiConfig.playerName.trim()
-                            ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500"
-                            : "bg-slate-600 cursor-not-allowed opacity-60"
+                            ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 hover:scale-[1.02] hover:shadow-purple-500/25"
+                            : "bg-slate-700 cursor-not-allowed opacity-50"
                     )}
                     onClick={handleStartAIGame}
                     disabled={!aiConfig.playerName.trim()}
                 >
-                    🚀 Affronter l'IA
+                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out skew-y-12" />
+                    <span className="relative flex items-center gap-2">
+                        🚀 Affronter l'IA
+                    </span>
                 </Button>
                 {avatarSelectorComponent}
             </div>
@@ -917,7 +909,7 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
 
         if (isRoomJoined) {
             return (
-                <div className="max-w-md mx-auto p-4 space-y-4 animate-in fade-in">
+                <div className="max-w-md mx-auto p-4 space-y-6 animate-in fade-in pt-10">
                     {avatarSelectorComponent}
                     {/* Toast notifications */}
                     <Toast
@@ -935,30 +927,28 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
                         variant="ghost"
                         size="sm"
                         onClick={handleBackToMenu}
-                        className="mb-2"
+                        className="mb-2 text-slate-300 hover:text-white"
                     >
                         <ArrowLeft className="h-4 w-4 mr-1" />
-                        Retour
+                        Quitter le salon
                     </Button>
-                    <Card className="glass-premium dark:glass-dark shadow-xl">
-                        <CardHeader className="text-center">
-                            <div className="flex justify-center mb-2">
-                                <div className={cn(
-                                    "p-3 rounded-full transition-all",
-                                    isOnlineConnected
-                                        ? "bg-emerald-100 dark:bg-emerald-900/30"
-                                        : "bg-red-100 dark:bg-red-900/30 animate-pulse"
-                                )}>
-                                    {isOnlineConnected ? (
-                                        <Wifi className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
-                                    ) : (
-                                        <WifiOff className="h-8 w-8 text-red-600 dark:text-red-400" />
-                                    )}
-                                </div>
-                            </div>
-                            <CardTitle>Salle d'attente</CardTitle>
-                            <div className="mt-2 flex items-center justify-center gap-2">
-                                <div className="flex-1 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center gap-2 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors group"
+
+                    <div className="text-center mb-2 space-y-1">
+                        <h2 className="text-2xl font-black text-white tracking-tighter flex items-center justify-center gap-2">
+                            <Wifi className="h-8 w-8 text-blue-400 animate-pulse" />
+                            SALON EN LIGNE
+                        </h2>
+                        <div className="h-1 w-12 bg-blue-500 mx-auto rounded-full" />
+                    </div>
+
+                    <Card className="glass-premium dark:glass-dark shadow-xl border-t border-white/10 overflow-hidden relative">
+                        {/* Ambient Background */}
+                        <div className="absolute inset-0 bg-blue-500/10 blur-3xl opacity-20 pointer-events-none" />
+
+                        <CardHeader className="text-center relative z-10 pb-2">
+                            <CardTitle className="text-slate-200 text-sm uppercase tracking-widest font-bold">Code d'invitation</CardTitle>
+                            <div className="mt-4 flex items-center justify-center gap-2">
+                                <div className="relative group cursor-pointer"
                                     onClick={() => {
                                         navigator.clipboard.writeText(onlineRoomCode);
                                         setCopyToast({
@@ -967,16 +957,20 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
                                             timestamp: Date.now()
                                         });
                                     }}>
-                                    <span className="text-xl font-mono tracking-wider font-bold text-slate-700 dark:text-slate-300">
-                                        {onlineRoomCode}
-                                    </span>
-                                    <Copy className="h-4 w-4 text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                                    <div className="absolute inset-0 bg-blue-500 blur-md opacity-20 group-hover:opacity-40 transition-opacity rounded-xl" />
+                                    <div className="relative p-4 bg-slate-900/80 border border-blue-500/30 rounded-xl flex items-center justify-center gap-3 min-w-[200px] transition-all group-hover:scale-105 group-hover:border-blue-400">
+                                        <span className="text-4xl font-black tracking-[0.2em] text-white text-shadow-glow">
+                                            {onlineRoomCode}
+                                        </span>
+                                        <Copy className="h-5 w-5 text-slate-400 group-hover:text-white transition-colors" />
+                                    </div>
                                 </div>
+
                                 {navigator.share && (
                                     <Button
                                         variant="outline"
-                                        size="sm"
-                                        className="h-10 px-3 border-blue-300 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                                        size="icon"
+                                        className="h-14 w-14 rounded-xl border-blue-500/30 bg-slate-900/50 hover:bg-blue-500/20 text-blue-400 relative group overflow-hidden"
                                         onClick={() => {
                                             const playerName = onlinePlayers.find(p => p.id === socketId)?.name || 'Un ami';
                                             navigator.share({
@@ -986,53 +980,79 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
                                             }).catch(() => { });
                                         }}
                                     >
-                                        <Share2 className="h-4 w-4" />
+                                        <div className="absolute inset-0 bg-blue-400/20 translate-y-full group-hover:translate-y-0 transition-transform" />
+                                        <Share2 className="h-6 w-6 relative z-10" />
                                     </Button>
                                 )}
                             </div>
-                            <p className="text-xs text-slate-500 mt-1">Partagez ce code avec vos amis</p>
+                            <p className="text-xs text-blue-300/80 mt-3 font-medium">Invitez vos amis avec ce code</p>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+
+                        <CardContent className="space-y-6 relative z-10">
                             <div>
-                                <h3 className="text-sm font-medium text-slate-500 mb-2">Joueurs ({onlinePlayers.length}/8)</h3>
-                                <div className="space-y-2">
+                                <div className="flex items-center justify-between mb-3 px-1">
+                                    <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                                        <Users className="h-4 w-4 text-blue-400" />
+                                        Joueurs ({onlinePlayers.length}/8)
+                                    </h3>
+                                    {onlineIsHost && (
+                                        <span className="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-1 rounded-full border border-amber-500/30 font-bold">
+                                            Voust êtes l'hôte
+                                        </span>
+                                    )}
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
                                     {onlinePlayers.map(p => (
                                         <div key={p.id} className={cn(
-                                            "flex items-center gap-3 p-2 rounded-lg transition-all",
+                                            "flex items-center gap-3 p-3 rounded-xl transition-all border",
                                             p.id === socketId
-                                                ? "bg-emerald-50 dark:bg-emerald-900/20 ring-2 ring-emerald-400/50"
-                                                : "bg-white/50 dark:bg-white/5"
+                                                ? "bg-blue-500/10 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.1)]"
+                                                : "bg-slate-800/40 border-white/5"
                                         )}>
-                                            <div className="w-10 h-10 rounded-full overflow-hidden relative ring-1 ring-white/10 shrink-0 bg-slate-800">
+                                            <div className="w-12 h-12 rounded-xl overflow-hidden relative ring-2 ring-white/10 shrink-0 bg-slate-800 shadow-lg">
                                                 <img
                                                     src={getAvatarPath(p.emoji)}
                                                     alt="Avatar"
                                                     className="w-full h-full object-cover"
                                                     onError={(e) => {
-                                                        // Fallback mechanism: if p.emoji is not a path/ID but an actual emoji char, 
-                                                        // or if load fails, show legacy emoji text or default
                                                         e.target.style.display = 'none';
                                                         e.target.nextSibling.style.display = 'block';
                                                     }}
                                                 />
-                                                {/* Fallback span for legacy emoji support */}
-                                                <span className="hidden absolute inset-0 flex items-center justify-center text-xl bg-slate-100 dark:bg-slate-700">
+                                                <span className="hidden absolute inset-0 flex items-center justify-center text-2xl bg-slate-700">
                                                     {p.emoji || '👤'}
                                                 </span>
                                                 <div className="absolute inset-0 bg-gradient-to-tr from-black/0 via-white/20 to-white/0 opacity-50 pointer-events-none" />
                                             </div>
 
-                                            <span className="font-medium">
-                                                {p.name}
-                                                {p.id === socketId && (
-                                                    <span className="ml-2 text-xs text-emerald-600 dark:text-emerald-400">(Moi)</span>
-                                                )}
-                                            </span>
-                                            {p.isHost && (
-                                                <span className="text-xs bg-gradient-to-r from-amber-200 to-yellow-200 dark:from-amber-800 dark:to-yellow-800 text-amber-800 dark:text-amber-200 px-2 py-0.5 rounded-full ml-auto font-medium">
-                                                    👑 Hôte
-                                                </span>
-                                            )}
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2">
+                                                    <span className={cn(
+                                                        "font-bold text-base",
+                                                        p.id === socketId ? "text-blue-400" : "text-slate-200"
+                                                    )}>
+                                                        {p.name}
+                                                    </span>
+                                                    {p.isHost && (
+                                                        <Trophy className="h-4 w-4 text-amber-400" />
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-1 text-xs text-slate-500">
+                                                    <div className={cn("w-2 h-2 rounded-full", p.id === socketId ? "bg-green-500 animate-pulse" : "bg-green-500/50")} />
+                                                    En ligne
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                    {/* Empty slots placeholders */}
+                                    {Array.from({ length: Math.max(0, 4 - onlinePlayers.length) }).map((_, i) => (
+                                        <div key={`empty-${i}`} className="p-3 rounded-xl border border-dashed border-white/5 bg-white/5 flex items-center gap-3 opacity-50">
+                                            <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center">
+                                                <Users className="h-5 w-5 text-white/20" />
+                                            </div>
+                                            <span className="text-sm font-medium text-slate-500">En attente...</span>
                                         </div>
                                     ))}
                                 </div>
@@ -1040,17 +1060,20 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
 
                             {onlineIsHost ? (
                                 <Button
-                                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg"
-                                    size="lg"
+                                    className="w-full h-14 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-lg text-lg font-black uppercase tracking-widest relative group overflow-hidden transition-all hover:scale-[1.02] hover:shadow-blue-500/25 rounded-xl border border-white/10"
                                     onClick={startOnlineGame}
                                     disabled={onlinePlayers.length < 2}
                                 >
-                                    <Play className="mr-2 h-4 w-4" />
-                                    Lancer la partie
+                                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out skew-y-12" />
+                                    <span className="relative flex items-center gap-2">
+                                        <Play className="h-5 w-5 fill-current" />
+                                        Lancer la partie
+                                    </span>
                                 </Button>
                             ) : (
-                                <div className="text-center p-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg">
-                                    <p className="text-sm text-slate-500 animate-pulse">En attente de l'hôte...</p>
+                                <div className="p-4 rounded-xl bg-slate-900/50 border border-white/10 text-center animate-pulse">
+                                    <p className="text-blue-300 font-medium">En attente de l'hôte...</p>
+                                    <p className="text-xs text-slate-500 mt-1">La partie va bientôt commencer</p>
                                 </div>
                             )}
                         </CardContent>
@@ -1060,40 +1083,41 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
         }
 
         return (
-            <div className="max-w-md mx-auto p-4 space-y-4 animate-in fade-in">
+            <div className="max-w-md mx-auto p-4 space-y-6 animate-in fade-in pt-10">
                 <Button
                     variant="ghost"
                     size="sm"
                     onClick={handleBackToMenu}
-                    className="mb-2"
+                    className="mb-2 text-slate-300 hover:text-white"
                 >
                     <ArrowLeft className="h-4 w-4 mr-1" />
                     Retour
                 </Button>
-                {avatarSelectorComponent}
 
-                <Card className="glass-premium dark:glass-dark shadow-xl">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <Wifi className="h-5 w-5 text-blue-600" />
-                            Connexion
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
+                <div className="text-center mb-6 space-y-1">
+                    <h2 className="text-2xl font-black text-white tracking-tighter flex items-center justify-center gap-2">
+                        <Globe className="h-8 w-8 text-blue-400" />
+                        MULTIJOUEUR
+                    </h2>
+                    <div className="h-1 w-12 bg-blue-500 mx-auto rounded-full" />
+                </div>
+
+                <Card className="glass-premium dark:glass-dark shadow-xl border-t border-white/10">
+                    <CardContent className="space-y-6 pt-6">
                         {onlineError && (
-                            <div className="p-3 bg-red-100 text-red-700 text-sm rounded-lg flex items-center gap-2">
-                                <Info className="h-4 w-4" />
+                            <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-200 text-sm rounded-xl flex items-center gap-2 animate-in slide-in-from-top-2">
+                                <Info className="h-4 w-4 text-red-400" />
                                 {onlineError}
                             </div>
                         )}
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">Votre pseudo</label>
-                            <div className="flex gap-2 items-center">
-                                {/* Avatar Button */}
+                        {/* Player Profile */}
+                        <div className="space-y-3">
+                            <label className="text-xs font-bold uppercase tracking-wider text-blue-200 ml-1">Votre Profil</label>
+                            <div className="flex gap-3 items-center bg-slate-900/40 p-2 rounded-2xl border border-white/5">
                                 <button
                                     onClick={() => setOpenAvatarSelector('online-setup')}
-                                    className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-105 border border-white/10 overflow-hidden relative group bg-slate-800 ring-2 ring-white/5 hover:ring-white/20"
+                                    className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-all hover:scale-105 border-2 border-blue-500/30 overflow-hidden relative group bg-slate-800"
                                 >
                                     <div className="absolute inset-0 bg-white">
                                         <img
@@ -1102,123 +1126,135 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
                                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                             onError={(e) => { e.target.src = '/avatars/cat.png' }}
                                         />
-                                        {/* Glossy Overlay */}
-                                        <div className="absolute inset-0 bg-gradient-to-tr from-black/0 via-white/20 to-white/0 opacity-50 pointer-events-none" />
+                                        <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-transparent pointer-events-none" />
+                                    </div>
+                                    <div className="absolute bottom-0 inset-x-0 h-4 bg-black/60 flex items-center justify-center">
+                                        <Palette className="w-2 h-2 text-white/80" />
                                     </div>
                                 </button>
-                                <Input
-                                    placeholder="Votre pseudo"
-                                    value={myPseudo}
-                                    onChange={(e) => setMyPseudo(e.target.value)}
-                                    className="flex-1 h-10"
-                                    required
-                                    style={{
-                                        borderColor: '#5742e2',
-                                        borderWidth: '2px'
-                                    }}
-                                />
+                                <div className="flex-1">
+                                    <Input
+                                        placeholder="Votre pseudo"
+                                        value={myPseudo}
+                                        onChange={(e) => setMyPseudo(e.target.value)}
+                                        className="h-12 bg-transparent border-0 text-lg font-bold text-white placeholder:text-slate-500 focus-visible:ring-0 px-2"
+                                        required
+                                    />
+                                    <div className="h-0.5 w-full bg-gradient-to-r from-blue-500/50 to-transparent" />
+                                </div>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                            <div className="space-y-2">
-                                <Button
-                                    className="w-full bg-blue-600 hover:bg-blue-700"
-                                    onClick={() => {
-                                        setPlayerInfo(myPseudo || 'Joueur', myAvatarId);
-                                        createRoom();
-                                        // Request notification permission when creating a room
-                                        requestPermission();
-                                    }}
-                                >
-                                    Créer une salle
-                                </Button>
-                                <p className="text-xs text-center text-slate-500">Devenez l'hôte de la partie</p>
-                            </div>
+                        {/* Actions Grid */}
+                        <div className="grid grid-cols-1 gap-3 pt-2">
+                            <Button
+                                className="w-full h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg text-lg font-bold relative group overflow-hidden rounded-xl"
+                                onClick={() => {
+                                    setPlayerInfo(myPseudo || 'Joueur', myAvatarId);
+                                    createRoom();
+                                    requestPermission();
+                                }}
+                            >
+                                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out skew-y-12" />
+                                <span className="relative flex items-center justify-center gap-2">
+                                    <Plus className="h-5 w-5" />
+                                    Créer une partie
+                                </span>
+                            </Button>
 
-                            <div className="space-y-2">
-                                <div className="flex gap-2">
+                            <div className="flex gap-2">
+                                <div className="relative flex-1">
                                     <Input
-                                        placeholder="Code"
+                                        placeholder="CODE"
                                         value={lobbyCode}
                                         onChange={(e) => setLobbyCode(e.target.value.toUpperCase())}
                                         maxLength={4}
-                                        className="text-center font-mono tracking-widest uppercase"
+                                        className="h-12 bg-slate-900/50 border-white/10 text-center font-mono tracking-[0.2em] font-bold text-lg text-white uppercase placeholder:tracking-normal"
                                     />
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => {
-                                            setPlayerInfo(myPseudo || 'Joueur', myAvatarId);
-                                            joinRoom(lobbyCode);
-                                        }}
-                                    >
-                                        Rejoindre
-                                    </Button>
                                 </div>
-                                <p className="text-xs text-center text-slate-500">Entrez le code à 4 lettres</p>
+                                <Button
+                                    className="h-12 px-6 bg-slate-800 hover:bg-slate-700 text-white border border-white/5 rounded-xl transition-all hover:border-blue-500/50"
+                                    onClick={() => {
+                                        setPlayerInfo(myPseudo || 'Joueur', myAvatarId);
+                                        joinRoom(lobbyCode);
+                                    }}
+                                >
+                                    Rejoindre
+                                </Button>
                             </div>
                         </div>
 
-                        {/* Public Lobbies List */}
-                        <div className="pt-4 border-t border-slate-700/50">
-                            <h3 className="text-sm font-medium text-slate-400 mb-3 flex items-center gap-2">
-                                <Users className="h-4 w-4" />
-                                Salons en attente ({publicRooms.length})
-                            </h3>
+                        {/* Public Lobbies & Friends Split */}
+                        <div className="space-y-4 pt-4 border-t border-white/5">
+                            {/* Public Lobbies */}
+                            <div className="space-y-2">
+                                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2 mb-2">
+                                    <Globe className="h-3 w-3 text-blue-400" />
+                                    Salons publics ({publicRooms.length})
+                                </h3>
 
-                            {publicRooms.length === 0 ? (
-                                <div className="text-center p-6 border-2 border-dashed border-slate-700 rounded-xl bg-slate-800/30">
-                                    <p className="text-slate-500 text-sm">Aucun salon public disponible.</p>
-                                    <p className="text-xs text-slate-600 mt-1">Créez une salle pour commencer !</p>
-                                </div>
-                            ) : (
-                                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1 custom-scrollbar">
-                                    {publicRooms.map((room) => (
-                                        <div
-                                            key={room.code}
-                                            className="flex items-center justify-between p-3 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-blue-500/50 rounded-xl transition-all cursor-pointer group"
-                                            onClick={() => {
-                                                setPlayerInfo(myPseudo || 'Joueur', myAvatarId);
-                                                joinRoom(room.code);
-                                            }}
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-xl shadow-inner overflow-hidden">
-                                                    {getAvatarPath(room.emoji) ? (
-                                                        <img
-                                                            src={getAvatarPath(room.emoji)}
-                                                            alt="Host avatar"
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                    ) : (
-                                                        <span>{room.emoji}</span>
-                                                    )}
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-slate-200 text-sm group-hover:text-blue-400 transition-colors">
-                                                        Salon de {room.hostName}
-                                                    </p>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-xs text-slate-500 font-mono bg-slate-900/50 px-1.5 py-0.5 rounded">
-                                                            {room.code}
-                                                        </span>
-                                                        <span className="text-xs text-slate-500 flex items-center gap-1">
-                                                            <Users className="h-3 w-3" />
-                                                            {room.playerCount}/8
-                                                        </span>
+                                {publicRooms.length === 0 ? (
+                                    <div className="text-center p-4 border border-dashed border-slate-700/50 rounded-xl bg-slate-800/20">
+                                        <p className="text-slate-500 text-xs font-medium">Aucun salon public.</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2 max-h-[160px] overflow-y-auto custom-scrollbar pr-1">
+                                        {publicRooms.map((room) => (
+                                            <div
+                                                key={room.code}
+                                                className="flex items-center justify-between p-2 pl-3 bg-slate-800/40 hover:bg-slate-700/60 border border-white/5 hover:border-blue-500/30 rounded-xl transition-all cursor-pointer group"
+                                                onClick={() => {
+                                                    setPlayerInfo(myPseudo || 'Joueur', myAvatarId);
+                                                    joinRoom(room.code);
+                                                }}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center text-sm shadow-inner overflow-hidden ring-1 ring-white/10">
+                                                        {getAvatarPath(room.emoji) ? (
+                                                            <img src={getAvatarPath(room.emoji)} alt="" className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <span>{room.emoji}</span>
+                                                        )}
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-bold text-slate-200 text-xs group-hover:text-blue-300 transition-colors">
+                                                            {room.hostName}
+                                                        </p>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-[10px] text-slate-500 font-mono bg-black/20 px-1 rounded">
+                                                                {room.code}
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs text-slate-500 flex items-center gap-1 bg-black/20 px-2 py-1 rounded-full">
+                                                        <Users className="h-3 w-3" />
+                                                        {room.playerCount}/8
+                                                    </span>
+                                                    <ChevronRight className="h-4 w-4 text-slate-600 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
+                                                </div>
                                             </div>
-                                            <Button
-                                                size="sm"
-                                                className="bg-blue-600/20 text-blue-400 hover:bg-blue-600 hover:text-white"
-                                            >
-                                                Rejoindre
-                                            </Button>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Friends (Mock) */}
+                            <div className="space-y-2 pt-2">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                                        <Users className="h-3 w-3 text-emerald-400" />
+                                        Amis en ligne
+                                    </h3>
+                                    <span className="text-[10px] bg-slate-800 text-slate-500 px-2 py-0.5 rounded-full">Bientôt</span>
                                 </div>
-                            )}
+                                <div className="p-3 bg-slate-800/20 border border-white/5 rounded-xl flex items-center justify-center gap-2 opacity-60">
+                                    <div className="text-xs text-slate-500 text-center">
+                                        Invitez vos amis pour les voir ici !
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
