@@ -1396,12 +1396,12 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
 
                             <div className="flex gap-3 pt-4">
                                 <Button
-                                    variant="outline"
-                                    className="flex-1"
+                                    variant="ghost"
+                                    size="icon"
                                     onClick={handleBackToMenu}
+                                    className="w-10 h-10 rounded-full bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 hover:scale-110 active:scale-95 transition-all shadow-lg"
                                 >
-                                    <ArrowLeft className="h-4 w-4 mr-1" />
-                                    Menu
+                                    <ArrowLeft className="h-5 w-5" />
                                 </Button>
                                 <Button
                                     className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 text-white"
@@ -1544,12 +1544,12 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
 
                         <div className="flex gap-3 pt-2">
                             <Button
-                                variant="outline"
-                                className="flex-1"
+                                variant="ghost"
+                                size="icon"
                                 onClick={handleBackToMenu}
+                                className="w-10 h-10 rounded-full bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 hover:scale-110 active:scale-95 transition-all shadow-lg"
                             >
-                                <ArrowLeft className="h-4 w-4 mr-1" />
-                                Quitter
+                                <ArrowLeft className="h-5 w-5" />
                             </Button>
                             <Button
                                 className="flex-1 bg-skyjo-blue hover:bg-skyjo-blue/90 text-white"

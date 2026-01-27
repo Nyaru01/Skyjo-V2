@@ -388,10 +388,14 @@ export default function Dashboard() {
                         exit="exit"
                         transition={pageTransition}
                     >
-                        <div className="flex items-center gap-2 mb-6 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setActiveTab('settings')}>
-                            <Undo2 className="h-5 w-5 text-slate-400" />
-                            <span className="text-slate-400 font-bold">Retour aux réglages</span>
-                        </div>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setActiveTab('settings')}
+                            className="w-10 h-10 rounded-full bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 hover:scale-110 active:scale-95 transition-all shadow-lg mb-4"
+                        >
+                            <ArrowLeft className="h-5 w-5" />
+                        </Button>
                         <Changelog />
                     </motion.div>
                 );
