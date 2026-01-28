@@ -250,9 +250,12 @@ export const useOnlineGameStore = create((set, get) => ({
                 set({
                     gameStarted: false,
                     gameState: null,
+                    roomCode: null,
+                    players: [],
+                    isHost: false,
                     lastNotification: {
                         type: 'warning',
-                        message: reason,
+                        message: reason + ' - Retour au menu',
                         timestamp: Date.now()
                     }
                 });

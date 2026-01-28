@@ -97,6 +97,7 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
     const onlineIsHost = useOnlineGameStore(s => s.isHost);
     const publicRooms = useOnlineGameStore(s => s.publicRooms);
     const socketId = useOnlineGameStore(s => s.socketId);
+    const getSocketId = useOnlineGameStore(s => s.getSocketId); // Direct access to socket.id
     const onlineLastNotificationRaw = useOnlineGameStore(s => s.lastNotification);
     const lastAction = useOnlineGameStore(s => s.lastAction);
     const onlinePendingAnimation = useOnlineGameStore(s => s.pendingAnimation);
@@ -1291,10 +1292,11 @@ export default function VirtualGame({ initialScreen = 'menu', onBackToMenu }) {
     }
 
     // Calculate the local player's index in the game state
-    // In online mode, find the player matching our socketId
+    // In online mode, find the player matching our socket.id using the direct getter
     // In local/AI mode, player 0 is always the local player
+    const currentSocketId = isOnlineMode ? (getSocketId?.() || socketId) : null;
     const myPlayerIndex = isOnlineMode
-        ? activeGameState.players.findIndex(p => p.id === socketId)
+        ? activeGameState.players.findIndex(p => p.id === currentSocketId)
         : 0;
 
     // Determine the opponent's index (for 2-player games)
