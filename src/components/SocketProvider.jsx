@@ -19,7 +19,12 @@ export function SocketProvider({ children }) {
 
     // Effect 1: Set up socket listeners ONCE
     useEffect(() => {
-        if (listenerSetupRef.current) return;
+        console.log('[SOCKET] SocketProvider Effect 1 triggered, listenerSetupRef:', listenerSetupRef.current);
+
+        if (listenerSetupRef.current) {
+            console.log('[SOCKET] Listeners already set up, skipping');
+            return;
+        }
         listenerSetupRef.current = true;
 
         const handleConnect = () => {
@@ -28,10 +33,14 @@ export function SocketProvider({ children }) {
 
             // Try to register immediately if profile exists
             const profile = useGameStore.getState().userProfile;
+            console.log('[SOCKET] Profile on connect:', profile?.id, profile?.name);
+
             if (profile?.id) {
                 console.log('[SOCKET] Registering on connect:', profile.name);
                 useSocialStore.getState().registerUser(profile.id, profile.name, profile.emoji, profile.vibeId);
                 hasRegisteredRef.current = true;
+            } else {
+                console.log('[SOCKET] No profile.id, skipping registration');
             }
         };
 
@@ -48,16 +57,26 @@ export function SocketProvider({ children }) {
         socket.on('disconnect', onDisconnect);
         socket.on('connect_error', onConnectError);
 
+        console.log('[SOCKET] Socket connected status:', socket.connected);
+
         if (!socket.connected) {
             console.log('[SOCKET] Initiating Global Connection...');
             socket.connect();
         } else {
+            console.log('[SOCKET] Already connected, calling handleConnect');
             handleConnect();
         }
     }, [setSocketId]);
 
     // Effect 2: Register when profile becomes available (if not already registered)
     useEffect(() => {
+        console.log('[SOCKET] Effect 2 - Profile check:', {
+            profileId: userProfile?.id,
+            profileName: userProfile?.name,
+            socketConnected: socket.connected,
+            hasRegistered: hasRegisteredRef.current
+        });
+
         if (userProfile?.id && socket.connected && !hasRegisteredRef.current) {
             console.log('[SOCKET] Late registration (profile loaded):', userProfile.name);
             useSocialStore.getState().registerUser(
