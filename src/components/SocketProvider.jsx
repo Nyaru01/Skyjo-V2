@@ -26,7 +26,7 @@ export function SocketProvider({ children }) {
 
             if (profile?.id && socket?.connected) {
                 console.log('[SOCKET] Auto-registering user on connect:', profile.name);
-                registerUser(profile.id, profile.name, profile.avatarId, profile.vibeId);
+                registerUser(profile.id, profile.name, profile.emoji, profile.vibeId);
             }
         };
 
